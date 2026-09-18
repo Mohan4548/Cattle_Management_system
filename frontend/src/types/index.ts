@@ -446,3 +446,139 @@ export interface OwnershipRecord {
   transfer_notes?: string;
   created_at: string;
 }
+
+// ─── Phase 10A: AI Breeding & Pregnancy Analysis Contracts ─────────────────
+
+export type BreedingStatus = 'NOT_BRED' | 'INSEMINATED' | 'PREGNANT' | 'DELIVERED' | 'FAILED';
+export type PregnancyStatus = 'CONFIRMED' | 'UNCONFIRMED' | 'NOT_PREGNANT' | 'DELIVERED';
+
+export interface BreedingTimelineStage {
+  stage: string;
+  date?: string;
+  status: 'completed' | 'current' | 'upcoming' | 'unconfirmed';
+  description: string;
+}
+
+export interface BreedingHistorySummary {
+  totalBreedingEvents: number;
+  confirmedPregnancies: number;
+  recordedDeliveries: number;
+  breedingSuccessRate: number;
+  latestBreedingDate?: string;
+  latestPregnancyCheckDate?: string;
+  latestCalvingDate?: string;
+}
+
+export interface PregnancyDetails {
+  isPregnant: boolean;
+  daysPregnant?: number;
+  daysRemaining?: number;
+  trimester?: '1st Trimester (Early)' | '2nd Trimester (Mid)' | '3rd Trimester (Late)' | 'Dry Period & Transition';
+  trimesterCode?: 'TRIMESTER_1' | 'TRIMESTER_2' | 'TRIMESTER_3' | 'DRY_PERIOD';
+  progressPercentage?: number;
+  dryOffDate?: string;
+  careRecommendations?: string[];
+}
+
+export interface BreedingInsightResult {
+  cattleId: string;
+  tagNumber: string;
+  name: string;
+  breed: string;
+  gender: CattleGender;
+  age?: string;
+  breedingStatus: BreedingStatus;
+  pregnancyStatus: PregnancyStatus;
+  latestBreedingDate?: string;
+  pregnancyConfirmationDate?: string;
+  estimatedDeliveryDate?: string;
+  estimatedDeliveryWindow?: {
+    start: string;
+    end: string;
+  };
+  dryOffDate?: string;
+  pregnancyDetails: PregnancyDetails;
+  timeline: BreedingTimelineStage[];
+  breedingHistory: BreedingHistorySummary;
+  missingData: string[];
+  insights: string[];
+  analyzedAt: string;
+  disclaimer: string;
+}
+
+// ─── Phase 10C: Farm Breeding Intelligence Interfaces ──────────────────────
+
+export interface FarmBreedingSummary {
+  totalBreedingRecords: number;
+  confirmedPregnancies: number;
+  upcomingDeliveries: number;
+  delivered: number;
+  incompleteRecords: number;
+  hasData: boolean;
+}
+
+export interface FarmPregnancyOverview {
+  confirmed: number;
+  unconfirmed: number;
+  delivered: number;
+  notPregnant: number;
+  unknown: number;
+}
+
+export interface UpcomingDeliveryItem {
+  cattleId: string;
+  cattleTag: string;
+  cattleName: string;
+  breed: string;
+  pregnancyStatus: PregnancyStatus;
+  estimatedDeliveryDate: string;
+  estimatedDeliveryWindow?: { start: string; end: string };
+  dryOffDate?: string;
+  daysRemaining: number;
+}
+
+export interface BreedingAttentionItem {
+  cattleId: string;
+  cattleTag: string;
+  cattleName: string;
+  breed: string;
+  issue: string;
+  relevantDate?: string;
+}
+
+export interface BreedingTrendItem {
+  period: string;
+  count: number;
+}
+
+export interface BreedingDataQuality {
+  totalCattleAnalyzed: number;
+  incompleteRecordsCount: number;
+  missingBreedingDateCount: number;
+  missingPregnancyCheckCount: number;
+  missingDeliveryInfoCount: number;
+  qualityScorePercentage: number;
+}
+
+export interface BreedingPerformanceMetrics {
+  totalBreedingEvents: number;
+  confirmedPregnancies: number;
+  recordedDeliveries: number;
+  pregnancyConfirmationRate: number | null;
+  hasSufficientData: boolean;
+}
+
+export interface FarmBreedingInsightsResult {
+  summary: FarmBreedingSummary;
+  pregnancyOverview: FarmPregnancyOverview;
+  upcomingDeliveries: UpcomingDeliveryItem[];
+  attentionRequired: BreedingAttentionItem[];
+  breedingTrends: BreedingTrendItem[];
+  confirmationTrends: BreedingTrendItem[];
+  dataQuality: BreedingDataQuality;
+  performanceMetrics: BreedingPerformanceMetrics;
+  insights: string[];
+  analyzedAt: string;
+  disclaimer: string;
+}
+

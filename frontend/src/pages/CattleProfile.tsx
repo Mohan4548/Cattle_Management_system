@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { Modal } from '../components/common/Modal';
 import { DigitalIdentityCard } from '../modules/digitalIdentity/components/DigitalIdentityCard';
 import { CattleHealthRiskCard } from '../modules/healthRisk/components/CattleHealthRiskCard';
+import { CattleBreedingInsightCard } from '../modules/breeding/components/CattleBreedingInsightCard';
 import {
   Beef,
   ArrowLeft,
@@ -48,7 +49,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-type TabType = 'timeline' | 'gallery' | 'health' | 'ai-health' | 'milk' | 'identity' | 'purchase' | 'documents';
+type TabType = 'timeline' | 'gallery' | 'health' | 'ai-health' | 'ai-breeding' | 'milk' | 'identity' | 'purchase' | 'documents';
 
 export const CattleProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -219,14 +220,15 @@ export const CattleProfile: React.FC = () => {
   const DOC_TYPES = ['Purchase Invoice','Sale Agreement','Ownership Document','Registration Certificate','Transportation Document','Previous Owner Document','Other Purchase Document'];
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: 'timeline',  label: 'Lifetime Timeline',      icon: <Clock className="w-4 h-4" /> },
-    { id: 'gallery',   label: `Photos (${gallery.length})`, icon: <ImageIcon className="w-4 h-4" /> },
-    { id: 'health',    label: 'Medical Records',         icon: <Stethoscope className="w-4 h-4" /> },
-    { id: 'ai-health', label: 'AI Health Risk',          icon: <Sparkles className="w-4 h-4 text-emerald-500" /> },
-    { id: 'milk',      label: 'Production Logs',         icon: <Milk className="w-4 h-4" /> },
-    { id: 'purchase',  label: 'Purchase Details',        icon: <ShoppingCart className="w-4 h-4" /> },
-    { id: 'documents', label: `Documents (${docs.length})`, icon: <FileText className="w-4 h-4" /> },
-    { id: 'identity',  label: 'Digital Identity & QR',   icon: <QrCode className="w-4 h-4" /> },
+    { id: 'timeline',    label: 'Lifetime Timeline',      icon: <Clock className="w-4 h-4" /> },
+    { id: 'gallery',     label: `Photos (${gallery.length})`, icon: <ImageIcon className="w-4 h-4" /> },
+    { id: 'health',      label: 'Medical Records',         icon: <Stethoscope className="w-4 h-4" /> },
+    { id: 'ai-health',   label: 'AI Health Risk',          icon: <Sparkles className="w-4 h-4 text-emerald-500" /> },
+    { id: 'ai-breeding', label: 'AI Breeding Insights',    icon: <Dna className="w-4 h-4 text-purple-500" /> },
+    { id: 'milk',        label: 'Production Logs',         icon: <Milk className="w-4 h-4" /> },
+    { id: 'purchase',    label: 'Purchase Details',        icon: <ShoppingCart className="w-4 h-4" /> },
+    { id: 'documents',   label: `Documents (${docs.length})`, icon: <FileText className="w-4 h-4" /> },
+    { id: 'identity',    label: 'Digital Identity & QR',   icon: <QrCode className="w-4 h-4" /> },
   ];
 
   return (
@@ -477,6 +479,13 @@ export const CattleProfile: React.FC = () => {
         {activeTab === 'ai-health' && (
           <div className="space-y-4 pt-2">
             <CattleHealthRiskCard cattleId={cattle.id} cattleName={cattle.name} />
+          </div>
+        )}
+
+        {/* Tab Content: AI Breeding Insights */}
+        {activeTab === 'ai-breeding' && (
+          <div className="space-y-4 pt-2">
+            <CattleBreedingInsightCard cattleId={cattle.id} cattleName={cattle.name} />
           </div>
         )}
 

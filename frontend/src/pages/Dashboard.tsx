@@ -140,6 +140,50 @@ const AIHealthSummaryWidget: React.FC = () => {
     </div>
   );
 };
+// ─── AI Breeding Summary Widget ────────────────────────────────────────────────
+const AIBreedingSummaryWidget: React.FC = () => {
+  const navigate = useNavigate();
+  const [summary, setSummary] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    apiClient.get('/farm/breeding-insights')
+      .then(res => setSummary(res.data))
+      .catch(() => {});
+  }, []);
+
+  if (!summary || !summary.summary?.hasData) return null;
+
+  return (
+    <div className="glass-card p-4 rounded-2xl border border-rose-500/20 dark:border-rose-800/40 bg-gradient-to-r from-rose-500/5 via-pink-500/5 to-purple-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <Heart className="w-4 h-4 text-rose-600 dark:text-rose-400 fill-rose-500/20" />
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              AI BREEDING OVERVIEW
+            </span>
+            <span className="px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/60 rounded border border-rose-200 dark:border-rose-800">
+              {summary.summary.confirmedPregnancies} Confirmed Pregnancies
+            </span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+            {summary.summary.upcomingDeliveries} upcoming estimated deliveries • {summary.attentionRequired?.length || 0} attention items
+          </p>
+        </div>
+      </div>
+
+      <button
+        onClick={() => navigate('/ai-insights?tab=breeding')}
+        className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
+      >
+        View AI Breeding Insights →
+      </button>
+    </div>
+  );
+};
+
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -287,6 +331,9 @@ export const Dashboard: React.FC = () => {
 
       {/* AI Health Summary Widget */}
       <AIHealthSummaryWidget />
+
+      {/* AI Breeding Overview Widget */}
+      <AIBreedingSummaryWidget />
 
       {/* ── Quick Actions ── */}
       <div className="card-premium p-4">

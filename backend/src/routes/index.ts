@@ -12,6 +12,7 @@ import * as dashboardController from '../controllers/dashboardController.js';
 import * as digitalIdentityController from '../controllers/digitalIdentityController.js';
 import * as cattleHealthRiskController from '../controllers/cattleHealthRiskController.js';
 import * as notificationController from '../controllers/notificationController.js';
+import * as cattleBreedingAnalysisController from '../controllers/cattleBreedingAnalysisController.js';
 import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -64,6 +65,8 @@ router.get('/health/vitals-trend', authenticateToken, healthController.getVitals
 router.get('/breeding', authenticateToken, breedingController.getBreedingRecords);
 router.post('/breeding', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), breedingController.createBreedingRecord);
 router.post('/breeding/register-calf', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), breedingController.registerCalf);
+router.get('/cattle/:id/breeding-insights', authenticateToken, cattleBreedingAnalysisController.getBreedingInsight);
+router.get('/farm/breeding-insights', authenticateToken, cattleBreedingAnalysisController.getFarmBreedingInsights);
 
 // Feed & Inventory Routes
 router.get('/inventory', authenticateToken, inventoryController.getInventory);

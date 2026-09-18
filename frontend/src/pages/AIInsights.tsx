@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { AIHealthInsightsSummary, CattleAttentionItem, SmartNotification } from '../types';
 import { Badge } from '../components/common/Badge';
+import { FarmBreedingIntelligence } from '../modules/breeding/components/FarmBreedingIntelligence';
 import {
   Sparkles,
   RefreshCw,
@@ -24,7 +25,8 @@ import {
   PieChart as PieIcon,
   Check,
   Bell,
-  CheckCheck
+  CheckCheck,
+  Heart
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -42,11 +44,20 @@ import {
 
 export const AIInsights: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'breeding' ? 'breeding' : 'health';
+  const [activeTab, setActiveTab] = useState<'health' | 'breeding'>(initialTab);
+
   const [data, setData] = useState<AIHealthInsightsSummary | null>(null);
   const [notifications, setNotifications] = useState<SmartNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleTabChange = (tab: 'health' | 'breeding') => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -150,7 +161,38 @@ export const AIInsights: React.FC = () => {
         </button>
       </div>
 
-      {/* Auto-generated AI Summary Banner */}
+      {/* Tab Navigation */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-fit">
+        <button
+          onClick={() => handleTabChange('health')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'health'
+              ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          Health Risk Intelligence
+        </button>
+
+        <button
+          onClick={() => handleTabChange('breeding')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'breeding'
+              ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Heart className="w-4 h-4" />
+          Breeding & Pregnancy Intelligence
+        </button>
+      </div>
+
+      {activeTab === 'breeding' ? (
+        <FarmBreedingIntelligence />
+      ) : (
+        <>
+          {/* Auto-generated AI Summary Banner */}
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 dark:from-emerald-950/40 dark:via-teal-950/40 dark:to-indigo-950/40 border border-emerald-500/20 dark:border-emerald-800/40 flex items-start gap-3.5">
         <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
           <Sparkles className="w-5 h-5" />
@@ -572,6 +614,8 @@ export const AIInsights: React.FC = () => {
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 };
