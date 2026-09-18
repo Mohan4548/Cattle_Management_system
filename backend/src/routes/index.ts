@@ -10,6 +10,8 @@ import * as tasksController from '../controllers/tasksController.js';
 import * as usersController from '../controllers/usersController.js';
 import * as dashboardController from '../controllers/dashboardController.js';
 import * as digitalIdentityController from '../controllers/digitalIdentityController.js';
+import * as cattleHealthRiskController from '../controllers/cattleHealthRiskController.js';
+import * as notificationController from '../controllers/notificationController.js';
 import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -28,7 +30,9 @@ router.post('/dashboard/activity', authenticateToken, dashboardController.logAct
 
 // Cattle Routes
 router.get('/cattle', authenticateToken, cattleController.getCattle);
+router.get('/cattle/:id/health-risk', authenticateToken, cattleHealthRiskController.getHealthRisk);
 router.get('/cattle/:id', authenticateToken, cattleController.getCattleById);
+
 router.post('/cattle', authenticateToken, requireRole(['admin', 'farmer']), cattleController.createCattle);
 router.put('/cattle/:id', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), cattleController.updateCattle);
 router.delete('/cattle/:id', authenticateToken, requireRole(['admin']), cattleController.deleteCattle);
@@ -43,6 +47,7 @@ router.get('/feed', authenticateToken, milkController.getFeedLogs);
 router.post('/feed', authenticateToken, requireRole(['admin', 'farmer', 'worker']), milkController.createFeedLog);
 
 // Health Routes
+router.get('/health/ai-insights', authenticateToken, cattleHealthRiskController.getAIHealthInsights);
 router.get('/health', authenticateToken, healthController.getHealthRecords);
 router.post('/health', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createHealthRecord);
 router.get('/vaccinations', authenticateToken, healthController.getVaccinations);
@@ -75,8 +80,12 @@ router.get('/tasks', authenticateToken, tasksController.getTasks);
 router.post('/tasks', authenticateToken, requireRole(['admin', 'farmer']), tasksController.createTask);
 router.patch('/tasks/:id/status', authenticateToken, tasksController.updateTaskStatus);
 router.get('/tasks/attendance', authenticateToken, tasksController.getAttendance);
-router.post('/tasks/attendance', authenticateToken, requireRole(['admin', 'farmer']), tasksController.markAttendance);
-
+// Smart Notification & AI Health Alert Routes
+router.get('/notifications', authenticateToken, notificationController.getNotifications);
+router.post('/notifications/generate', authenticateToken, notificationController.generateAlerts);
+router.post('/notifications/mark-all-read', authenticateToken, notificationController.markAllAsRead);
+router.patch('/notifications/:id/read', authenticateToken, notificationController.markAsRead);
+router.get('/cattle/:id/alerts', authenticateToken, notificationController.getCattleAlerts);
 
 // Purchase Document Routes
 router.get('/cattle/:id/purchase-documents', authenticateToken, cattleController.getPurchaseDocuments);

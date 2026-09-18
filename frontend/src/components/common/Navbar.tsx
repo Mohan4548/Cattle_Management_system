@@ -22,15 +22,17 @@ import {
   Menu,
   ChevronRight,
 } from 'lucide-react';
-import { UserRole } from '../../types';
+import { UserRole, SmartNotification } from '../../types';
+import { apiClient } from '../../api/client';
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
 }
 
 const PAGE_TITLES: Record<string, { title: string; crumb: string }> = {
-  '/dashboard':  { title: 'Dashboard',          crumb: 'Dashboard' },
-  '/cattle':     { title: 'Cattle',             crumb: 'Cattle' },
+  '/dashboard':   { title: 'Dashboard',          crumb: 'Dashboard' },
+  '/ai-insights': { title: 'AI Health Insights', crumb: 'AI Insights' },
+  '/cattle':      { title: 'Cattle',             crumb: 'Cattle' },
   '/milk':       { title: 'Milk Records',       crumb: 'Milk Records' },
   '/health':     { title: 'Health & Vet',       crumb: 'Health' },
   '/breeding':   { title: 'Breeding',           crumb: 'Breeding' },
@@ -44,33 +46,6 @@ const PAGE_TITLES: Record<string, { title: string; crumb: string }> = {
   '/qr-scanner': { title: 'QR Scanner',         crumb: 'QR Scanner' },
 };
 
-const NOTIFICATIONS = [
-  {
-    id: '1',
-    title: 'Emergency Visit Needed',
-    desc: 'Lakshmi (FE-103) — Mastitis check requested.',
-    time: '10m ago',
-    type: 'urgent' as const,
-    read: false,
-  },
-  {
-    id: '2',
-    title: 'Milk Logged Today',
-    desc: 'Morning yield: 38.5 L recorded.',
-    time: '1h ago',
-    type: 'success' as const,
-    read: false,
-  },
-  {
-    id: '3',
-    title: 'Vaccination Due Tomorrow',
-    desc: 'Anthrax booster for Veera (Hallikar).',
-    time: '3h ago',
-    type: 'warning' as const,
-    read: true,
-  },
-];
-
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   const { user, switchRole, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -82,16 +57,77 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   const [isOnline, setIsOnline]           = useState(navigator.onLine);
   const [isNotifOpen, setIsNotifOpen]     = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<SmartNotification[]>([]);
+  const [loadingNotifs, setLoadingNotifs] = useState(false);
 
   const notifRef   = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoadingNotifs(true);
+      // First generate any new alerts based on current health risk data
+      await apiClient.post('/notifications/generate').catch(() => {});
+      const res = await apiClient.get('/notifications');
+      setNotifications(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    } finally {
+      setLoadingNotifs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000); // refresh every minute
+    return () => clearInterval(interval);
+  }, []);
 
   const pageInfo = Object.entries(PAGE_TITLES).find(
     ([path]) => location.pathname === path || (path !== '/dashboard' && location.pathname.startsWith(path))
   )?.[1];
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => n.status === 'UNREAD').length;
+
+  const markAllRead = async () => {
+    try {
+      await apiClient.post('/notifications/mark-all-read');
+      setNotifications((prev) => prev.map((n) => ({ ...n, status: 'READ' as const })));
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+    }
+  };
+
+  const handleNotificationClick = async (notif: SmartNotification) => {
+    if (notif.status === 'UNREAD') {
+      try {
+        await apiClient.patch(`/notifications/${notif.id}/read`);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notif.id ? { ...n, status: 'READ' as const } : n))
+        );
+      } catch (err) {
+        console.error('Failed to mark notification read:', err);
+      }
+    }
+    setIsNotifOpen(false);
+    if (notif.action_url) {
+      navigate(notif.action_url);
+    } else if (notif.cattle_id) {
+      navigate(`/cattle/${notif.cattle_id}`);
+    }
+  };
+
+  const formatNotifTime = (dateStr: string) => {
+    try {
+      const diffSec = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (diffSec < 60) return 'Just now';
+      if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+      return `${Math.floor(diffSec / 86400)}d ago`;
+    } catch {
+      return '';
+    }
+  };
 
   // Network detection
   useEffect(() => {
@@ -129,20 +165,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     recognition.onerror  = () => setIsListening(false);
     recognition.onend    = () => setIsListening(false);
     recognition.start();
-  };
-
-  const markAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-
-  const notifIcon = {
-    urgent:  <AlertTriangle className="w-3.5 h-3.5 text-[var(--accent-rose)]" />,
-    success: <CheckCircle2  className="w-3.5 h-3.5 text-[var(--accent-green)]" />,
-    warning: <Info          className="w-3.5 h-3.5 text-[var(--accent-amber)]" />,
-  };
-
-  const notifBg = {
-    urgent:  'bg-[var(--accent-rose-subtle)]  border-[var(--accent-rose)]/20',
-    success: 'bg-[var(--accent-green-subtle)] border-[var(--accent-green)]/20',
-    warning: 'bg-[var(--accent-amber-subtle)] border-[var(--accent-amber)]/20',
   };
 
   return (
@@ -327,31 +349,64 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
               </div>
 
               {/* Notification list */}
-              <div className="divide-y divide-[var(--border-card)] max-h-72 overflow-y-auto">
-                {notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={`notif-item ${n.read ? 'notif-read' : 'notif-unread'}`}
-                  >
-                    <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${notifBg[n.type]}`}>
-                      {notifIcon[n.type]}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-xs font-semibold text-[var(--text-primary)] leading-snug">{n.title}</p>
-                        <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-0.5">{n.time}</span>
+              <div className="divide-y divide-[var(--border-card)] max-h-80 overflow-y-auto">
+                {loadingNotifs ? (
+                  <div className="p-4 text-center text-xs text-[var(--text-muted)]">Loading alerts...</div>
+                ) : notifications.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-[var(--text-muted)]">No active notifications</div>
+                ) : (
+                  notifications.map((n) => {
+                    const isUnread = n.status === 'UNREAD';
+                    const isCritical = n.priority === 'CRITICAL' || n.priority === 'HIGH';
+                    const iconColor = n.priority === 'CRITICAL' ? 'text-[var(--accent-rose)]' :
+                                      n.priority === 'HIGH' ? 'text-[var(--accent-amber)]' : 'text-[var(--accent-green)]';
+                    const iconBg = n.priority === 'CRITICAL' ? 'bg-[var(--accent-rose-subtle)] border-[var(--accent-rose)]/20' :
+                                   n.priority === 'HIGH' ? 'bg-[var(--accent-amber-subtle)] border-[var(--accent-amber)]/20' :
+                                   'bg-[var(--accent-green-subtle)] border-[var(--accent-green)]/20';
+
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => handleNotificationClick(n)}
+                        className={`p-3 cursor-pointer transition-colors flex items-start gap-2.5 hover:bg-[var(--bg-tertiary)] ${
+                          isUnread ? 'bg-[var(--accent-green-subtle)]/30 font-medium' : 'opacity-85'
+                        }`}
+                      >
+                        <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${iconBg}`}>
+                          {isCritical ? <AlertTriangle className={`w-3.5 h-3.5 ${iconColor}`} /> : <CheckCircle2 className={`w-3.5 h-3.5 ${iconColor}`} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-1">
+                            <p className="text-xs font-semibold text-[var(--text-primary)] leading-snug truncate">
+                              {n.title}
+                            </p>
+                            <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap mt-0.5">
+                              {formatNotifTime(n.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 leading-snug line-clamp-2">
+                            {n.message}
+                          </p>
+                          {n.recommended_action && (
+                            <p className="text-[10px] text-[var(--accent-green-dark)] font-medium mt-1 truncate">
+                              💡 {n.recommended_action}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 leading-snug">{n.desc}</p>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                )}
               </div>
 
               {/* Panel footer */}
               <div className="px-4 py-2.5 border-t border-[var(--border-card)]"
                 style={{ background: 'linear-gradient(135deg, var(--bg-tertiary), var(--bg-card))' }}>
-                <button className="text-[11px] font-semibold w-full text-center transition-colors text-[var(--text-secondary)] hover:text-[var(--accent-green)]">
-                  View all notifications →
+                <button
+                  onClick={() => { setIsNotifOpen(false); navigate('/ai-insights'); }}
+                  className="text-[11px] font-semibold w-full text-center transition-colors text-[var(--text-secondary)] hover:text-[var(--accent-green)]"
+                >
+                  View AI Insights & Alerts →
                 </button>
               </div>
             </div>

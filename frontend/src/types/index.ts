@@ -7,6 +7,109 @@ export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type TaskStatus = 'todo' | 'in_progress' | 'completed';
 export type TransactionType = 'income' | 'expense';
 export type QRStatus = 'pending' | 'active' | 'inactive';
+export type HealthRiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+export type HealthRiskConfidence = 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface ExplainableFactor {
+  factor: string;
+  impact: 'High' | 'Medium' | 'Low';
+  description: string;
+}
+
+export interface HealthRiskInputSummary {
+  age?: string;
+  breed?: string;
+  gender?: CattleGender;
+  weight_kg?: number;
+  health_status?: HealthStatus;
+  lactation_stage?: LactationStage;
+  recent_vitals?: {
+    body_temp_c?: number;
+    heart_rate_bpm?: number;
+  };
+  total_health_records?: number;
+  active_health_records?: number;
+  vaccinations_count?: number;
+  doctor_visits_count?: number;
+  is_pregnant?: boolean;
+}
+
+export interface HealthRiskResult {
+  cattleId: string;
+  riskLevel: HealthRiskLevel;
+  riskScore: number;
+  confidence: HealthRiskConfidence;
+  keyFactors: ExplainableFactor[];
+  recommendations: string[];
+  analyzedAt: string;
+  safetyNotice: string;
+  inputSummary: HealthRiskInputSummary;
+}
+
+export interface CattleAttentionItem {
+  id: string;
+  tag_number: string;
+  name: string;
+  breed: string;
+  riskLevel: HealthRiskLevel;
+  riskScore: number;
+  confidence: HealthRiskConfidence;
+  mainFactor: string;
+  factorDescription: string;
+  lastAnalysis: string;
+}
+
+export interface AIHealthInsightsSummary {
+  totalAnalyzed: number;
+  lowRiskCount: number;
+  mediumRiskCount: number;
+  highRiskCount: number;
+  insufficientDataCount: number;
+  healthDataCoverage: number;
+  riskDistribution: { name: string; value: number; color: string }[];
+  cattleRequiringAttention: CattleAttentionItem[];
+  highRiskCattle: CattleAttentionItem[];
+  mediumRiskCattle: CattleAttentionItem[];
+  recentAnalyses: HealthRiskResult[];
+  vaccinationInsights: {
+    dueSoonCount: number;
+    overdueCount: number;
+    totalVaccinations: number;
+  };
+  aiSummary: string;
+  healthTrends: { date: string; temp: number; heartRate: number; activeRecords: number }[];
+  hasHistoricalData: boolean;
+}
+
+export type NotificationPriority = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'INFO';
+export type NotificationType =
+  | 'RISK_HIGH'
+  | 'RISK_TRANSITION'
+  | 'VACCINATION_DUE'
+  | 'TREATMENT_FOLLOWUP'
+  | 'REPEATED_CONCERN';
+export type NotificationStatus = 'UNREAD' | 'READ' | 'ARCHIVED';
+
+export interface SmartNotification {
+  id: string;
+  cattle_id?: string;
+  cattle_tag?: string;
+  cattle_name?: string;
+  type: NotificationType;
+  priority: NotificationPriority;
+  title: string;
+  message: string;
+  trigger_reason: string;
+  recommended_action: string;
+  status: NotificationStatus;
+  risk_level?: HealthRiskLevel;
+  key_factors?: string[];
+  action_url?: string;
+  created_at: string;
+}
+
+
+
 
 export interface UserProfile {
   id: string;

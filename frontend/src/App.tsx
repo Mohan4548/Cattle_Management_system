@@ -22,6 +22,7 @@ import { ForgotPassword } from './pages/ForgotPassword';
 
 // Protected SaaS App Pages
 import { Dashboard } from './pages/Dashboard';
+import { AIInsights } from './pages/AIInsights';
 import { HerdDirectory } from './pages/HerdDirectory';
 import { CattleProfile } from './pages/CattleProfile';
 import { MilkYield } from './pages/MilkYield';
@@ -74,6 +75,14 @@ export const App: React.FC = () => {
                       element={
                         <DashboardLayout>
                           <Dashboard />
+                        </DashboardLayout>
+                      }
+                    />
+                    <Route
+                      path="/ai-insights"
+                      element={
+                        <DashboardLayout>
+                          <AIInsights />
                         </DashboardLayout>
                       }
                     />
@@ -134,6 +143,14 @@ export const App: React.FC = () => {
                       }
                     />
                     <Route
+                      path="/purchases"
+                      element={
+                        <DashboardLayout>
+                          <Purchases />
+                        </DashboardLayout>
+                      }
+                    />
+                    <Route
                       path="/tasks"
                       element={
                         <DashboardLayout>
@@ -166,14 +183,6 @@ export const App: React.FC = () => {
                       }
                     />
                     <Route
-                      path="/purchases"
-                      element={
-                        <DashboardLayout>
-                          <Purchases />
-                        </DashboardLayout>
-                      }
-                    />
-                    <Route
                       path="/qr-scanner"
                       element={
                         <DashboardLayout>
@@ -183,8 +192,9 @@ export const App: React.FC = () => {
                     />
                   </Route>
 
-                  {/* Fallback */}
-                  <Route path="*" element={<NotFound />} />
+                  {/* Fallback & 404 */}
+                  <Route path="/404" element={<NotFound />} />
+                  <Route path="*" element={<Navigate to="/404" replace />} />
                 </Routes>
               </BrowserRouter>
             </ToastProvider>

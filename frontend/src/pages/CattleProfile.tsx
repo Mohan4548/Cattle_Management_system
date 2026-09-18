@@ -6,6 +6,7 @@ import { Badge } from '../components/common/Badge';
 import { useAuth } from '../context/AuthContext';
 import { Modal } from '../components/common/Modal';
 import { DigitalIdentityCard } from '../modules/digitalIdentity/components/DigitalIdentityCard';
+import { CattleHealthRiskCard } from '../modules/healthRisk/components/CattleHealthRiskCard';
 import {
   Beef,
   ArrowLeft,
@@ -47,7 +48,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-type TabType = 'timeline' | 'gallery' | 'health' | 'milk' | 'identity' | 'purchase' | 'documents';
+type TabType = 'timeline' | 'gallery' | 'health' | 'ai-health' | 'milk' | 'identity' | 'purchase' | 'documents';
 
 export const CattleProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -221,6 +222,7 @@ export const CattleProfile: React.FC = () => {
     { id: 'timeline',  label: 'Lifetime Timeline',      icon: <Clock className="w-4 h-4" /> },
     { id: 'gallery',   label: `Photos (${gallery.length})`, icon: <ImageIcon className="w-4 h-4" /> },
     { id: 'health',    label: 'Medical Records',         icon: <Stethoscope className="w-4 h-4" /> },
+    { id: 'ai-health', label: 'AI Health Risk',          icon: <Sparkles className="w-4 h-4 text-emerald-500" /> },
     { id: 'milk',      label: 'Production Logs',         icon: <Milk className="w-4 h-4" /> },
     { id: 'purchase',  label: 'Purchase Details',        icon: <ShoppingCart className="w-4 h-4" /> },
     { id: 'documents', label: `Documents (${docs.length})`, icon: <FileText className="w-4 h-4" /> },
@@ -471,9 +473,17 @@ export const CattleProfile: React.FC = () => {
           </div>
         )}
 
+        {/* Tab Content: AI Health Risk */}
+        {activeTab === 'ai-health' && (
+          <div className="space-y-4 pt-2">
+            <CattleHealthRiskCard cattleId={cattle.id} cattleName={cattle.name} />
+          </div>
+        )}
+
         {/* Tab Content 3: Health – full per-cattle panel */}
         {activeTab === 'health' && (
           <div className="space-y-5 pt-2">
+            <CattleHealthRiskCard cattleId={cattle.id} cattleName={cattle.name} />
 
             {/* Header row */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

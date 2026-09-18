@@ -97,6 +97,50 @@ const PurchaseSummaryStrip: React.FC = () => {
   );
 };
 
+// ─── AI Health Summary Widget ──────────────────────────────────────────────────
+const AIHealthSummaryWidget: React.FC = () => {
+  const navigate = useNavigate();
+  const [summary, setSummary] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    apiClient.get('/health/ai-insights')
+      .then(res => setSummary(res.data))
+      .catch(() => {});
+  }, []);
+
+  if (!summary) return null;
+
+  return (
+    <div className="glass-card p-4 rounded-2xl border border-emerald-500/20 dark:border-emerald-800/40 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-indigo-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <Sparkles className="w-4 h-4 animate-pulse text-emerald-600 dark:text-emerald-400" />
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              AI HEALTH SUMMARY
+            </span>
+            <span className="px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 rounded border border-emerald-200 dark:border-emerald-800">
+              {summary.healthDataCoverage}% Coverage
+            </span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+            {summary.cattleRequiringAttention?.length || 0} cattle require attention ({summary.highRiskCount || 0} High, {summary.mediumRiskCount || 0} Medium risk)
+          </p>
+        </div>
+      </div>
+
+      <button
+        onClick={() => navigate('/ai-insights')}
+        className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
+      >
+        View AI Insights →
+      </button>
+    </div>
+  );
+};
+
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -240,6 +284,9 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI Health Summary Widget */}
+      <AIHealthSummaryWidget />
 
       {/* ── Quick Actions ── */}
       <div className="card-premium p-4">
