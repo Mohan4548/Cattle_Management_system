@@ -47,6 +47,7 @@ import {
   Thermometer,
   Activity,
   AlertTriangle,
+  Heart,
 } from 'lucide-react';
 
 type TabType = 'timeline' | 'gallery' | 'health' | 'ai-health' | 'ai-breeding' | 'milk' | 'identity' | 'purchase' | 'documents';
@@ -56,6 +57,7 @@ export const CattleProfile: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [cattle, setCattle]           = useState<Cattle | null>(null);
+  const [breedingInsight, setBreedingInsight] = useState<any>(null);
   const [activeTab, setActiveTab]     = useState<TabType>('timeline');
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [loading, setLoading]         = useState(true);
@@ -126,8 +128,19 @@ export const CattleProfile: React.FC = () => {
     }
   };
 
+  const fetchBreedingInsight = async () => {
+    if (!id) return;
+    try {
+      const res = await apiClient.get(`/cattle/${id}/breeding-insights`);
+      setBreedingInsight(res.data);
+    } catch {
+      // Non-critical
+    }
+  };
+
   useEffect(() => {
     fetchCattle();
+    fetchBreedingInsight();
   }, [id]);
 
   // Lazy-load health data when health tab is first opened
@@ -405,6 +418,55 @@ export const CattleProfile: React.FC = () => {
             <p className="font-bold text-slate-900 dark:text-white mt-0.5">₹{(cattle.purchase_cost || 85000).toLocaleString('en-IN')}</p>
           </div>
         </div>
+
+        {/* Compact Breeding Reminders Section */}
+        {((cattle.gender || '').toLowerCase() === 'female' || (cattle.gender || '').toLowerCase() === 'cow') && (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-500/10 via-pink-500/5 to-purple-500/10 border border-rose-500/20 dark:border-rose-900/40 text-xs space-y-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Heart className="w-4 h-4 text-rose-500" />
+                Breeding Reminders & Pregnancy Overview
+              </span>
+              <button
+                onClick={() => setActiveTab('ai-breeding')}
+                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+              >
+                View Breeding Insights →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div className="p-2.5 rounded-xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Upcoming Reminder</span>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                  {breedingInsight?.pregnancyStatus === 'CONFIRMED'
+                    ? (breedingInsight?.estimatedDeliveryDate ? `Est. delivery scheduled on ${breedingInsight.estimatedDeliveryDate}` : 'Active pregnancy monitoring')
+                    : breedingInsight?.pregnancyStatus === 'UNCONFIRMED'
+                    ? 'Pregnancy confirmation check is pending'
+                    : breedingInsight?.pregnancyStatus === 'DELIVERED'
+                    ? 'Delivery completed. Post-calving care.'
+                    : 'No active breeding reminder'}
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Estimated Delivery</span>
+                <p className="font-bold text-rose-600 dark:text-rose-400 mt-0.5">
+                  {breedingInsight?.estimatedDeliveryDate || 'N/A (Not pregnant)'}
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Follow-up & Data Status</span>
+                <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5">
+                  {breedingInsight?.missingData && breedingInsight.missingData.length > 0
+                    ? `Incomplete: ${breedingInsight.missingData[0]}`
+                    : 'Records up to date'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 print:hidden overflow-x-auto">

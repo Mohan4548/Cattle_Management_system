@@ -39,6 +39,7 @@ import {
 export const FarmBreedingIntelligence: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<FarmBreedingInsightsResult | null>(null);
+  const [breedingNotifications, setBreedingNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +55,19 @@ export const FarmBreedingIntelligence: React.FC = () => {
     setError(null);
 
     try {
-      const res = await apiClient.get('/farm/breeding-insights');
+      const [res, notifRes] = await Promise.all([
+        apiClient.get('/farm/breeding-insights'),
+        apiClient.get('/notifications').catch(() => ({ data: [] }))
+      ]);
       setData(res.data);
+      const notifs = Array.isArray(notifRes.data) ? notifRes.data : [];
+      const bNotifs = notifs.filter((n: any) =>
+        n.type?.startsWith('delivery_') ||
+        n.type?.startsWith('pregnancy_') ||
+        n.type?.startsWith('missing_') ||
+        n.type?.startsWith('breeding_')
+      );
+      setBreedingNotifications(bNotifs);
     } catch (err: any) {
       console.error('Error fetching farm breeding insights:', err);
       setError('Unable to load farm breeding insights. Please try again.');
@@ -354,6 +366,88 @@ export const FarmBreedingIntelligence: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Upcoming Breeding & Pregnancy Actions Table / Section */}
+      <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-rose-500" />
+              Upcoming Breeding & Pregnancy Actions
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Smart notifications and automated action reminders derived from active farm breeding records.
+            </p>
+          </div>
+          <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+            {breedingNotifications.length > 0 ? `${breedingNotifications.length} Action(s)` : '0 Actions'}
+          </span>
+        </div>
+
+        {breedingNotifications.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                  <th className="py-2.5 px-3">Cattle</th>
+                  <th className="py-2.5 px-3">Action / Reminder</th>
+                  <th className="py-2.5 px-3">Priority</th>
+                  <th className="py-2.5 px-3">Status</th>
+                  <th className="py-2.5 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {breedingNotifications.map((notif: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-3 px-3">
+                      <div className="font-bold text-slate-900 dark:text-white">{notif.cattle_name}</div>
+                      <div className="text-[10px] font-mono text-slate-400">{notif.cattle_tag}</div>
+                    </td>
+                    <td className="py-3 px-3 max-w-xs">
+                      <div className="font-semibold text-slate-900 dark:text-white">{notif.title}</div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{notif.description}</div>
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase ${
+                        notif.priority === 'high'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200'
+                          : notif.priority === 'medium'
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200'
+                          : 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200'
+                      }`}>
+                        {notif.priority}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className="capitalize text-slate-600 dark:text-slate-400 font-semibold text-[11px]">
+                        {notif.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      <button
+                        onClick={() => navigate(notif.action_url || `/cattle/${notif.cattle_id}`)}
+                        className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-all cursor-pointer inline-flex items-center gap-1"
+                      >
+                        <Eye className="w-3 h-3" /> View Cattle
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-6 px-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-800">
+            <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              No pending breeding actions
+            </h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              All reproductive timeline alerts and pregnancy reminders are currently up to date.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Breeding Attention Section */}

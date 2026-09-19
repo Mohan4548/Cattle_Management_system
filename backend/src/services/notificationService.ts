@@ -1,5 +1,6 @@
 import { store } from './store.js';
 import { cattleHealthRiskService } from './cattleHealthRiskService.js';
+import { cattleBreedingAnalysisService } from './cattleBreedingAnalysisService.js';
 import {
   SmartNotification,
   NotificationType,
@@ -228,6 +229,184 @@ export class NotificationService {
   }
 
   /**
+   * Evaluates Smart Breeding & Pregnancy Reminders (Phase 10D)
+   */
+  public async evaluateBreedingReminders(): Promise<SmartNotification[]> {
+    const allCattle = store.cattle || [];
+    const femaleCattle = allCattle.filter(
+      (c: any) => (c.gender || '').toLowerCase() === 'female' || (c.gender || '').toLowerCase() === 'cow'
+    );
+    const targetCattle = femaleCattle.length > 0 ? femaleCattle : allCattle;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayMs = new Date(todayStr).getTime();
+    const newAlerts: SmartNotification[] = [];
+
+    for (const cattle of targetCattle) {
+      try {
+        const insight = await cattleBreedingAnalysisService.getBreedingInsight(cattle.id);
+        const cattleName = cattle.name || insight.name || 'Cattle';
+        const cattleTag = cattle.tag_number || cattle.tag_id || insight.tagNumber || 'FE-UNKNOWN';
+
+        // 1. DELIVERY RECORDED check
+        if (insight.pregnancyStatus === 'DELIVERED') {
+          // Delivery recorded: Stop future pregnancy reminders for this cycle.
+          // Resolve any active estimated delivery notifications for this cattle
+          if (store.notifications) {
+            store.notifications.forEach((n: SmartNotification) => {
+              if (
+                n.cattle_id === cattle.id &&
+                (n.type === 'delivery_approaching' || n.type === 'delivery_due_soon' || n.type === 'delivery_date_passed' || n.type === 'pregnancy_followup_due') &&
+                n.status !== 'resolved'
+              ) {
+                n.status = 'resolved';
+              }
+            });
+          }
+          continue; // Skip generating further pregnancy reminders for delivered cattle
+        }
+
+        // 2. ESTIMATED DELIVERY REMINDERS (Only when valid estimated delivery date exists)
+        if (insight.estimatedDeliveryDate) {
+          const delDateStr = insight.estimatedDeliveryDate;
+          const delDateMs = new Date(delDateStr).getTime();
+          const diffDays = Math.ceil((delDateMs - todayMs) / (1000 * 60 * 60 * 24));
+
+          // Scenario A: Estimated Delivery Date Passed (delDateStr < todayStr and no delivery recorded)
+          if (delDateStr < todayStr) {
+            if (!this.hasRecentDuplicateAlert(cattle.id, 'delivery_date_passed')) {
+              newAlerts.push({
+                id: `notif-brd-passed-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                cattle_id: cattle.id,
+                cattle_name: cattleName,
+                cattle_tag: cattleTag,
+                type: 'delivery_date_passed',
+                priority: 'high',
+                title: `Estimated Delivery Date Passed: ${cattleName}`,
+                description: `The estimated delivery date for ${cattleName} has passed. Please review the breeding and delivery records.`,
+                recommended_action: 'Review breeding and delivery records. Confirm calving status.',
+                status: 'unread',
+                action_url: `/cattle/${cattle.id}`,
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+          // Scenario B: Delivery Due Soon (0 to 7 days remaining or date reached)
+          else if (diffDays >= 0 && diffDays <= 7) {
+            if (!this.hasRecentDuplicateAlert(cattle.id, 'delivery_due_soon')) {
+              newAlerts.push({
+                id: `notif-brd-soon-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                cattle_id: cattle.id,
+                cattle_name: cattleName,
+                cattle_tag: cattleTag,
+                type: 'delivery_due_soon',
+                priority: 'high',
+                title: `Delivery Due Soon: ${cattleName}`,
+                description: `Estimated delivery approaching for ${cattleName}. Estimated delivery date: ${delDateStr}. Please review the breeding, health, and preparation records.`,
+                recommended_action: 'Prepare clean calving pen and monitor cow closely.',
+                status: 'unread',
+                action_url: `/cattle/${cattle.id}`,
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+          // Scenario C: Delivery Approaching (8 to 30 days remaining)
+          else if (diffDays > 7 && diffDays <= 30) {
+            if (!this.hasRecentDuplicateAlert(cattle.id, 'delivery_approaching')) {
+              newAlerts.push({
+                id: `notif-brd-app-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                cattle_id: cattle.id,
+                cattle_name: cattleName,
+                cattle_tag: cattleTag,
+                type: 'delivery_approaching',
+                priority: 'medium',
+                title: `Estimated Delivery Approaching: ${cattleName}`,
+                description: `Estimated delivery approaching for ${cattleName}. Estimated delivery date: ${delDateStr}. Please review the breeding, health, and preparation records.`,
+                recommended_action: 'Schedule pre-calving diet adjustment and dry-off check.',
+                status: 'unread',
+                action_url: `/cattle/${cattle.id}`,
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+        }
+
+        // 3. PREGNANCY FOLLOW-UP REMINDER
+        if (insight.pregnancyStatus === 'CONFIRMED') {
+          // If pregnancy confirmed but follow-up check or transition check needed
+          if (insight.dryOffDate && insight.dryOffDate <= todayStr) {
+            if (!this.hasRecentDuplicateAlert(cattle.id, 'pregnancy_followup_due')) {
+              newAlerts.push({
+                id: `notif-brd-fol-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                cattle_id: cattle.id,
+                cattle_name: cattleName,
+                cattle_tag: cattleTag,
+                type: 'pregnancy_followup_due',
+                priority: 'medium',
+                title: `Pregnancy Follow-up Due: ${cattleName}`,
+                description: `Pregnancy follow-up is due for ${cattleName}. Please review the breeding and pregnancy records.`,
+                recommended_action: 'Conduct transition dry-off check and prenatal vitals evaluation.',
+                status: 'unread',
+                action_url: `/cattle/${cattle.id}`,
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+        }
+
+        // 4. MISSING PREGNANCY CONFIRMATION REMINDER
+        if (insight.pregnancyStatus === 'UNCONFIRMED' && insight.latestBreedingDate) {
+          const bDateMs = new Date(insight.latestBreedingDate).getTime();
+          const daysSinceBreeding = Math.floor((todayMs - bDateMs) / (1000 * 60 * 60 * 24));
+          if (daysSinceBreeding >= 21) {
+            if (!this.hasRecentDuplicateAlert(cattle.id, 'missing_pregnancy_confirmation')) {
+              newAlerts.push({
+                id: `notif-brd-conf-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                cattle_id: cattle.id,
+                cattle_name: cattleName,
+                cattle_tag: cattleTag,
+                type: 'missing_pregnancy_confirmation',
+                priority: 'medium',
+                title: `Pregnancy Confirmation Missing: ${cattleName}`,
+                description: `Pregnancy confirmation has not been recorded for ${cattleName}. Please update the breeding record if confirmation is available.`,
+                recommended_action: 'Schedule ultrasound or clinical rectal palpation pregnancy check.',
+                status: 'unread',
+                action_url: `/cattle/${cattle.id}`,
+                created_at: new Date().toISOString()
+              });
+            }
+          }
+        }
+
+        // 5. BREEDING RECORD COMPLETION REMINDER
+        if (insight.missingData && insight.missingData.length > 0 && insight.pregnancyStatus !== 'NOT_PREGNANT') {
+          if (!this.hasRecentDuplicateAlert(cattle.id, 'breeding_record_incomplete')) {
+            newAlerts.push({
+              id: `notif-brd-inc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+              cattle_id: cattle.id,
+              cattle_name: cattleName,
+              cattle_tag: cattleTag,
+              type: 'breeding_record_incomplete',
+              priority: 'low',
+              title: `Incomplete Breeding Record: ${cattleName}`,
+              description: `Breeding record for ${cattleName} is incomplete. Review and update the available breeding information.`,
+              recommended_action: `Update missing data point: ${insight.missingData[0]}.`,
+              status: 'unread',
+              action_url: `/cattle/${cattle.id}`,
+              created_at: new Date().toISOString()
+            });
+          }
+        }
+
+      } catch (err) {
+        // Silently handle any missing breeding cattle errors
+      }
+    }
+
+    return newAlerts;
+  }
+
+  /**
    * Main evaluator: Runs deduplicated alert generation across all rules
    */
   public async generateAllAlerts(): Promise<SmartNotification[]> {
@@ -239,8 +418,9 @@ export class NotificationService {
     const vacAlerts = this.evaluateVaccinationAlerts();
     const trtAlerts = this.evaluateTreatmentAlerts();
     const repAlerts = this.evaluateRepeatedHealthConcernAlerts();
+    const brdAlerts = await this.evaluateBreedingReminders();
 
-    const allNew = [...aiAlerts, ...vacAlerts, ...trtAlerts, ...repAlerts];
+    const allNew = [...aiAlerts, ...vacAlerts, ...trtAlerts, ...repAlerts, ...brdAlerts];
 
     // Push new alerts to store
     for (const notif of allNew) {

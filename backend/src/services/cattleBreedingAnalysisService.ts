@@ -1,5 +1,6 @@
 import { store, calculateAgeFromDOB } from './store.js';
 import {
+  DEFAULT_GESTATION_DAYS,
   BreedingInsightResult,
   BreedingStatus,
   PregnancyStatus,
@@ -25,7 +26,7 @@ export interface CollectedBreedingData {
 }
 
 export class CattleBreedingAnalysisService {
-  private averageGestationDays: number = 283;
+  private averageGestationDays: number = DEFAULT_GESTATION_DAYS;
 
   /**
    * Set custom gestation period (default 283 days for bovine cattle)
@@ -58,7 +59,11 @@ export class CattleBreedingAnalysisService {
       .sort((a: any, b: any) => {
         const dateA = a.event_date || a.ai_date || a.heat_detection_date || a.created_at || '';
         const dateB = b.event_date || b.ai_date || b.heat_detection_date || b.created_at || '';
-        return new Date(dateB).getTime() - new Date(dateA).getTime();
+        const tA = new Date(dateA).getTime();
+        const tB = new Date(dateB).getTime();
+        if (isNaN(tA)) return 1;
+        if (isNaN(tB)) return -1;
+        return tB - tA;
       });
 
     const latestInsemination = breedingRecords.find(
@@ -105,9 +110,12 @@ export class CattleBreedingAnalysisService {
     if (data.latestInsemination && data.latestPregnancyCheck) {
       const insDate = data.latestInsemination.event_date || data.latestInsemination.ai_date;
       const checkDate = data.latestPregnancyCheck.event_date || data.latestPregnancyCheck.pregnancy_check_date;
-      if (insDate && checkDate && new Date(checkDate).getTime() < new Date(insDate).getTime()) {
-        // Log warning or handle gracefully without throwing exception
-        console.warn(`[BreedingAnalysis] Pregnancy check date (${checkDate}) precedes insemination date (${insDate}) for cattle ${data.cattle.id}`);
+      if (insDate && checkDate) {
+        const tIns = new Date(insDate).getTime();
+        const tCheck = new Date(checkDate).getTime();
+        if (!isNaN(tIns) && !isNaN(tCheck) && tCheck < tIns) {
+          console.warn(`[BreedingAnalysis] Pregnancy check date (${checkDate}) precedes insemination date (${insDate}) for cattle ${data.cattle.id}`);
+        }
       }
     }
   }
@@ -158,9 +166,9 @@ export class CattleBreedingAnalysisService {
       return { isPregnant: false };
     }
 
-    const insDateStr = data.latestInsemination?.event_date || data.latestInsemination?.ai_date || data.cattle.purchase_date;
+    const insDateStr = data.latestInsemination?.event_date || data.latestInsemination?.ai_date;
 
-    if (!insDateStr) {
+    if (!insDateStr || isNaN(new Date(insDateStr).getTime())) {
       return {
         isPregnant: true,
         trimester: '2nd Trimester (Mid)',
@@ -232,6 +240,7 @@ export class CattleBreedingAnalysisService {
    */
   public calculateExpectedDelivery(data: CollectedBreedingData): {
     estimatedDeliveryDate?: string;
+    deliveryDateType?: 'stored' | 'calculated';
     estimatedDeliveryWindow?: { start: string; end: string };
     dryOffDate?: string;
   } {
@@ -241,22 +250,31 @@ export class CattleBreedingAnalysisService {
       data.confirmedPregnancyRecord?.expected_calving_date ||
       data.confirmedPregnancyRecord?.expected_delivery_date;
 
+    let deliveryDateType: 'stored' | 'calculated' = 'calculated';
+
+    if (baseDeliveryDateStr && !isNaN(new Date(baseDeliveryDateStr).getTime())) {
+      deliveryDateType = 'stored';
+    } else {
+      baseDeliveryDateStr = undefined;
+    }
+
     const insDateStr = data.latestInsemination?.event_date || data.latestInsemination?.ai_date;
 
-    if (!baseDeliveryDateStr && insDateStr) {
+    if (!baseDeliveryDateStr && insDateStr && !isNaN(new Date(insDateStr).getTime())) {
       const insDate = new Date(insDateStr);
-      insDate.setDate(insDate.getDate() + this.averageGestationDays);
+      insDate.setDate(insDate.getDate() + (this.averageGestationDays || DEFAULT_GESTATION_DAYS));
       baseDeliveryDateStr = insDate.toISOString().split('T')[0];
+      deliveryDateType = 'calculated';
     }
 
     let dryOffDate: string | undefined;
-    if (insDateStr) {
+    if (insDateStr && !isNaN(new Date(insDateStr).getTime())) {
       const dDate = new Date(insDateStr);
       dDate.setDate(dDate.getDate() + 223);
       dryOffDate = dDate.toISOString().split('T')[0];
     }
 
-    if (!baseDeliveryDateStr) {
+    if (!baseDeliveryDateStr || isNaN(new Date(baseDeliveryDateStr).getTime())) {
       return { dryOffDate };
     }
 
@@ -269,6 +287,7 @@ export class CattleBreedingAnalysisService {
 
     return {
       estimatedDeliveryDate: baseDeliveryDateStr,
+      deliveryDateType,
       estimatedDeliveryWindow: {
         start: startDate.toISOString().split('T')[0],
         end: endDate.toISOString().split('T')[0],
@@ -399,14 +418,23 @@ export class CattleBreedingAnalysisService {
     cattleId: string,
     data: CollectedBreedingData,
     history: BreedingHistorySummary,
-    deliveryInfo: { estimatedDeliveryDate?: string; estimatedDeliveryWindow?: { start: string; end: string }; dryOffDate?: string },
+    deliveryInfo: { estimatedDeliveryDate?: string; deliveryDateType?: 'stored' | 'calculated'; estimatedDeliveryWindow?: { start: string; end: string }; dryOffDate?: string },
     missingData: string[]
   ): BreedingInsightResult {
     const { cattle } = data;
 
+    // Cycle tracking check: Compare latestInsemination date with latestCalving date
+    const insDate = data.latestInsemination?.event_date || data.latestInsemination?.ai_date;
+    const calvingDate = data.latestCalving?.actual_calving_date || data.latestCalving?.event_date;
+
+    const tIns = insDate ? new Date(insDate).getTime() : 0;
+    const tCalv = calvingDate ? new Date(calvingDate).getTime() : 0;
+
+    const isNewInseminationAfterCalving = tIns > 0 && tCalv > 0 && tIns > tCalv;
+
     // Determine Pregnancy Status strictly from actual confirmed data
     let pregnancyStatus: PregnancyStatus = 'NOT_PREGNANT';
-    if (data.latestCalving) {
+    if (data.latestCalving && !isNewInseminationAfterCalving) {
       pregnancyStatus = 'DELIVERED';
     } else if (cattle.health_status === 'pregnant' || data.confirmedPregnancyRecord) {
       pregnancyStatus = 'CONFIRMED';
@@ -475,6 +503,7 @@ export class CattleBreedingAnalysisService {
       latestBreedingDate: history.latestBreedingDate,
       pregnancyConfirmationDate: latestPregnancyCheckDate,
       estimatedDeliveryDate: deliveryInfo.estimatedDeliveryDate,
+      deliveryDateType: deliveryInfo.deliveryDateType,
       estimatedDeliveryWindow: deliveryInfo.estimatedDeliveryWindow,
       dryOffDate: deliveryInfo.dryOffDate || pregnancyDetails.dryOffDate,
       pregnancyDetails,
@@ -576,22 +605,24 @@ export class CattleBreedingAnalysisService {
     individualInsights.forEach(i => {
       if (i.pregnancyStatus === 'UNCONFIRMED' && i.latestBreedingDate) {
         const bDate = new Date(i.latestBreedingDate);
-        const daysSinceBreeding = Math.floor((today.getTime() - bDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSinceBreeding > 35) {
-          attentionRequired.push({
-            cattleId: i.cattleId,
-            cattleTag: i.tagNumber,
-            cattleName: i.name,
-            breed: i.breed,
-            issue: `Inseminated ${daysSinceBreeding} days ago, pregnancy confirmation check is pending.`,
-            relevantDate: i.latestBreedingDate,
-          });
+        if (!isNaN(bDate.getTime())) {
+          const daysSinceBreeding = Math.floor((today.getTime() - bDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysSinceBreeding > 35) {
+            attentionRequired.push({
+              cattleId: i.cattleId,
+              cattleTag: i.tagNumber,
+              cattleName: i.name,
+              breed: i.breed,
+              issue: `Inseminated ${daysSinceBreeding} days ago, pregnancy confirmation check is pending.`,
+              relevantDate: i.latestBreedingDate,
+            });
+          }
         }
       }
 
       if (i.estimatedDeliveryDate) {
         const delDate = new Date(i.estimatedDeliveryDate);
-        if (delDate.getTime() < today.getTime() && i.pregnancyStatus === 'CONFIRMED') {
+        if (!isNaN(delDate.getTime()) && delDate.getTime() < today.getTime() && i.pregnancyStatus === 'CONFIRMED') {
           attentionRequired.push({
             cattleId: i.cattleId,
             cattleTag: i.tagNumber,

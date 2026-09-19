@@ -11,6 +11,7 @@ import {
 
 export interface CollectedCattleHealthData {
   cattle: any;
+  
   healthRecords: any[];
   vaccinations: any[];
   breedingRecords: any[];

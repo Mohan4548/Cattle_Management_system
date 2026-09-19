@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { store } from '../services/store.js';
-import { BreedingRecord, Cattle } from '../types/index.js';
+import { BreedingRecord, Cattle, DEFAULT_GESTATION_DAYS } from '../types/index.js';
 
 export const getBreedingRecords = async (req: Request, res: Response) => {
   const { cattle_id } = req.query;
@@ -47,9 +47,16 @@ export const createBreedingRecord = async (req: Request, res: Response) => {
   if (event_type === 'Insemination' || event_type === 'Pregnancy Check') {
     // Gestation period for cattle is ~283 days
     const baseDate = new Date(event_date);
-    baseDate.setDate(baseDate.getDate() + 283);
-    expectedCalvingDate = baseDate.toISOString().split('T')[0];
+    if (!isNaN(baseDate.getTime())) {
+      baseDate.setDate(baseDate.getDate() + DEFAULT_GESTATION_DAYS);
+      expectedCalvingDate = baseDate.toISOString().split('T')[0];
+    }
   }
+
+  const nowMs = Date.now();
+  const calculatedDaysRemaining = expectedCalvingDate && !isNaN(new Date(expectedCalvingDate).getTime())
+    ? Math.max(0, Math.ceil((new Date(expectedCalvingDate).getTime() - nowMs) / (1000 * 60 * 60 * 24)))
+    : undefined;
 
   const newRecord: BreedingRecord = {
     id: `br-${Date.now()}`,
@@ -62,7 +69,7 @@ export const createBreedingRecord = async (req: Request, res: Response) => {
     sire_tag: sire_tag || 'BULL-92',
     dam_tag: dam_tag || cattle?.tag_number || 'FE-CAT-2026-001',
     expected_calving_date: expectedCalvingDate,
-    days_remaining: expectedCalvingDate ? 245 : undefined,
+    days_remaining: calculatedDaysRemaining,
     outcome: outcome || 'Pending',
     technician_name: technician_name || 'Dr. Marcus Vance',
     notes,
@@ -152,5 +159,12 @@ export const registerCalf = async (req: Request, res: Response) => {
     record.calf_id = newCalf.id;
   }
 
+  // Update dam health status back from pregnant to healthy/lactating
+  const damCattle = store.cattle.find(c => c.tag_number === (dam_tag || record?.dam_tag) || c.id === record?.cattle_id);
+  if (damCattle) {
+    damCattle.health_status = 'healthy';
+  }
+
   return res.status(201).json(newCalf);
 };
+

@@ -16,6 +16,14 @@ import {
   Save
 } from 'lucide-react';
 
+interface CalendarEvent {
+  date: string;
+  title: string;
+  type: string;
+  color: string;
+  cattleId?: string;
+}
+
 interface DiaryEntry {
   id: string;
   date: string;
@@ -33,6 +41,7 @@ export const FarmCalendar: React.FC = () => {
   const [cattleList, setCattleList] = useState<Cattle[]>([]);
   const [diaryLogs, setDiaryLogs] = useState<DiaryEntry[]>(INITIAL_DIARY);
   const [activeView, setActiveView] = useState<'calendar' | 'map' | 'diary'>('calendar');
+  const [dynamicEvents, setDynamicEvents] = useState<CalendarEvent[]>([]);
 
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
@@ -46,8 +55,58 @@ export const FarmCalendar: React.FC = () => {
     }
   };
 
+  const fetchBreedingEvents = async () => {
+    try {
+      const res = await apiClient.get('/farm/breeding-insights');
+      const data = res.data;
+      const events: CalendarEvent[] = [];
+
+      if (data?.upcomingDeliveries && Array.isArray(data.upcomingDeliveries)) {
+        data.upcomingDeliveries.forEach((u: any) => {
+          if (u.estimatedDeliveryDate) {
+            events.push({
+              date: u.estimatedDeliveryDate,
+              title: `Estimated Delivery – ${u.cattleName} (${u.cattleTag})`,
+              type: 'calving',
+              color: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+              cattleId: u.cattleId,
+            });
+          }
+          if (u.dryOffDate) {
+            events.push({
+              date: u.dryOffDate,
+              title: `Dry-off / Transition – ${u.cattleName}`,
+              type: 'dryoff',
+              color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+              cattleId: u.cattleId,
+            });
+          }
+        });
+      }
+
+      if (data?.attentionRequired && Array.isArray(data.attentionRequired)) {
+        data.attentionRequired.forEach((a: any) => {
+          if (a.relevantDate) {
+            events.push({
+              date: a.relevantDate,
+              title: `Breeding Action – ${a.cattleName}: ${a.issue}`,
+              type: 'attention',
+              color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+              cattleId: a.cattleId,
+            });
+          }
+        });
+      }
+
+      setDynamicEvents(events);
+    } catch {
+      // Gracefully handle if endpoint fails
+    }
+  };
+
   useEffect(() => {
     fetchCattle();
+    fetchBreedingEvents();
   }, []);
 
   const handleAddDiary = (e: React.FormEvent) => {
@@ -65,13 +124,24 @@ export const FarmCalendar: React.FC = () => {
     setNewContent('');
   };
 
-  const calendarEvents = [
+  const staticEvents: CalendarEvent[] = [
     { date: '2026-08-09', title: 'Morning & Evening Milking Logs', type: 'milk', color: 'bg-teal-500/20 text-teal-400 border-teal-500/30' },
     { date: '2026-08-11', title: 'Dairy Concentrate Mix 18% Delivery (50 Bags)', type: 'feed', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
     { date: '2026-08-15', title: 'Anthrax & Blackleg Booster Vaccination (Veera)', type: 'vaccine', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
     { date: '2026-08-20', title: 'Fenbendazole Deworming (Lakshmi)', type: 'deworm', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-    { date: '2027-01-18', title: 'Ganga Expected Calving Date (Gestation 283 Days)', type: 'calving', color: 'bg-rose-500/20 text-rose-400 border-rose-500/30' },
   ];
+
+  // Deduplicate combined calendar events by title + date
+  const combinedEventsMap = new Map<string, CalendarEvent>();
+  [...staticEvents, ...dynamicEvents].forEach(evt => {
+    const key = `${evt.date}-${evt.title}`;
+    if (!combinedEventsMap.has(key)) {
+      combinedEventsMap.set(key, evt);
+    }
+  });
+  const calendarEvents = Array.from(combinedEventsMap.values()).sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   return (
     <div className="space-y-6">
@@ -121,7 +191,7 @@ export const FarmCalendar: React.FC = () => {
       {/* Tab 1: Operational Schedule */}
       {activeView === 'calendar' && (
         <div className="glass-card p-6 rounded-3xl border border-slate-200/60 dark:border-slate-800/80 space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">August 2026 Operational Schedule</h3>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Smart Operational & Breeding Schedule</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {calendarEvents.map((evt, idx) => (

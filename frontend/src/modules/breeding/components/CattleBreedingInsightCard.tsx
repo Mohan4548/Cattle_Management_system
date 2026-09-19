@@ -319,13 +319,22 @@ export const CattleBreedingInsightCard: React.FC<CattleBreedingInsightCardProps>
                 <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-2">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-purple-500 shrink-0" />
-                    <div>
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
-                        Estimated Delivery Date
+                    <div className="flex-1 flex items-center justify-between">
+                      <div>
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                          Estimated Delivery Date
+                        </div>
+                        <div className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
+                          {insight.estimatedDeliveryDate}
+                        </div>
                       </div>
-                      <div className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
-                        {insight.estimatedDeliveryDate}
-                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                        insight.deliveryDateType === 'stored'
+                          ? 'bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border border-purple-300'
+                          : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200'
+                      }`}>
+                        {insight.deliveryDateType === 'stored' ? 'Stored Record' : 'Calculated (283d)'}
+                      </span>
                     </div>
                   </div>
                   {insight.estimatedDeliveryWindow && (

@@ -87,7 +87,13 @@ export type NotificationType =
   | 'vaccination_due'
   | 'vaccination_overdue'
   | 'treatment_followup'
-  | 'repeated_health_concern';
+  | 'repeated_health_concern'
+  | 'delivery_approaching'
+  | 'delivery_due_soon'
+  | 'delivery_date_passed'
+  | 'pregnancy_followup_due'
+  | 'missing_pregnancy_confirmation'
+  | 'breeding_record_incomplete';
 export type NotificationStatus = 'unread' | 'read' | 'resolved';
 
 export interface SmartNotification {
@@ -516,6 +522,8 @@ export interface PregnancyDetails {
   careRecommendations?: string[];
 }
 
+export const DEFAULT_GESTATION_DAYS = 283;
+
 export interface BreedingInsightResult {
   cattleId: string;
   tagNumber: string;
@@ -528,6 +536,7 @@ export interface BreedingInsightResult {
   latestBreedingDate?: string;
   pregnancyConfirmationDate?: string;
   estimatedDeliveryDate?: string;
+  deliveryDateType?: 'stored' | 'calculated';
   estimatedDeliveryWindow?: {
     start: string;
     end: string;
