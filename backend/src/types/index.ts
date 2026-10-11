@@ -627,3 +627,13 @@ export interface FarmBreedingInsightsResult {
   disclaimer: string;
 }
 
+export interface Delivery {
+  id: string;
+  title: string;
+  supplier_or_client: string;
+  type: 'incoming_feed' | 'outgoing_milk' | 'equipment';
+  expected_date: string;
+  quantity: string;
+  status: 'pending' | 'in_transit' | 'delivered';
+}
+
