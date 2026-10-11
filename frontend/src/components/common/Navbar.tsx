@@ -209,8 +209,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
         <div
           className={`relative flex items-center rounded-xl transition-all duration-200 border ${
             isListening
-              ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-slate-900'
-              : 'border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-emerald-500/70 focus-within:ring-2 focus-within:ring-emerald-500/10'
+              ? 'border-blue-500 ring-2 ring-blue-500/20 bg-white dark:bg-slate-900'
+              : 'border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-blue-500/70 focus-within:ring-2 focus-within:ring-blue-500/10'
           }`}
         >
           <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
@@ -225,7 +225,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
             type="button"
             onClick={handleVoiceSearch}
             className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md transition-all ${
-              isListening ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-emerald-600'
+              isListening ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-blue-600'
             }`}
             title="Voice search"
           >
@@ -241,11 +241,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
         <div className={`
           hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200
           ${isOnline
-            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/80'
+            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/80'
             : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/80 animate-pulse'
           }
         `}>
-          <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-blue-500' : 'bg-rose-500'}`} />
           <span>{isOnline ? 'Online' : 'Offline'}</span>
         </div>
 
@@ -253,10 +253,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
         <button
           onClick={() => navigate('/qr-scanner')}
           title="Open QR Scanner"
-          className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/40 shadow-xs transition-colors cursor-pointer"
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/40 shadow-xs transition-colors cursor-pointer"
           aria-label="QR Scanner"
         >
-          <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
         </button>
 
         {/* Role switcher */}
@@ -418,7 +418,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
               <img
                 src={
                   user?.avatar_url ||
-                  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=16a34a&textColor=ffffff`
+                  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=2563eb&textColor=ffffff`
                 }
                 alt={user?.full_name || 'User'}
                 className="relative w-8 h-8 rounded-lg object-cover"
@@ -459,7 +459,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                   <img
                     src={
                       user?.avatar_url ||
-                      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=16a34a&textColor=ffffff`
+                      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=2563eb&textColor=ffffff`
                     }
                     alt={user?.full_name || 'User'}
                     className="w-9 h-9 rounded-lg object-cover"

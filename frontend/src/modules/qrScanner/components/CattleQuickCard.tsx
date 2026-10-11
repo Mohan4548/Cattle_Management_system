@@ -130,12 +130,12 @@ export const CattleQuickCard: React.FC<CattleQuickCardProps> = ({
                     className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white dark:ring-slate-900 shadow-xl"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 ring-4 ring-white dark:ring-slate-900 flex items-center justify-center">
-                    <Beef className="w-8 h-8 text-emerald-400" />
+                  <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 ring-4 ring-white dark:ring-slate-900 flex items-center justify-center">
+                    <Beef className="w-8 h-8 text-blue-400" />
                   </div>
                 )}
                 {/* Status dot */}
-                <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${cattle.health_status === 'healthy' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${cattle.health_status === 'healthy' ? 'bg-blue-500' : 'bg-amber-500'}`} />
               </div>
 
               {/* Name + Tag */}
@@ -194,11 +194,11 @@ export const CattleQuickCard: React.FC<CattleQuickCardProps> = ({
                 <span className="flex items-center gap-1">
                   <Syringe className="w-2.5 h-2.5" /> Opening profile in {countdown}s...
                 </span>
-                <span className="text-emerald-500">Auto-navigating</span>
+                <span className="text-blue-500">Auto-navigating</span>
               </div>
               <div className="h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                 <motion.div
-                  className="h-full rounded-full bg-emerald-500"
+                  className="h-full rounded-full bg-blue-500"
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
                   transition={{ duration: autoNavigateDelay / 1000, ease: 'linear' }}
@@ -210,7 +210,7 @@ export const CattleQuickCard: React.FC<CattleQuickCardProps> = ({
             <button
               onClick={goToProfile}
               disabled={navigating}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 disabled:opacity-60 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-emerald-500/30"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 disabled:opacity-60 text-white font-bold text-sm transition-all duration-200 shadow-lg shadow-blue-500/30"
             >
               {navigating ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

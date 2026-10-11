@@ -79,8 +79,8 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
       {/* === Top Bar === */}
       <div className="flex items-center justify-between px-4 py-3 bg-black/40 backdrop-blur-sm z-20 relative">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-            <Scan className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="w-7 h-7 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center">
+            <Scan className="w-3.5 h-3.5 text-blue-400" />
           </div>
           <div>
             <h2 className="text-xs font-bold text-white leading-none">Smart QR Scanner</h2>
@@ -147,14 +147,14 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05, type: 'spring' }}
-                    className={`absolute w-8 h-8 border-emerald-400 ${cls}`}
+                    className={`absolute w-8 h-8 border-blue-400 ${cls}`}
                   />
                 ))}
 
                 {/* Scanning line */}
                 <motion.div
-                  className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent mx-2 rounded-full shadow-lg"
-                  style={{ boxShadow: '0 0 8px rgba(52,211,153,0.8)' }}
+                  className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent mx-2 rounded-full shadow-lg"
+                  style={{ boxShadow: '0 0 8px rgba(59,130,246,0.8)' }}
                   animate={{ top: ['8%', '88%', '8%'] }}
                   transition={{ duration: 2.5, ease: 'easeInOut', repeat: Infinity }}
                 />
@@ -162,7 +162,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
                 {/* Center crosshair dot */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
-                    className="w-3 h-3 rounded-full bg-emerald-400 opacity-60"
+                    className="w-3 h-3 rounded-full bg-blue-400 opacity-60"
                     animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0.2, 0.6] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
@@ -193,7 +193,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                className="w-14 h-14 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 mb-4"
+                className="w-14 h-14 rounded-full border-4 border-blue-500/20 border-t-blue-500 mb-4"
               />
               <p className="text-sm font-bold text-white">
                 {scanState === 'idle' ? 'Preparing Camera…' : 'Requesting Permission…'}
@@ -215,9 +215,9 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               <motion.div
                 animate={{ scale: [1, 1.15, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
-                className="w-16 h-16 rounded-3xl bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center mb-4"
+                className="w-16 h-16 rounded-3xl bg-blue-500/20 border-2 border-blue-500/50 flex items-center justify-center mb-4"
               >
-                <QrCode className="w-8 h-8 text-emerald-400" />
+                <QrCode className="w-8 h-8 text-blue-400" />
               </motion.div>
               <p className="text-sm font-bold text-white">QR Code Detected!</p>
               <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
@@ -235,9 +235,9 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-emerald-950/90"
+              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-blue-950/90"
             >
-              <CheckCircle2 className="w-16 h-16 text-emerald-400" />
+              <CheckCircle2 className="w-16 h-16 text-blue-400" />
               <p className="text-sm font-bold text-white mt-3">Profile Found!</p>
             </motion.div>
           )}
@@ -294,7 +294,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
             {/* Center indicator */}
             <div className="flex flex-col items-center gap-1">
               <motion.div
-                className="w-2.5 h-2.5 rounded-full bg-emerald-400"
+                className="w-2.5 h-2.5 rounded-full bg-blue-400"
                 animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
               />
@@ -332,7 +332,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
           >
             <button
               onClick={handleRetry}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-white font-bold text-xs transition-all"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Retry
             </button>

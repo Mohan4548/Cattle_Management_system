@@ -297,8 +297,8 @@ export const Dashboard: React.FC = () => {
   });
 
   const breedData = data?.charts?.breedDistribution || [
-    { name: 'Holstein Friesian', value: 2, color: '#10b981' },
-    { name: 'Jersey', value: 1, color: '#14b8a6' },
+    { name: 'Holstein Friesian', value: 2, color: '#3b82f6' },
+    { name: 'Jersey', value: 1, color: '#0ea5e9' },
     { name: 'Brown Swiss', value: 1, color: '#f59e0b' },
     { name: 'Angus', value: 1, color: '#6366f1' },
   ];
@@ -314,8 +314,8 @@ export const Dashboard: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2.5 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
               Live Farm Operations
             </span>
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -350,7 +350,7 @@ export const Dashboard: React.FC = () => {
 
           <button
             onClick={() => setActiveModal('cattle')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold transition-all shadow-xs shadow-blue-500/20 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Cattle
@@ -359,7 +359,7 @@ export const Dashboard: React.FC = () => {
             onClick={() => navigate('/qr-scanner')}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <ScanLine className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <ScanLine className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             Scan QR
           </button>
         </div>
@@ -378,7 +378,7 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Cattle</span>
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <Beef className="w-4.5 h-4.5" />
               </div>
             </div>
@@ -391,14 +391,14 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300">
+              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300">
                 {kpi.healthyCattle} Healthy
               </span>
               <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300">
                 {kpi.pregnantCattle} Pregnant
               </span>
             </div>
-            <Link to="/cattle" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+            <Link to="/cattle" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
               Herd →
             </Link>
           </div>
@@ -417,7 +417,7 @@ export const Dashboard: React.FC = () => {
               <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                 <AnimatedCounter value={kpi.milkToday} decimals={1} suffix=" L" />
               </span>
-              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.5 rounded">
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded">
                 Today
               </span>
             </div>
@@ -488,14 +488,14 @@ export const Dashboard: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div className="flex items-center justify-between mb-3 px-1">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             Quick Farm Operations
           </span>
           <span className="text-[11px] text-slate-400 font-medium">Daily management shortcuts</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
-            { label: 'Register Cattle', icon: Beef, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50', action: () => setActiveModal('cattle') },
+            { label: 'Register Cattle', icon: Beef, color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50', action: () => setActiveModal('cattle') },
             { label: 'Record Milk', icon: Milk, color: 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50', action: () => setActiveModal('milk') },
             { label: 'Scan Cattle QR', icon: ScanLine, color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50', action: () => navigate('/qr-scanner') },
             { label: 'Schedule Vaccine', icon: Syringe, color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50', action: () => setActiveModal('vaccine') },
@@ -504,7 +504,7 @@ export const Dashboard: React.FC = () => {
             <button
               key={label}
               onClick={action}
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150 text-left group cursor-pointer"
+              className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800 hover:border-blue-500/40 dark:hover:border-blue-500/40 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150 text-left group cursor-pointer"
             >
               <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
                 <Icon className="w-4 h-4" />
@@ -637,7 +637,7 @@ export const Dashboard: React.FC = () => {
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', color: 'var(--text-secondary)' }} />
-                <Bar dataKey="income" name="Income" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="income" name="Income" fill="#2563eb" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

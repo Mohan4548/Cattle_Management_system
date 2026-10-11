@@ -47,8 +47,8 @@ const navGroups: NavGroup[] = [
     label: 'Farm Operations',
     items: [
       { to: '/dashboard',   label: 'Dashboard',        icon: LayoutDashboard },
-      { to: '/ai-insights', label: 'AI Insights',      icon: Sparkles,      badge: 'AI', badgeColor: 'green' },
-      { to: '/qr-scanner',  label: 'QR Scanner',        icon: ScanLine,      badge: 'Scan', badgeColor: 'green' },
+      { to: '/ai-insights', label: 'AI Insights',      icon: Sparkles,      badge: 'AI', badgeColor: 'sky' },
+      { to: '/qr-scanner',  label: 'QR Scanner',        icon: ScanLine,      badge: 'Scan', badgeColor: 'sky' },
       { to: '/cattle',      label: 'Cattle',            icon: Beef },
       { to: '/milk',        label: 'Milk Records',      icon: Milk },
       { to: '/health',      label: 'Health & Vet',      icon: Stethoscope,   badge: '1', badgeColor: 'rose' },
@@ -75,7 +75,7 @@ const navGroups: NavGroup[] = [
 ];
 
 const badgeStyles: Record<string, string> = {
-  green:  'bg-[var(--accent-green-subtle)] text-[var(--accent-green-dark)] border border-[var(--accent-green)]/25',
+  green:  'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800',
   rose:   'bg-[var(--accent-rose-subtle)]  text-[var(--accent-rose)]  border border-[var(--accent-rose)]/25',
   sky:    'bg-[var(--accent-sky-subtle)]   text-[var(--accent-sky)]   border border-[var(--accent-sky)]/25',
   amber:  'bg-[var(--accent-amber-subtle)] text-[var(--accent-amber)] border border-[var(--accent-amber)]/25',
@@ -97,14 +97,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
       <div className="flex items-center justify-between px-4 pt-5 pb-4 border-b border-[var(--border-card)] shrink-0">
         <div className="flex items-center gap-3">
           {/* Clean logo mark */}
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/20">
             <Leaf className="w-4.5 h-4.5 text-white" strokeWidth={2.2} />
           </div>
           <div>
             <div className="font-extrabold text-slate-900 dark:text-white text-sm leading-tight tracking-tight">
               FarmEase
             </div>
-            <div className="text-[10px] font-semibold tracking-wider uppercase text-emerald-700 dark:text-emerald-400">
+            <div className="text-[10px] font-semibold tracking-wider uppercase text-blue-600 dark:text-blue-400">
               Smart Cattle SaaS
             </div>
           </div>
@@ -150,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
                       to={item.to}
                       className={`flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 group ${
                         active
-                          ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-semibold shadow-xs'
+                          ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-semibold shadow-xs'
                           : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
                       }`}
                     >
@@ -159,8 +159,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
                         <div
                           className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                             active
-                              ? 'bg-emerald-600 text-white shadow-xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/40'
+                              ? 'bg-blue-600 text-white shadow-xs'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/40'
                           }`}
                         >
                           <Icon className="w-3.5 h-3.5" strokeWidth={active ? 2.5 : 2} />
@@ -177,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
 
                       {/* Active chevron */}
                       {active && !item.badge && (
-                        <ChevronRight className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 opacity-70" />
+                        <ChevronRight className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 opacity-70" />
                       )}
                     </NavLink>
                   );
@@ -213,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
               <img
                 src={
                   user?.avatar_url ||
-                  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=16a34a&textColor=ffffff`
+                  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.full_name || 'FE')}&backgroundColor=2563eb&textColor=ffffff`
                 }
                 alt={user?.full_name || 'User'}
                 className="relative w-8 h-8 rounded-lg object-cover"

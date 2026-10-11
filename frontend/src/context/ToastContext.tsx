@@ -42,7 +42,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             key={toast.id}
             className={`pointer-events-auto flex items-center justify-between p-3.5 rounded-2xl shadow-2xl border text-xs font-bold transition-all duration-300 transform translate-y-0 ${
               toast.type === 'success'
-                ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/40 backdrop-blur-md'
+                ? 'bg-blue-950/90 text-blue-300 border-blue-500/40 backdrop-blur-md'
                 : toast.type === 'error'
                 ? 'bg-rose-950/90 text-rose-300 border-rose-500/40 backdrop-blur-md'
                 : toast.type === 'warning'
@@ -51,10 +51,10 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             }`}
           >
             <div className="flex items-center gap-2.5">
-              {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+              {toast.type === 'success' && <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />}
               {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
               {toast.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />}
-              {toast.type === 'info' && <Info className="w-4 h-4 text-teal-400 shrink-0" />}
+              {toast.type === 'info' && <Info className="w-4 h-4 text-sky-400 shrink-0" />}
               <span>{toast.message}</span>
             </div>
 

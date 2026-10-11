@@ -96,7 +96,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
       default:
         return (
           <Badge variant="healthy" className="gap-1.5 px-3 py-1 text-sm font-bold tracking-wide">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <ShieldCheck className="w-4 h-4 text-blue-500" />
             LOW RISK
           </Badge>
         );
@@ -107,13 +107,13 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
     switch (confidence) {
       case 'HIGH':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             HIGH CONFIDENCE
           </span>
         );
       case 'MEDIUM':
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
             MEDIUM CONFIDENCE
           </span>
         );
@@ -135,14 +135,14 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
         return <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">Medium Impact</span>;
       case 'Low':
       default:
-        return <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">Low Impact</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-blue-500/10 text-blue-600 border border-blue-500/20">Low Impact</span>;
     }
   };
 
   const getScoreColor = (score: number) => {
     if (score >= 60) return 'bg-rose-500 text-rose-600';
     if (score >= 30) return 'bg-amber-500 text-amber-600';
-    return 'bg-emerald-500 text-emerald-600';
+    return 'bg-blue-500 text-blue-600';
   };
 
   return (
@@ -150,15 +150,15 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-semibold">
-            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-semibold">
+            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 AI Health Risk Prediction
               </h3>
-              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-md border border-emerald-200 dark:border-emerald-800">
+              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 rounded-md border border-blue-200 dark:border-blue-800">
                 Phase 2 Engine
               </span>
             </div>
@@ -171,7 +171,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
         <button
           onClick={handleAnalyzeHealth}
           disabled={status === 'loading'}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {status === 'loading' ? (
             <>
@@ -180,7 +180,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
             </>
           ) : (
             <>
-              <Activity className="w-4 h-4 text-emerald-100" />
+              <Activity className="w-4 h-4 text-blue-100" />
               {status === 'idle' ? 'Analyze Health' : 'Re-analyze Health'}
             </>
           )}
@@ -205,7 +205,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
         {/* State 2: LOADING */}
         {status === 'loading' && (
           <div className="text-center py-10 px-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-            <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin mx-auto mb-3" />
+            <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3" />
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Analyzing health data...
             </p>
@@ -329,7 +329,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
                 </div>
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                   <div className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                    <Scale className="w-3 h-3 text-emerald-500" /> Weight
+                    <Scale className="w-3 h-3 text-blue-500" /> Weight
                   </div>
                   <div className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                     {result.inputSummary.weight_kg ? `${result.inputSummary.weight_kg} kg` : 'Not recorded'}
@@ -341,7 +341,7 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
             {/* Explainable Key Factors List */}
             <div className="p-5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 Key Explainable Risk Factors
               </h4>
               <div className="space-y-2.5">
@@ -401,14 +401,14 @@ export const CattleHealthRiskCard: React.FC<CattleHealthRiskCardProps> = ({
             {/* Recommended Action Plan */}
             <div className="p-5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 Recommended Next Actions
               </h4>
               <ul className="space-y-2">
                 {result.recommendations && result.recommendations.length > 0 ? (
                   result.recommendations.map((rec, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
-                      <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-5 h-5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-3 h-3" />
                       </span>
                       <span className="mt-0.5 font-medium">{rec}</span>

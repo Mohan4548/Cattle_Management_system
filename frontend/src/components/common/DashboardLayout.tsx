@@ -31,8 +31,8 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
     >
       {/* ── Subtle ambient decoration (light mode appropriate) ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-32 left-48 w-[480px] h-[480px] bg-emerald-500/[0.04] dark:bg-emerald-500/[0.07] rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-16 w-[360px] h-[360px] bg-sky-500/[0.04] dark:bg-sky-500/[0.06] rounded-full blur-[100px]" />
+        <div className="absolute -top-32 left-48 w-[480px] h-[480px] bg-blue-500/[0.03] dark:bg-blue-500/[0.05] rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-16 w-[360px] h-[360px] bg-sky-500/[0.03] dark:bg-sky-500/[0.05] rounded-full blur-[100px]" />
       </div>
 
       {/* ── Desktop Sidebar ── */}

@@ -86,8 +86,8 @@ export const CattleBreedingInsightCard: React.FC<CattleBreedingInsightCardProps>
         );
       case 'DELIVERED':
         return (
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
             CALVING COMPLETED
           </span>
         );
@@ -254,7 +254,7 @@ export const CattleBreedingInsightCard: React.FC<CattleBreedingInsightCardProps>
                   </div>
                   <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(Math.max(insight.pregnancyDetails.progressPercentage || 0, 4), 100)}%` }}
                     />
                   </div>
@@ -291,7 +291,7 @@ export const CattleBreedingInsightCard: React.FC<CattleBreedingInsightCardProps>
                             isCurrent
                               ? 'bg-purple-600 text-white border-purple-400 ring-4 ring-purple-500/30 animate-pulse'
                               : isCompleted
-                              ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm'
+                              ? 'bg-blue-600 text-white border-blue-400 shadow-sm'
                               : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-300 dark:border-slate-700'
                           }`}
                         >
