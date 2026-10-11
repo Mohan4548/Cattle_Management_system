@@ -150,8 +150,11 @@ export function useQRScanner(): UseQRScannerReturn {
         cameraId ? { deviceId: { exact: cameraId } } : { facingMode: 'environment' },
         {
           fps: 15,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
+          qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edge = Math.max(180, Math.min(260, Math.floor(minEdge * 0.72)));
+            return { width: edge, height: edge };
+          },
           disableFlip: false,
         },
         async (decodedText: string, _result: Html5QrcodeResult) => {

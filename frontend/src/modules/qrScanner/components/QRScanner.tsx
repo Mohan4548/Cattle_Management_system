@@ -77,14 +77,14 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
     <div className="flex flex-col h-full bg-slate-950 relative overflow-hidden">
 
       {/* === Top Bar === */}
-      <div className="flex items-center justify-between px-4 py-3 bg-black/40 backdrop-blur-sm z-20 relative">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900/80 backdrop-blur-md z-20 relative shrink-0 border-b border-slate-800/80">
+        <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center">
             <Scan className="w-3.5 h-3.5 text-blue-400" />
           </div>
           <div>
             <h2 className="text-xs font-bold text-white leading-none">Smart QR Scanner</h2>
-            <p className="text-[10px] text-slate-400 mt-0.5">
+            <p className="text-[10px] text-slate-400 mt-1">
               {scanState === 'active'   ? 'Point camera at cattle QR code' :
                scanState === 'requesting' ? 'Requesting camera access…' :
                scanState === 'processing' ? 'Reading QR code…' :
@@ -104,12 +104,12 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
       </div>
 
       {/* === Main Scanner Area === */}
-      <div className="flex-1 relative flex items-center justify-center">
+      <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden">
         {/* Camera viewport — html5-qrcode mounts its <video> element here */}
         <div
           id={QR_SCANNER_ELEMENT_ID}
-          className="absolute inset-0 w-full h-full overflow-hidden"
-          style={{ background: '#0a0a0a' }}
+          className="absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center"
+          style={{ background: '#020617' }}
         />
 
         {/* === Scanning Overlay (shown only when active) === */}
@@ -119,22 +119,22 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+              className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none"
             >
               {/* Dark vignette mask */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 pointer-events-none"
                 style={{
                   background: `radial-gradient(
-                    ellipse 280px 280px at 50% 45%,
-                    transparent 40%,
-                    rgba(0,0,0,0.75) 100%
+                    circle 160px at 50% 48%,
+                    transparent 75px,
+                    rgba(2, 6, 23, 0.65) 160px
                   )`,
                 }}
               />
 
               {/* Scan frame */}
-              <div className="relative w-64 h-64">
+              <div className="relative w-64 h-64 pointer-events-none shrink-0">
                 {/* Corner brackets */}
                 {[
                   'top-0 left-0 border-t-4 border-l-4 rounded-tl-2xl',
@@ -154,7 +154,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
                 {/* Scanning line */}
                 <motion.div
                   className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent mx-2 rounded-full shadow-lg"
-                  style={{ boxShadow: '0 0 8px rgba(59,130,246,0.8)' }}
+                  style={{ boxShadow: '0 0 10px rgba(96, 165, 250, 0.9)' }}
                   animate={{ top: ['8%', '88%', '8%'] }}
                   transition={{ duration: 2.5, ease: 'easeInOut', repeat: Infinity }}
                 />
@@ -170,9 +170,9 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               </div>
 
               {/* Hint text */}
-              <div className="absolute bottom-16 left-0 right-0 flex justify-center">
-                <div className="px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 backdrop-blur-sm">
-                  <p className="text-xs text-slate-300 text-center">
+              <div className="mt-4 flex justify-center pointer-events-none">
+                <div className="px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 backdrop-blur-md shadow-lg">
+                  <p className="text-xs font-medium text-slate-200 text-center tracking-wide">
                     Align QR code within the frame
                   </p>
                 </div>
@@ -270,7 +270,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="relative z-20 bg-black/60 backdrop-blur-md px-6 py-4 flex items-center justify-between"
+            className="relative z-20 bg-slate-950/90 backdrop-blur-md px-6 py-3.5 flex items-center justify-between shrink-0 border-t border-slate-800/80"
           >
             {/* Flash toggle */}
             <button

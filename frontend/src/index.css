@@ -1500,3 +1500,47 @@
     box-shadow: none;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────
+   QR SCANNER VIEWPORT & CAMERA ALIGNMENT
+   ────────────────────────────────────────────────────────────── */
+#farmease-qr-scanner-viewport {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  inset: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #020617 !important;
+}
+
+#farmease-qr-scanner-viewport video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+#farmease-qr-scanner-viewport__scan_region {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+}
+
+#qr-shaded-region {
+  border: none !important;
+}
+
+#farmease-qr-scanner-viewport img[alt="Info icon"],
+#farmease-qr-scanner-viewport div[style*="text-align: center"] {
+  display: none !important;
+}
