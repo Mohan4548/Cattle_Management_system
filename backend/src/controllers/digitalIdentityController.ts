@@ -93,19 +93,33 @@ export const getIdentityBySlug = async (req: Request, res: Response) => {
   }
 
   try {
-    const identity = digitalIdentityService.getIdentityBySlug(slug.toLowerCase());
+    const cleanSlug = slug.trim().toLowerCase();
+    let identity = digitalIdentityService.getIdentityBySlug(cleanSlug);
+
+    // 1. Fallback: check if slug is a Digital Identity ID (e.g. CAT-2026-000001)
     if (!identity) {
-      return res.status(404).json({
-        message: `No Digital Identity found for slug "${slug}". The QR code may be invalid or the cattle may have been removed.`,
-        slug,
-      });
+      identity = digitalIdentityService.getIdentityByDigitalId(slug.trim().toUpperCase());
     }
 
-    // Enrich with cattle details for the Quick Info Card
-    const cattle = store.cattle.find((c: any) => c.id === identity.cattle_id);
+    // 2. Fallback: check if slug matches a Cattle ID (e.g. cattle-1) or Tag (e.g. FE-GIR-001)
+    let cattle = identity ? store.cattle.find((c: any) => c.id === identity?.cattle_id) : null;
     if (!cattle) {
+      cattle = store.cattle.find((c: any) =>
+        c.id?.toLowerCase() === cleanSlug ||
+        c.tag_id?.toLowerCase() === cleanSlug ||
+        c.tag_number?.toLowerCase() === cleanSlug ||
+        c.name?.toLowerCase() === cleanSlug
+      ) ?? null;
+
+      if (cattle && !identity) {
+        identity = digitalIdentityService.getIdentityByCattleId(cattle.id)
+          ?? digitalIdentityService.ensureIdentityForCattle(cattle);
+      }
+    }
+
+    if (!identity || !cattle) {
       return res.status(404).json({
-        message: `Digital Identity found but corresponding cattle record no longer exists.`,
+        message: `No Digital Identity found for identifier "${slug}". The QR code may be invalid or the cattle may have been removed.`,
         slug,
       });
     }

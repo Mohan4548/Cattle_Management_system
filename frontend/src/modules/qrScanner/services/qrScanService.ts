@@ -2,29 +2,88 @@
  * FarmEase – QR Scanner Service
  * Phase 3: Smart QR Scanner & Digital Profile Access
  *
- * Resolves a raw QR code payload to cattle information.
- * Phase 2 QR codes encode:  /farm/cattle/{public_profile_slug}
- * e.g.                       /farm/cattle/cat-2026-000001
+ * Resolves any QR code payload to cattle information.
+ * Supports:
+ * - FarmEase Public URLs: /farm/cattle/{slug}
+ * - Direct Cattle Detail URLs: /cattle/{id}
+ * - Digital Identity IDs: CAT-2026-000001
+ * - Ear Tag IDs: FE-GIR-001, FE-HF-002, etc.
+ * - Cattle IDs: cattle-1, cattle-2, etc.
+ * - JSON encoded cattle payloads
  */
 
 import { apiClient } from '../../../api/client';
 import type { QRResolveResult, ScannedCattleInfo, ScanError } from '../types/index';
 
-/** Expected QR payload pattern — only match FarmEase cattle QRs */
-const FARMEASE_QR_PATTERN = /^(?:https?:\/\/[^/]+)?\/farm\/cattle\/([a-z0-9-]+)$/i;
-
 /**
- * Parse the raw QR payload string and extract the public_profile_slug.
- * Returns null if the payload is not a valid FarmEase cattle QR.
+ * Parse raw QR payload string and extract the most relevant identifier.
+ * Extremely tolerant of URLs, full links, JSON tags, and raw codes.
  */
-function extractSlug(rawPayload: string): string | null {
-  const trimmed = rawPayload?.trim();
-  if (!trimmed) return null;
+export function extractSlug(rawPayload: string): string | null {
+  if (!rawPayload || typeof rawPayload !== 'string') return null;
+  let text = rawPayload.trim();
 
-  const match = trimmed.match(FARMEASE_QR_PATTERN);
-  if (!match) return null;
+  // 1. JSON payload check
+  if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('%7B') && text.endsWith('%7D'))) {
+    try {
+      const decoded = text.startsWith('%7B') ? decodeURIComponent(text) : text;
+      const parsed = JSON.parse(decoded);
+      if (parsed.public_profile_slug) return String(parsed.public_profile_slug).trim().toLowerCase();
+      if (parsed.slug) return String(parsed.slug).trim().toLowerCase();
+      if (parsed.digital_identity_id) return String(parsed.digital_identity_id).trim().toLowerCase();
+      if (parsed.cattle_id) return String(parsed.cattle_id).trim().toLowerCase();
+      if (parsed.tag_id || parsed.tag_number || parsed.tag) return String(parsed.tag_id || parsed.tag_number || parsed.tag).trim().toLowerCase();
+      if (parsed.id) return String(parsed.id).trim().toLowerCase();
+    } catch {
+      // not JSON, fallback to regex
+    }
+  }
 
-  return match[1].toLowerCase();
+  // 2. Strip surrounding quotes if present
+  text = text.replace(/^["']|["']$/g, '');
+
+  // 3. /farm/cattle/:slug (with or without domain, query params, trailing slash)
+  const farmCattleMatch = text.match(/(?:^|\/)farm\/cattle\/([a-zA-Z0-9_-]+)/i);
+  if (farmCattleMatch) {
+    return farmCattleMatch[1].toLowerCase();
+  }
+
+  // 4. /cattle/:id
+  const cattleRouteMatch = text.match(/(?:^|\/)cattle\/([a-zA-Z0-9_-]+)/i);
+  if (cattleRouteMatch) {
+    return cattleRouteMatch[1].toLowerCase();
+  }
+
+  // 5. Digital Identity format: CAT-2026-XXXXXX
+  const digitalIdMatch = text.match(/\b(CAT-\d{4}-\d{6})\b/i);
+  if (digitalIdMatch) {
+    return digitalIdMatch[1].toLowerCase();
+  }
+
+  // 6. Ear Tag format: FE-XXX-NNN
+  const earTagMatch = text.match(/\b(FE-[A-Z0-9]+-\d+)\b/i);
+  if (earTagMatch) {
+    return earTagMatch[1].toLowerCase();
+  }
+
+  // 7. Query parameters: ?tag=... or ?id=... or ?slug=...
+  const queryMatch = text.match(/[?&](?:slug|cattle_id|tag_id|tag|id)=([a-zA-Z0-9_-]+)/i);
+  if (queryMatch) {
+    return queryMatch[1].toLowerCase();
+  }
+
+  // 8. Cattle ID pattern: cattle-1, cattle-2, etc.
+  const cattleIdMatch = text.match(/\b(cattle-[a-zA-Z0-9_-]+)\b/i);
+  if (cattleIdMatch) {
+    return cattleIdMatch[1].toLowerCase();
+  }
+
+  // 9. Raw alphanumeric slug or tag token (length 2 to 64)
+  if (/^[a-zA-Z0-9_-]{2,64}$/.test(text)) {
+    return text.toLowerCase();
+  }
+
+  return null;
 }
 
 /**
@@ -36,8 +95,8 @@ function slugToDigitalId(slug: string): string {
 }
 
 /**
- * Resolve a raw QR code payload to a ScannedCattleInfo.
- * This is the primary function called when a QR code is detected.
+ * Resolve a raw QR code payload to ScannedCattleInfo.
+ * Tries the digital identity endpoint first, then falls back to direct cattle records.
  */
 export async function resolveQRPayload(rawPayload: string): Promise<QRResolveResult> {
   // 1. Check network
@@ -59,58 +118,36 @@ export async function resolveQRPayload(rawPayload: string): Promise<QRResolveRes
       success: false,
       error: {
         code: 'INVALID_QR',
-        message: 'Invalid QR Code',
-        detail: `This QR code is not a FarmEase cattle identifier. Scanned: "${rawPayload?.slice(0, 80)}"`,
+        message: 'Unrecognized QR Code',
+        detail: `The scanned QR code is not recognized as a FarmEase livestock identifier: "${rawPayload?.slice(0, 60)}"`,
       },
     };
   }
 
-  // 3. Resolve slug via API
+  // 3. Try resolving via digital identity slug endpoint
   try {
     const res = await apiClient.get(`/identity/slug/${encodeURIComponent(slug)}`);
     const data = res.data;
 
-    if (!data?.cattle_id) {
-      return {
-        success: false,
-        error: {
-          code: 'UNKNOWN_CATTLE',
-          message: 'Cattle Not Found',
-          detail: `No cattle record matches this QR code (slug: ${slug}).`,
-        },
+    if (data?.cattle_id) {
+      const info: ScannedCattleInfo = {
+        cattle_id: data.cattle_id,
+        cattle_name: data.cattle_name ?? 'Unknown',
+        cattle_tag: data.cattle_tag ?? 'N/A',
+        breed: data.breed ?? 'Unknown',
+        age: data.age,
+        health_status: data.health_status ?? 'healthy',
+        lactation_stage: data.lactation_stage ?? 'mid',
+        image_url: data.image_url ?? '',
+        digital_identity_id: data.digital_identity_id ?? slugToDigitalId(slug),
+        public_profile_slug: data.public_profile_slug ?? slug,
+        qr_status: data.qr_status ?? 'active',
       };
+      return { success: true, cattle: info };
     }
-
-    const info: ScannedCattleInfo = {
-      cattle_id: data.cattle_id,
-      cattle_name: data.cattle_name ?? 'Unknown',
-      cattle_tag: data.cattle_tag ?? 'N/A',
-      breed: data.breed ?? 'Unknown',
-      age: data.age,
-      health_status: data.health_status ?? 'healthy',
-      lactation_stage: data.lactation_stage ?? 'mid',
-      image_url: data.image_url ?? '',
-      digital_identity_id: data.digital_identity_id ?? slugToDigitalId(slug),
-      public_profile_slug: slug,
-      qr_status: data.qr_status ?? 'active',
-    };
-
-    return { success: true, cattle: info };
-
   } catch (err: any) {
+    // If not a 404, or if 404 let's try direct cattle API lookup below
     const status = err?.response?.status;
-
-    if (status === 404) {
-      return {
-        success: false,
-        error: {
-          code: 'UNKNOWN_CATTLE',
-          message: 'Cattle Record Not Found',
-          detail: 'This QR code references a cattle that no longer exists in the system.',
-        },
-      };
-    }
-
     if (status === 401 || status === 403) {
       return {
         success: false,
@@ -121,25 +158,71 @@ export async function resolveQRPayload(rawPayload: string): Promise<QRResolveRes
         },
       };
     }
-
-    if (!navigator.onLine) {
-      return {
-        success: false,
-        error: {
-          code: 'OFFLINE',
-          message: 'No Internet Connection',
-          detail: 'Please check your connection and try again.',
-        },
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        code: 'SERVER_ERROR',
-        message: 'Server Error',
-        detail: err?.response?.data?.message ?? err?.message ?? 'An unexpected error occurred.',
-      },
-    };
   }
+
+  // 4. Fallback: try direct cattle endpoint (/cattle/:id)
+  try {
+    const cattleRes = await apiClient.get(`/cattle/${encodeURIComponent(slug)}`);
+    const c = cattleRes.data;
+    if (c?.id) {
+      const info: ScannedCattleInfo = {
+        cattle_id: c.id,
+        cattle_name: c.name ?? 'Unknown',
+        cattle_tag: c.tag_id ?? c.tag_number ?? 'N/A',
+        breed: c.breed ?? 'Unknown',
+        age: c.age,
+        health_status: c.health_status ?? c.status ?? 'healthy',
+        lactation_stage: c.lactation_stage ?? 'mid',
+        image_url: c.image_url ?? c.photo_url ?? '',
+        digital_identity_id: c.digital_identity_id ?? `CAT-2026-${c.id}`,
+        public_profile_slug: c.public_profile_slug ?? slug,
+        qr_status: c.qr_status ?? 'active',
+      };
+      return { success: true, cattle: info };
+    }
+  } catch {
+    // Continue to tag search fallback
+  }
+
+  // 5. Fallback: search all cattle list for matching tag_id or tag_number
+  try {
+    const listRes = await apiClient.get('/cattle');
+    const allCattle = Array.isArray(listRes.data) ? listRes.data : listRes.data?.data;
+    if (Array.isArray(allCattle)) {
+      const match = allCattle.find((c: any) =>
+        c.id?.toLowerCase() === slug ||
+        c.tag_id?.toLowerCase() === slug ||
+        c.tag_number?.toLowerCase() === slug ||
+        c.digital_identity_id?.toLowerCase() === slug ||
+        c.public_profile_slug?.toLowerCase() === slug
+      );
+      if (match) {
+        const info: ScannedCattleInfo = {
+          cattle_id: match.id,
+          cattle_name: match.name ?? 'Unknown',
+          cattle_tag: match.tag_id ?? match.tag_number ?? 'N/A',
+          breed: match.breed ?? 'Unknown',
+          age: match.age,
+          health_status: match.health_status ?? match.status ?? 'healthy',
+          lactation_stage: match.lactation_stage ?? 'mid',
+          image_url: match.image_url ?? match.photo_url ?? '',
+          digital_identity_id: match.digital_identity_id ?? `CAT-2026-${match.id}`,
+          public_profile_slug: match.public_profile_slug ?? slug,
+          qr_status: match.qr_status ?? 'active',
+        };
+        return { success: true, cattle: info };
+      }
+    }
+  } catch {
+    // If all fail, return unknown cattle error
+  }
+
+  return {
+    success: false,
+    error: {
+      code: 'UNKNOWN_CATTLE',
+      message: 'Cattle Record Not Found',
+      detail: `No active cattle record was found matching code "${slug}".`,
+    },
+  };
 }

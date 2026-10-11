@@ -2,16 +2,16 @@
  * FarmEase – QRScanner Component
  * Phase 3: Smart QR Scanner & Digital Profile Access
  *
- * Full-featured camera QR scanner UI:
- * - Real camera viewfinder (html5-qrcode)
- * - Animated corner brackets + scanning line
- * - Flashlight toggle, camera switch
- * - Permission & error states
- * - Framer Motion animations
- * - Dark mode support
+ * Full-featured high-definition camera QR scanner UI:
+ * - Crystal clear camera feed without foggy vignettes or dimming
+ * - Hardware-accelerated BarcodeDetector with instant detection
+ * - High-tech reticle with animated corners and scanning beam
+ * - Manual tag / cattle ID lookup fallback for testing & field flexibility
+ * - Flashlight toggle and camera switch
+ * - Modern dark glassmorphism SaaS aesthetic
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scan,
@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   RefreshCw,
   QrCode,
+  Search,
+  Tag,
 } from 'lucide-react';
 import { useQRScanner, QR_SCANNER_ELEMENT_ID } from '../hooks/useQRScanner';
 import { QRScannerErrorPage } from './QRScannerErrorPage';
@@ -34,6 +36,13 @@ interface QRScannerProps {
   /** If true, renders as an embedded widget (no close button) */
   embedded?: boolean;
 }
+
+const SAMPLE_TAGS = [
+  { tag: 'FE-GIR-001', name: 'Kamadhenu' },
+  { tag: 'FE-HF-002', name: 'Lakshmi' },
+  { tag: 'FE-JER-003', name: 'Gowri' },
+  { tag: 'FE-SAH-004', name: 'Daisy' },
+];
 
 export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false }) => {
   const {
@@ -49,11 +58,14 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
     resetScanner,
     toggleFlash,
     switchCamera,
+    resolveManualCode,
   } = useQRScanner();
+
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [manualCode, setManualCode] = useState('');
 
   // Auto-start on mount
   useEffect(() => {
-    // Small delay so the DOM element is rendered before scanner init
     const timer = setTimeout(() => startScanner(), 200);
     return () => {
       clearTimeout(timer);
@@ -71,13 +83,25 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
     onClose?.();
   };
 
+  const handleManualSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!manualCode.trim()) return;
+    setShowManualInput(false);
+    resolveManualCode(manualCode.trim());
+  };
+
+  const handleQuickTagClick = (tag: string) => {
+    setShowManualInput(false);
+    resolveManualCode(tag);
+  };
+
   const otherCameras = cameras.filter(c => c.id !== activeCameraId);
 
   return (
     <div className="flex flex-col h-full bg-slate-950 relative overflow-hidden">
 
       {/* === Top Bar === */}
-      <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900/80 backdrop-blur-md z-20 relative shrink-0 border-b border-slate-800/80">
+      <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900/90 backdrop-blur-md z-20 relative shrink-0 border-b border-slate-800/80">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center">
             <Scan className="w-3.5 h-3.5 text-blue-400" />
@@ -85,7 +109,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
           <div>
             <h2 className="text-xs font-bold text-white leading-none">Smart QR Scanner</h2>
             <p className="text-[10px] text-slate-400 mt-1">
-              {scanState === 'active'   ? 'Point camera at cattle QR code' :
+              {scanState === 'active'   ? 'Point camera at cattle QR tag' :
                scanState === 'requesting' ? 'Requesting camera access…' :
                scanState === 'processing' ? 'Reading QR code…' :
                scanState === 'success'  ? 'QR detected!' :
@@ -93,26 +117,100 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
             </p>
           </div>
         </div>
-        {!embedded && (
+
+        <div className="flex items-center gap-2">
+          {/* Manual Tag Lookup Toggle */}
           <button
-            onClick={handleClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all"
+            onClick={() => setShowManualInput(prev => !prev)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-400 text-xs font-semibold transition-all active:scale-95"
+            title="Enter tag or test manually"
           >
-            <X className="w-4 h-4" />
+            <Tag className="w-3 h-3" />
+            <span>Manual Tag</span>
           </button>
-        )}
+
+          {!embedded && (
+            <button
+              onClick={handleClose}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* === Manual Tag Input Drawer / Overlay === */}
+      <AnimatePresence>
+        {showManualInput && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-14 left-0 right-0 z-30 bg-slate-900/95 border-b border-slate-800 backdrop-blur-md p-4 shadow-2xl"
+          >
+            <form onSubmit={handleManualSubmit} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-200">Enter Cattle Tag or ID</span>
+                <button
+                  type="button"
+                  onClick={() => setShowManualInput(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    value={manualCode}
+                    onChange={e => setManualCode(e.target.value)}
+                    placeholder="e.g. FE-GIR-001 or cat-2026-000001"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    autoFocus
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!manualCode.trim()}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-all active:scale-95"
+                >
+                  Lookup
+                </button>
+              </div>
+
+              {/* Quick sample chips */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                <span className="text-[10px] text-slate-400">Quick Test:</span>
+                {SAMPLE_TAGS.map(item => (
+                  <button
+                    key={item.tag}
+                    type="button"
+                    onClick={() => handleQuickTagClick(item.tag)}
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-blue-600/30 border border-slate-700 hover:border-blue-500/50 text-[11px] font-mono text-slate-200 hover:text-blue-300 transition-all"
+                  >
+                    {item.tag} ({item.name})
+                  </button>
+                ))}
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* === Main Scanner Area === */}
       <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden">
-        {/* Camera viewport — html5-qrcode mounts its <video> element here */}
+        {/* Camera viewport — mounts high-definition clean video stream */}
         <div
           id={QR_SCANNER_ELEMENT_ID}
           className="absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center"
           style={{ background: '#020617' }}
         />
 
-        {/* === Scanning Overlay (shown only when active) === */}
+        {/* === Scanning Overlay (shown only when active, crystal-clear with NO dark vignette) === */}
         <AnimatePresence>
           {scanState === 'active' && (
             <motion.div
@@ -121,59 +219,48 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none"
             >
-              {/* Dark vignette mask */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: `radial-gradient(
-                    circle 160px at 50% 48%,
-                    transparent 75px,
-                    rgba(2, 6, 23, 0.65) 160px
-                  )`,
-                }}
-              />
-
-              {/* Scan frame */}
-              <div className="relative w-64 h-64 pointer-events-none shrink-0">
-                {/* Corner brackets */}
+              {/* Scan frame — sleek clean viewfinder reticle */}
+              <div className="relative w-72 h-72 pointer-events-none shrink-0">
+                {/* 4 Corner brackets with subtle glow */}
                 {[
-                  'top-0 left-0 border-t-4 border-l-4 rounded-tl-2xl',
-                  'top-0 right-0 border-t-4 border-r-4 rounded-tr-2xl',
-                  'bottom-0 left-0 border-b-4 border-l-4 rounded-bl-2xl',
-                  'bottom-0 right-0 border-b-4 border-r-4 rounded-br-2xl',
+                  'top-0 left-0 border-t-[3.5px] border-l-[3.5px] rounded-tl-2xl',
+                  'top-0 right-0 border-t-[3.5px] border-r-[3.5px] rounded-tr-2xl',
+                  'bottom-0 left-0 border-b-[3.5px] border-l-[3.5px] rounded-bl-2xl',
+                  'bottom-0 right-0 border-b-[3.5px] border-r-[3.5px] rounded-br-2xl',
                 ].map((cls, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05, type: 'spring' }}
-                    className={`absolute w-8 h-8 border-blue-400 ${cls}`}
+                    className={`absolute w-10 h-10 border-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.8)] ${cls}`}
                   />
                 ))}
 
-                {/* Scanning line */}
+                {/* Smooth laser scanning bar */}
                 <motion.div
-                  className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent mx-2 rounded-full shadow-lg"
-                  style={{ boxShadow: '0 0 10px rgba(96, 165, 250, 0.9)' }}
-                  animate={{ top: ['8%', '88%', '8%'] }}
-                  transition={{ duration: 2.5, ease: 'easeInOut', repeat: Infinity }}
+                  className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent rounded-full"
+                  style={{ boxShadow: '0 0 12px rgba(96, 165, 250, 0.95), 0 0 4px rgba(255, 255, 255, 0.8)' }}
+                  animate={{ top: ['10%', '90%', '10%'] }}
+                  transition={{ duration: 2.2, ease: 'easeInOut', repeat: Infinity }}
                 />
 
-                {/* Center crosshair dot */}
+                {/* Subtle center crosshair */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
-                    className="w-3 h-3 rounded-full bg-blue-400 opacity-60"
-                    animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0.2, 0.6] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="w-2.5 h-2.5 rounded-full bg-blue-400/70"
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.7, 0.3, 0.7] }}
+                    transition={{ duration: 1.6, repeat: Infinity }}
                   />
                 </div>
               </div>
 
-              {/* Hint text */}
-              <div className="mt-4 flex justify-center pointer-events-none">
-                <div className="px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 backdrop-blur-md shadow-lg">
-                  <p className="text-xs font-medium text-slate-200 text-center tracking-wide">
-                    Align QR code within the frame
+              {/* Status pill badge */}
+              <div className="mt-5 flex justify-center pointer-events-none">
+                <div className="px-4 py-1.5 rounded-full bg-slate-900/85 border border-slate-700/70 backdrop-blur-md shadow-xl flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  <p className="text-xs font-semibold text-slate-200 text-center tracking-wide">
+                    Hold QR code within camera view
                   </p>
                 </div>
               </div>
@@ -196,9 +283,9 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
                 className="w-14 h-14 rounded-full border-4 border-blue-500/20 border-t-blue-500 mb-4"
               />
               <p className="text-sm font-bold text-white">
-                {scanState === 'idle' ? 'Preparing Camera…' : 'Requesting Permission…'}
+                {scanState === 'idle' ? 'Preparing Camera…' : 'Requesting Camera Access…'}
               </p>
-              <p className="text-xs text-slate-400 mt-1">Please allow camera access when prompted</p>
+              <p className="text-xs text-slate-400 mt-1">Please allow camera permissions if prompted</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -210,32 +297,32 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-slate-950/90"
+              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-slate-950/90 backdrop-blur-sm"
             >
               <motion.div
-                animate={{ scale: [1, 1.15, 1] }}
+                animate={{ scale: [1, 1.12, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
                 className="w-16 h-16 rounded-3xl bg-blue-500/20 border-2 border-blue-500/50 flex items-center justify-center mb-4"
               >
                 <QrCode className="w-8 h-8 text-blue-400" />
               </motion.div>
               <p className="text-sm font-bold text-white">QR Code Detected!</p>
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Resolving cattle profile…
+              <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                Resolving cattle digital passport…
               </p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* === Success State (brief flash before quick card) === */}
+        {/* === Success State === */}
         <AnimatePresence>
           {scanState === 'success' && !scannedCattle && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-blue-950/90"
+              className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-slate-950/95"
             >
               <CheckCircle2 className="w-16 h-16 text-blue-400" />
               <p className="text-sm font-bold text-white mt-3">Profile Found!</p>
@@ -262,7 +349,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
         </AnimatePresence>
       </div>
 
-      {/* === Bottom Controls (shown only when active) === */}
+      {/* === Bottom Controls Bar === */}
       <AnimatePresence>
         {scanState === 'active' && (
           <motion.div
@@ -276,7 +363,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
             <button
               onClick={toggleFlash}
               disabled={!hasFlash}
-              title={hasFlash ? (flashOn ? 'Turn off flash' : 'Turn on flash') : 'Flash not available'}
+              title={hasFlash ? (flashOn ? 'Turn off flash' : 'Turn on flash') : 'Flash not available on this device'}
               className={`
                 flex flex-col items-center gap-1 p-3 rounded-2xl transition-all active:scale-95
                 ${hasFlash
@@ -294,11 +381,11 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
             {/* Center indicator */}
             <div className="flex flex-col items-center gap-1">
               <motion.div
-                className="w-2.5 h-2.5 rounded-full bg-blue-400"
-                animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"
+                animate={{ scale: [1, 1.35, 1], opacity: [1, 0.6, 1] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
               />
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Scanning</span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Active Scanner</span>
             </div>
 
             {/* Camera switch */}
@@ -321,34 +408,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onClose, embedded = false 
         )}
       </AnimatePresence>
 
-      {/* === Retry bar on error (compact) === */}
-      <AnimatePresence>
-        {scanState === 'error' && (
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-            className="relative z-20 bg-black/60 backdrop-blur-sm px-4 py-3 flex items-center justify-center gap-3"
-          >
-            <button
-              onClick={handleRetry}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-xs transition-all"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Retry
-            </button>
-            {!embedded && (
-              <button
-                onClick={handleClose}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-slate-300 font-bold text-xs transition-all"
-              >
-                <X className="w-3.5 h-3.5" /> Cancel
-              </button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* === Quick Info Card Popup === */}
+      {/* === Quick Info Card Popup on scan success === */}
       <AnimatePresence>
         {scanState === 'success' && scannedCattle && (
           <CattleQuickCard

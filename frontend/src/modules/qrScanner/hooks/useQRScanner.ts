@@ -3,11 +3,12 @@
  * Phase 3: Smart QR Scanner & Digital Profile Access
  *
  * Manages the full html5-qrcode camera lifecycle:
- * - Camera permission request
- * - Scanner initialization and teardown
+ * - High-definition camera stream (1080p/720p with autofocus)
+ * - Hardware-accelerated BarcodeDetector integration
+ * - Full-frame scanning (no restrictive clipping)
+ * - Camera permission handling & graceful error recovery
  * - Duplicate scan prevention
- * - Camera switching (front/rear)
- * - Torch (flashlight) toggle
+ * - Camera switching (front/rear) & torch toggle
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -30,6 +31,7 @@ interface UseQRScannerReturn {
   resetScanner: () => void;
   toggleFlash: () => Promise<void>;
   switchCamera: (cameraId: string) => Promise<void>;
+  resolveManualCode: (code: string) => Promise<void>;
 }
 
 export function useQRScanner(): UseQRScannerReturn {
@@ -42,17 +44,20 @@ export function useQRScanner(): UseQRScannerReturn {
   const [activeCameraId, setActiveCameraId] = useState<string | null>(null);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const scanHandledRef = useRef(false); // prevent duplicate scans
+  const scanHandledRef = useRef(false);
   const isRunningRef = useRef(false);
 
   /** Clean up scanner on unmount */
   useEffect(() => {
     return () => {
-      if (isRunningRef.current && scannerRef.current) {
+      if (scannerRef.current) {
         try {
-          scannerRef.current.stop().catch(() => {});
+          if (scannerRef.current.isScanning) {
+            scannerRef.current.stop().catch(() => {});
+          }
           scannerRef.current.clear();
         } catch { /* ignore cleanup errors */ }
+        isRunningRef.current = false;
       }
     };
   }, []);
@@ -121,19 +126,28 @@ export function useQRScanner(): UseQRScannerReturn {
       }
       setActiveCameraId(cameraId || null);
 
-      // Stop any existing scanner
-      if (isRunningRef.current && scannerRef.current) {
-        await scannerRef.current.stop().catch(() => {});
+      // Stop any existing scanner safely
+      if (scannerRef.current) {
+        try {
+          if (scannerRef.current.isScanning) {
+            await scannerRef.current.stop();
+          }
+          scannerRef.current.clear();
+        } catch { /* ignore */ }
         isRunningRef.current = false;
       }
 
-      // Create scanner instance
-      const scanner = new Html5Qrcode(QR_SCANNER_ELEMENT_ID, { verbose: false });
+      // Create scanner instance with hardware BarcodeDetector enabled
+      const scanner = new Html5Qrcode(QR_SCANNER_ELEMENT_ID, {
+        verbose: false,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true,
+        },
+      });
       scannerRef.current = scanner;
 
       // Check flash support
       try {
-        // @ts-ignore – torch capability check
         const capabilities = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         const track = capabilities.getVideoTracks()[0];
         // @ts-ignore
@@ -146,16 +160,24 @@ export function useQRScanner(): UseQRScannerReturn {
 
       setScanState('active');
 
+      // High-definition camera configuration
+      const cameraConfig = cameraId
+        ? { deviceId: { exact: cameraId } }
+        : { facingMode: { ideal: 'environment' } };
+
       await scanner.start(
-        cameraId ? { deviceId: { exact: cameraId } } : { facingMode: 'environment' },
+        cameraConfig,
         {
-          fps: 15,
-          qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            const edge = Math.max(180, Math.min(260, Math.floor(minEdge * 0.72)));
-            return { width: edge, height: edge };
-          },
+          fps: 24, // High framerate for crisp, immediate detection
           disableFlip: false,
+          videoConstraints: {
+            facingMode: cameraId ? undefined : { ideal: 'environment' },
+            width: { ideal: 1920, min: 640 },
+            height: { ideal: 1080, min: 480 },
+            aspectRatio: { ideal: 1.7777777778 },
+            // Continuous autofocus if supported
+            advanced: [{ focusMode: 'continuous' } as any],
+          },
         },
         async (decodedText: string, _result: Html5QrcodeResult) => {
           // Prevent processing the same scan twice
@@ -164,23 +186,57 @@ export function useQRScanner(): UseQRScannerReturn {
 
           setScanState('processing');
 
-          // Stop camera immediately after detection
           try {
-            await scanner.stop();
-            isRunningRef.current = false;
-          } catch { /* already stopped */ }
+            // Resolve the payload
+            const result = await resolveQRPayload(decodedText);
 
-          // Resolve the payload
-          const result = await resolveQRPayload(decodedText);
-          if (result.success && result.cattle) {
-            setScannedCattle(result.cattle);
-            setScanState('success');
-          } else {
-            setError(result.error ?? { code: 'CORRUPTED', message: 'Unknown Error', detail: '' });
+            if (result.success && result.cattle) {
+              // Haptic vibration feedback on supported mobile devices
+              try { navigator.vibrate?.(120); } catch { /* ignore */ }
+
+              // Stop camera now that scan succeeded
+              try {
+                if (scanner.isScanning) {
+                  await scanner.stop();
+                }
+                isRunningRef.current = false;
+              } catch { /* already stopped */ }
+
+              setScannedCattle(result.cattle);
+              setScanState('success');
+            } else {
+              // Stop camera and show clear error state with retry option
+              try {
+                if (scanner.isScanning) {
+                  await scanner.stop();
+                }
+                isRunningRef.current = false;
+              } catch { /* ignore */ }
+
+              setError(result.error ?? {
+                code: 'CORRUPTED',
+                message: 'QR Code Unrecognized',
+                detail: `Code scanned: "${decodedText.slice(0, 50)}". Please scan a FarmEase livestock QR code.`,
+              });
+              setScanState('error');
+            }
+          } catch (err: any) {
+            try {
+              if (scanner.isScanning) {
+                await scanner.stop();
+              }
+              isRunningRef.current = false;
+            } catch { /* ignore */ }
+
+            setError({
+              code: 'SERVER_ERROR',
+              message: 'Failed to Process QR',
+              detail: err?.message || 'Unexpected error while reading QR payload.',
+            });
             setScanState('error');
           }
         },
-        undefined // optional error callback (suppress per-frame noise)
+        undefined // suppress per-frame scanning noise
       );
 
       isRunningRef.current = true;
@@ -215,10 +271,12 @@ export function useQRScanner(): UseQRScannerReturn {
 
   /** Stop the QR scanner and release camera resources */
   const stopScanner = useCallback(async () => {
-    if (scannerRef.current && isRunningRef.current) {
+    if (scannerRef.current) {
       try {
-        await scannerRef.current.stop();
-        await scannerRef.current.clear();
+        if (scannerRef.current.isScanning) {
+          await scannerRef.current.stop();
+        }
+        scannerRef.current.clear();
       } catch { /* ignore */ }
       isRunningRef.current = false;
     }
@@ -247,9 +305,38 @@ export function useQRScanner(): UseQRScannerReturn {
   const switchCamera = useCallback(async (cameraId: string) => {
     if (cameraId === activeCameraId) return;
     await stopScanner();
-    // Small delay to let the DOM element clear
     setTimeout(() => startScanner(cameraId), 300);
   }, [activeCameraId, stopScanner, startScanner]);
+
+  /** Manually resolve an ID or test code */
+  const resolveManualCode = useCallback(async (code: string) => {
+    setScanState('processing');
+    try {
+      const result = await resolveQRPayload(code);
+      if (result.success && result.cattle) {
+        if (scannerRef.current?.isScanning) {
+          await scannerRef.current.stop();
+          isRunningRef.current = false;
+        }
+        setScannedCattle(result.cattle);
+        setScanState('success');
+      } else {
+        setError(result.error ?? {
+          code: 'UNKNOWN_CATTLE',
+          message: 'Cattle Not Found',
+          detail: `No cattle matching "${code}" was found.`,
+        });
+        setScanState('error');
+      }
+    } catch (err: any) {
+      setError({
+        code: 'SERVER_ERROR',
+        message: 'Lookup Failed',
+        detail: err?.message || 'Error resolving code',
+      });
+      setScanState('error');
+    }
+  }, []);
 
   return {
     scanState,
@@ -264,5 +351,6 @@ export function useQRScanner(): UseQRScannerReturn {
     resetScanner,
     toggleFlash,
     switchCamera,
+    resolveManualCode,
   };
 }

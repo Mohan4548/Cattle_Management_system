@@ -1524,6 +1524,8 @@
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  filter: contrast(104%) brightness(102%) saturate(102%) !important;
 }
 
 #farmease-qr-scanner-viewport__scan_region {
@@ -1537,10 +1539,14 @@
 }
 
 #qr-shaded-region {
+  display: none !important;
+  opacity: 0 !important;
   border: none !important;
+  visibility: hidden !important;
 }
 
 #farmease-qr-scanner-viewport img[alt="Info icon"],
-#farmease-qr-scanner-viewport div[style*="text-align: center"] {
+#farmease-qr-scanner-viewport div[style*="text-align: center"],
+#farmease-qr-scanner-viewport span {
   display: none !important;
 }

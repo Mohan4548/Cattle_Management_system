@@ -96,7 +96,7 @@ export const CattleQuickCard: React.FC<CattleQuickCardProps> = ({
           className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-200/60 dark:border-slate-800"
         >
           {/* Success Header */}
-          <div className="relative bg-gradient-to-br from-emerald-500 to-teal-600 p-5 pb-14">
+          <div className="relative bg-gradient-to-br from-blue-600 to-indigo-700 p-5 pb-14">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-white" />
