@@ -108,34 +108,37 @@ const AIHealthSummaryWidget: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  if (!summary) return null;
+  // Only show if there are actual cattle requiring attention or high/medium risk alerts
+  if (!summary || ((summary.cattleRequiringAttention?.length ?? 0) === 0 && (summary.highRiskCount ?? 0) === 0 && (summary.mediumRiskCount ?? 0) === 0)) {
+    return null;
+  }
 
   return (
-    <div className="glass-card p-4 rounded-2xl border border-emerald-500/20 dark:border-emerald-800/40 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-indigo-500/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="p-4 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-          <Sparkles className="w-4 h-4 animate-pulse text-emerald-600 dark:text-emerald-400" />
+        <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-              AI HEALTH SUMMARY
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-200">
+              Health Attention Required
             </span>
-            <span className="px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 rounded border border-emerald-200 dark:border-emerald-800">
-              {summary.healthDataCoverage}% Coverage
+            <span className="px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300 bg-amber-200/60 dark:bg-amber-900/60 rounded">
+              {summary.highRiskCount} High Risk
             </span>
           </div>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            {summary.cattleRequiringAttention?.length || 0} cattle require attention ({summary.highRiskCount || 0} High, {summary.mediumRiskCount || 0} Medium risk)
+          <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5">
+            {summary.cattleRequiringAttention?.length || 0} cattle require clinical review ({summary.highRiskCount || 0} High, {summary.mediumRiskCount || 0} Medium risk)
           </p>
         </div>
       </div>
 
       <button
         onClick={() => navigate('/ai-insights')}
-        className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
+        className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 shadow-xs"
       >
-        View AI Insights →
+        Review Alerts →
       </button>
     </div>
   );
@@ -258,19 +261,40 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const kpi = data?.kpi || {
-    totalCattle: 5,
-    healthyCattle: 3,
-    pregnantCattle: 1,
-    milkToday: 38.5,
-    milkThisMonth: 1120.0,
-    feedCost: 45000,
-    profit: 141000,
-    expenses: 45000,
-    vaccinationsDue: 1,
-    todaysTasks: 1,
-    upcomingDeliveries: 1,
+  const getGreetingName = () => {
+    if (!user?.full_name) return 'Farmer';
+    const parts = user.full_name.trim().split(/\s+/);
+    if (parts[0].toLowerCase().startsWith('dr') && parts.length > 1) {
+      return `${parts[0]} ${parts[1]}`;
+    }
+    return parts[0];
   };
+
+  const kpi = (data as any)?.kpi || (data ? {
+    totalCattle: (data as any).totalCattle ?? 0,
+    healthyCattle: (data as any).healthyCattle ?? 0,
+    pregnantCattle: (data as any).pregnantCattle ?? 0,
+    milkToday: (data as any).milkToday ?? 0,
+    milkThisMonth: (data as any).milkThisMonth ?? 0,
+    feedCost: (data as any).feedCost ?? 0,
+    profit: (data as any).profit ?? 0,
+    expenses: (data as any).expenses ?? 0,
+    vaccinationsDue: (data as any).vaccinationsDue ?? 0,
+    todaysTasks: (data as any).todaysTasks ?? 0,
+    upcomingDeliveries: (data as any).upcomingDeliveries ?? 0,
+  } : {
+    totalCattle: 0,
+    healthyCattle: 0,
+    pregnantCattle: 0,
+    milkToday: 0,
+    milkThisMonth: 0,
+    feedCost: 0,
+    profit: 0,
+    expenses: 0,
+    vaccinationsDue: 0,
+    todaysTasks: 0,
+    upcomingDeliveries: 0,
+  });
 
   const breedData = data?.charts?.breedDistribution || [
     { name: 'Holstein Friesian', value: 2, color: '#10b981' },
@@ -285,47 +309,59 @@ export const Dashboard: React.FC = () => {
   );
 
   return (
-    <div className="space-y-5 pb-8 animate-page-in">
-      {/* ── Page Header ── */}
-      <div className="card-premium p-5 border border-[var(--accent-green)]/15 bg-gradient-to-r from-[var(--accent-green-subtle)] via-[var(--bg-card)] to-[var(--bg-card)]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="badge-pill badge-green">
-                <Activity className="w-2.5 h-2.5" /> Live
-              </span>
-              <span className="text-xs text-[var(--text-muted)]">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
-            <h1 className="page-title">
-              Good morning, {user?.full_name?.split(' ')[0]} 👋
-            </h1>
-            <p className="page-subtitle">
-              Here's what's happening on your farm today.
-            </p>
+    <div className="space-y-6 pb-10">
+      {/* ── Modern Human Header ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div>
+          <div className="flex items-center gap-2.5 mb-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Live Farm Operations
+            </span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Good morning, {getGreetingName()} 👋
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Real-time cattle diagnostics, milk collection, and livestock financials.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Time range switcher */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/70 dark:border-slate-700">
+            {(['today', 'week', 'month'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setTimeRange(r)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  timeRange === r
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {r === 'today' ? 'Today' : r === 'week' ? 'This Week' : 'This Month'}
+              </button>
+            ))}
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative">
-              <Search className="search-icon w-3.5 h-3.5" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search activities…"
-                className="search-input w-52"
-              />
-            </div>
-
-            <div className="tab-bar">
-              {(['today', 'week', 'month'] as const).map((r) => (
-                <button key={r} onClick={() => setTimeRange(r)} className={`tab-item ${timeRange === r ? 'active' : ''}`}>
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
+          <button
+            onClick={() => setActiveModal('cattle')}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Cattle
+          </button>
+          <button
+            onClick={() => navigate('/qr-scanner')}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <ScanLine className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            Scan QR
+          </button>
         </div>
       </div>
 
@@ -335,147 +371,149 @@ export const Dashboard: React.FC = () => {
       {/* AI Breeding Overview Widget */}
       <AIBreedingSummaryWidget />
 
-      {/* ── Quick Actions ── */}
-      <div className="card-premium p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-green)]" />
-            <span className="section-label">Quick Actions</span>
+      {/* ── Core KPI Command Cards (High-Impact 4-Card Grid) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Active Herd */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Cattle</span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <Beef className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
+                <AnimatedCounter value={kpi.totalCattle} />
+              </span>
+              <span className="text-xs text-slate-400 font-medium">registered head</span>
+            </div>
           </div>
-          <span className="badge-pill badge-green">1-Click</span>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300">
+                {kpi.healthyCattle} Healthy
+              </span>
+              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300">
+                {kpi.pregnantCattle} Pregnant
+              </span>
+            </div>
+            <Link to="/cattle" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+              Herd →
+            </Link>
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+
+        {/* Card 2: Milk Yield */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Daily Milk Yield</span>
+              <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                <Droplet className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
+                <AnimatedCounter value={kpi.milkToday} decimals={1} suffix=" L" />
+              </span>
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.5 rounded">
+                Today
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Month: <strong className="text-slate-800 dark:text-slate-200 font-bold">{kpi.milkThisMonth.toLocaleString()} L</strong>
+            </span>
+            <Link to="/milk" className="text-sky-600 dark:text-sky-400 font-bold hover:underline">
+              Log Yield →
+            </Link>
+          </div>
+        </div>
+
+        {/* Card 3: Financial Net Profit */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Net Profit</span>
+              <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                <TrendingUp className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
+                <AnimatedCounter value={kpi.profit} prefix="₹" decimals={0} />
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Expenses: ₹{kpi.expenses.toLocaleString('en-IN')}
+            </span>
+            <Link to="/financials" className="text-teal-600 dark:text-teal-400 font-bold hover:underline">
+              Ledger →
+            </Link>
+          </div>
+        </div>
+
+        {/* Card 4: Action Items & Alerts */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Actions</span>
+              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <Bell className="w-4.5 h-4.5" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
+                <AnimatedCounter value={kpi.vaccinationsDue + kpi.todaysTasks} />
+              </span>
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold">items to review</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              {kpi.vaccinationsDue} Vax Due · {kpi.todaysTasks} Tasks
+            </span>
+            <Link to="/tasks" className="text-amber-600 dark:text-amber-400 font-bold hover:underline">
+              Task Board →
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Quick Operations Bar ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            Quick Farm Operations
+          </span>
+          <span className="text-[11px] text-slate-400 font-medium">Daily management shortcuts</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
-            { label: 'Add Cattle',   icon: Beef,      color: 'icon-box-green',  action: () => setActiveModal('cattle' as const) },
-            { label: 'Add Milk',     icon: Milk,      color: 'icon-box-teal',   action: () => setActiveModal('milk' as const) },
-            { label: 'Scan QR',      icon: ScanLine,  color: 'icon-box-indigo', action: () => navigate('/qr-scanner') },
-            { label: 'Vaccination',  icon: Syringe,   color: 'icon-box-violet', action: () => setActiveModal('vaccine' as const) },
-            { label: 'Add Feed',     icon: Boxes,     color: 'icon-box-amber',  action: () => setActiveModal('feed' as const) },
+            { label: 'Register Cattle', icon: Beef, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50', action: () => setActiveModal('cattle') },
+            { label: 'Record Milk', icon: Milk, color: 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50', action: () => setActiveModal('milk') },
+            { label: 'Scan Cattle QR', icon: ScanLine, color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50', action: () => navigate('/qr-scanner') },
+            { label: 'Schedule Vaccine', icon: Syringe, color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50', action: () => setActiveModal('vaccine') },
+            { label: 'Update Feed Stock', icon: Boxes, color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50', action: () => setActiveModal('feed') },
           ].map(({ label, icon: Icon, color, action }) => (
             <button
               key={label}
               onClick={action}
-              className="p-3 rounded-xl bg-[var(--bg-tertiary)] hover:bg-[var(--accent-green-subtle)] border border-[var(--border-base)] hover:border-[var(--accent-green)]/30 text-xs font-semibold flex flex-col items-center gap-2 transition-all duration-200 text-[var(--text-secondary)] hover:text-[var(--accent-green-dark)] group"
+              className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150 text-left group cursor-pointer"
             >
-              <div className={`icon-box ${color} w-9 h-9 group-hover:scale-110 transition-transform rounded-xl`}>
+              <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
                 <Icon className="w-4 h-4" />
               </div>
-              <span className="text-center leading-tight">{label}</span>
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white leading-tight">
+                {label}
+              </span>
             </button>
           ))}
-        </div>
-      </div>
-
-      {/* 11 KPI Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
-        {/* KPI 1 */}
-        <div className="stat-card accent-green p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Total Cattle</span>
-            <div className="icon-box icon-box-green w-7 h-7"><Beef className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--text-primary)]"><AnimatedCounter value={kpi.totalCattle} /></div>
-          <p className="text-[10px] text-emerald-500 dark:text-emerald-400 font-semibold mt-1.5">100% Active Herd</p>
-        </div>
-
-        {/* KPI 2 */}
-        <div className="stat-card accent-green p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Healthy</span>
-            <div className="icon-box icon-box-green w-7 h-7"><Heart className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-emerald-500 dark:text-emerald-400"><AnimatedCounter value={kpi.healthyCattle} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Normal Health</p>
-        </div>
-
-        {/* KPI 3 */}
-        <div className="stat-card accent-violet p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Pregnant</span>
-            <div className="icon-box icon-box-violet w-7 h-7"><Stethoscope className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-violet)]"><AnimatedCounter value={kpi.pregnantCattle} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Expected Calving</p>
-        </div>
-
-        {/* KPI 4 */}
-        <div className="stat-card accent-teal p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Milk Today</span>
-            <div className="icon-box icon-box-teal w-7 h-7"><Droplet className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-teal)]"><AnimatedCounter value={kpi.milkToday} decimals={1} suffix=" L" /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">AM + PM Sessions</p>
-        </div>
-
-        {/* KPI 5 */}
-        <div className="stat-card accent-sky p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Monthly Milk</span>
-            <div className="icon-box icon-box-sky w-7 h-7"><Milk className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--text-primary)]"><AnimatedCounter value={kpi.milkThisMonth} decimals={1} suffix=" L" /></div>
-          <p className="text-[10px] text-emerald-500 dark:text-emerald-400 font-semibold mt-1.5">+6.4% vs last month</p>
-        </div>
-
-        {/* KPI 6 */}
-        <div className="stat-card accent-amber p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Feed Cost</span>
-            <div className="icon-box icon-box-amber w-7 h-7"><Boxes className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-amber)]"><AnimatedCounter value={kpi.feedCost} prefix="₹" decimals={0} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Monthly Fodder</p>
-        </div>
-
-        {/* KPI 7 */}
-        <div className="stat-card accent-green p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Net Profit</span>
-            <div className="icon-box icon-box-green w-7 h-7"><DollarSign className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-emerald-500 dark:text-emerald-400"><AnimatedCounter value={kpi.profit} prefix="₹" decimals={0} /></div>
-          <p className="text-[10px] text-emerald-500 dark:text-emerald-400 font-semibold mt-1.5">Revenue − Expenses</p>
-        </div>
-
-        {/* KPI 8 */}
-        <div className="stat-card accent-rose p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Expenses</span>
-            <div className="icon-box icon-box-rose w-7 h-7"><ArrowDownRight className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-rose)]"><AnimatedCounter value={kpi.expenses} prefix="₹" decimals={0} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Total Operational</p>
-        </div>
-
-        {/* KPI 9 */}
-        <div className="stat-card accent-violet p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Vax Due</span>
-            <div className="icon-box icon-box-violet w-7 h-7"><Syringe className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-violet)]"><AnimatedCounter value={kpi.vaccinationsDue} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Clarabelle (FE-105)</p>
-        </div>
-
-        {/* KPI 10 */}
-        <div className="stat-card accent-sky p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Tasks Today</span>
-            <div className="icon-box icon-box-sky w-7 h-7"><CheckSquare className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--text-primary)]"><AnimatedCounter value={kpi.todaysTasks} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">Worker Assignments</p>
-        </div>
-
-        {/* KPI 11 */}
-        <div className="stat-card accent-amber p-4 sm:col-span-2 xl:col-span-2">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Deliveries</span>
-            <div className="icon-box icon-box-amber w-7 h-7"><Truck className="w-3.5 h-3.5" /></div>
-          </div>
-          <div className="font-display text-2xl font-black text-[var(--accent-amber)]"><AnimatedCounter value={kpi.upcomingDeliveries} /></div>
-          <p className="text-[10px] text-[var(--text-muted)] mt-1.5">NutriFeed Co. (In Transit)</p>
         </div>
       </div>
 

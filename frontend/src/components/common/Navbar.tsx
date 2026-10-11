@@ -205,29 +205,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
       </div>
 
       {/* ── Center: Search ── */}
-      <div className="relative flex-1 max-w-xs hidden md:block">
+      <div className="relative flex-1 max-w-sm hidden md:block">
         <div
-          className="relative flex items-center rounded-xl transition-all duration-200"
-          style={{
-            background: 'var(--bg-input)',
-            border: `1.5px solid ${isListening ? 'var(--accent-green)' : 'var(--border-base)'}`,
-            boxShadow: isListening ? '0 0 0 3px var(--accent-green-glow)' : undefined,
-          }}
+          className={`relative flex items-center rounded-xl transition-all duration-200 border ${
+            isListening
+              ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-slate-900'
+              : 'border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-emerald-500/70 focus-within:ring-2 focus-within:ring-emerald-500/10'
+          }`}
         >
-          <Search className="absolute left-2.5 w-3.5 h-3.5 text-[var(--text-muted)] pointer-events-none" />
+          <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isListening ? 'Listening…' : 'Search cattle, logs…'}
-            className="w-full py-2 pl-8 pr-9 bg-transparent text-[13px] font-normal text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            placeholder={isListening ? 'Listening…' : 'Search cattle ID, tags, records…'}
+            className="w-full py-2 pl-9 pr-9 bg-transparent text-xs font-normal text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none"
           />
           <button
             type="button"
             onClick={handleVoiceSearch}
             className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md transition-all ${
-              isListening ? 'text-[var(--accent-rose)] animate-pulse' : 'text-[var(--text-muted)] hover:text-[var(--accent-green)]'
+              isListening ? 'text-rose-500 animate-pulse' : 'text-slate-400 hover:text-emerald-600'
             }`}
             title="Voice search"
           >
@@ -237,17 +235,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
       </div>
 
       {/* ── Right: Actions ── */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
 
         {/* Online status indicator */}
         <div className={`
-          hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all duration-300
+          hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200
           ${isOnline
-            ? 'bg-[var(--accent-green-subtle)] text-[var(--accent-green-dark)] border-[var(--accent-green)]/22'
-            : 'bg-[var(--accent-rose-subtle)]  text-[var(--accent-rose)]  border-[var(--accent-rose)]/22 animate-pulse'
+            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/80'
+            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/80 animate-pulse'
           }
         `}>
-          {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+          <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
           <span>{isOnline ? 'Online' : 'Offline'}</span>
         </div>
 
@@ -255,23 +253,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
         <button
           onClick={() => navigate('/qr-scanner')}
           title="Open QR Scanner"
-          className="btn-icon"
-          style={{ color: 'var(--accent-green)', borderColor: 'rgba(21,163,74,0.3)', background: 'var(--accent-green-subtle)' }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = 'var(--accent-green)';
-            (e.currentTarget as HTMLElement).style.color = 'white';
-            (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent-green)';
-            (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-green)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = 'var(--accent-green-subtle)';
-            (e.currentTarget as HTMLElement).style.color = 'var(--accent-green)';
-            (e.currentTarget as HTMLElement).style.borderColor = 'rgba(21,163,74,0.3)';
-            (e.currentTarget as HTMLElement).style.boxShadow = '';
-          }}
+          className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-500/40 shadow-xs transition-colors cursor-pointer"
           aria-label="QR Scanner"
         >
-          <QrCode className="w-4 h-4" />
+          <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
         </button>
 
         {/* Role switcher */}
@@ -279,14 +264,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
           <select
             value={user?.role}
             onChange={(e) => switchRole(e.target.value as UserRole)}
-            className="py-1.5 pl-2.5 pr-6 text-[11px] rounded-lg font-semibold cursor-pointer bg-[var(--bg-tertiary)] border border-[var(--border-base)] text-[var(--text-secondary)] focus:outline-none appearance-none hover:border-[var(--border-strong)] transition-colors"
+            className="py-1.5 pl-3 pr-7 text-xs rounded-xl font-semibold cursor-pointer bg-slate-100/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none appearance-none hover:border-slate-300 dark:hover:border-slate-600 transition-colors shadow-xs"
           >
             <option value="admin">Admin</option>
             <option value="farmer">Farmer</option>
             <option value="veterinarian">Veterinarian</option>
             <option value="worker">Worker</option>
           </select>
-          <ChevronDown className="w-3 h-3 text-[var(--text-muted)] absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
         {/* Theme toggle */}
