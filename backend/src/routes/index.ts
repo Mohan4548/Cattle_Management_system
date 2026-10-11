@@ -36,7 +36,7 @@ router.get('/cattle/:id', authenticateToken, cattleController.getCattleById);
 
 router.post('/cattle', authenticateToken, requireRole(['admin', 'farmer']), cattleController.createCattle);
 router.put('/cattle/:id', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), cattleController.updateCattle);
-router.delete('/cattle/:id', authenticateToken, requireRole(['admin']), cattleController.deleteCattle);
+router.delete('/cattle/:id', authenticateToken, requireRole(['admin', 'farmer']), cattleController.deleteCattle);
 
 // Comprehensive Milk Production Routes
 router.get('/milk', authenticateToken, milkController.getMilkLogs);
@@ -52,13 +52,13 @@ router.get('/health/ai-insights', authenticateToken, cattleHealthRiskController.
 router.get('/health', authenticateToken, healthController.getHealthRecords);
 router.post('/health', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createHealthRecord);
 router.get('/vaccinations', authenticateToken, healthController.getVaccinations);
-router.post('/vaccinations', authenticateToken, requireRole(['admin', 'veterinarian']), healthController.createVaccination);
+router.post('/vaccinations', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createVaccination);
 router.get('/health/deworming', authenticateToken, healthController.getDeworming);
 router.post('/health/deworming', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createDeworming);
 router.get('/health/vitamins', authenticateToken, healthController.getVitamins);
 router.post('/health/vitamins', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createVitamin);
 router.get('/health/doctor-visits', authenticateToken, healthController.getDoctorVisits);
-router.post('/health/doctor-visits', authenticateToken, requireRole(['admin', 'veterinarian']), healthController.createDoctorVisit);
+router.post('/health/doctor-visits', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createDoctorVisit);
 router.get('/health/vitals-trend', authenticateToken, healthController.getVitalsTrend);
 
 // Comprehensive Breeding & Calving Routes
@@ -80,9 +80,10 @@ router.post('/financials', authenticateToken, requireRole(['admin', 'farmer']), 
 
 // Task Management & Attendance Routes
 router.get('/tasks', authenticateToken, tasksController.getTasks);
-router.post('/tasks', authenticateToken, requireRole(['admin', 'farmer']), tasksController.createTask);
+router.post('/tasks', authenticateToken, requireRole(['admin', 'farmer', 'worker']), tasksController.createTask);
 router.patch('/tasks/:id/status', authenticateToken, tasksController.updateTaskStatus);
 router.get('/tasks/attendance', authenticateToken, tasksController.getAttendance);
+router.post('/tasks/attendance', authenticateToken, tasksController.markAttendance);
 // Smart Notification & AI Health Alert Routes
 router.get('/notifications', authenticateToken, notificationController.getNotifications);
 router.post('/notifications/generate', authenticateToken, notificationController.generateAlerts);

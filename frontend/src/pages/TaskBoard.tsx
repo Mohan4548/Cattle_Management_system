@@ -6,6 +6,7 @@ import { apiClient } from '../api/client';
 import { Task, UserProfile } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
+import { useToast } from '../context/ToastContext';
 import { 
   Users, 
   CheckSquare, 
@@ -79,14 +80,17 @@ export const TaskBoard: React.FC = () => {
     fetchData();
   }, []);
 
+  const { showToast } = useToast();
+
   const handleCreateTask = async (data: TaskFormData) => {
     try {
       const res = await apiClient.post('/tasks', data);
       setTasks(prev => [res.data, ...prev]);
       setIsTaskModalOpen(false);
       reset();
+      showToast(`Task "${data.title}" assigned successfully!`, 'success');
     } catch {
-      alert('Failed to assign task.');
+      showToast('Failed to assign task.', 'error');
     }
   };
 
@@ -94,8 +98,9 @@ export const TaskBoard: React.FC = () => {
     try {
       await apiClient.patch(`/tasks/${taskId}/status`, { status: newStatus });
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+      showToast(`Task status updated to ${newStatus.replace('_', ' ')}!`, 'success');
     } catch {
-      alert('Failed to update status.');
+      showToast('Failed to update task status.', 'error');
     }
   };
 
@@ -103,8 +108,9 @@ export const TaskBoard: React.FC = () => {
     try {
       const res = await apiClient.post('/tasks/attendance', { worker_id: workerId, status: 'present', shift: 'Full Day' });
       setAttendance(prev => [res.data, ...prev]);
+      showToast(`Marked ${workerName} present for today!`, 'success');
     } catch {
-      alert('Failed to mark attendance.');
+      showToast('Failed to mark attendance.', 'error');
     }
   };
 

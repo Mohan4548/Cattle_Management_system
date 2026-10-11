@@ -5,6 +5,7 @@ import { Cattle, PurchaseDocument, OwnershipRecord } from '../types';
 import { Badge } from '../components/common/Badge';
 import { useAuth } from '../context/AuthContext';
 import { Modal } from '../components/common/Modal';
+import { useToast } from '../context/ToastContext';
 import { DigitalIdentityCard } from '../modules/digitalIdentity/components/DigitalIdentityCard';
 import { CattleHealthRiskCard } from '../modules/healthRisk/components/CattleHealthRiskCard';
 import { CattleBreedingInsightCard } from '../modules/breeding/components/CattleBreedingInsightCard';
@@ -56,6 +57,7 @@ export const CattleProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [cattle, setCattle]           = useState<Cattle | null>(null);
   const [breedingInsight, setBreedingInsight] = useState<any>(null);
   const [activeTab, setActiveTab]     = useState<TabType>('timeline');
@@ -153,9 +155,10 @@ export const CattleProfile: React.FC = () => {
     if (!window.confirm(`Are you sure you want to delete ${cattle.name} (${cattle.tag_number})?`)) return;
     try {
       await apiClient.delete(`/cattle/${cattle.id}`);
+      showToast('Cattle record deleted successfully.', 'success');
       navigate('/cattle');
     } catch {
-      alert('Failed to delete cattle record.');
+      showToast('Failed to delete cattle record.', 'error');
     }
   };
 
@@ -206,7 +209,8 @@ export const CattleProfile: React.FC = () => {
       setDocs(prev => [...prev, res.data]);
       setDocForm({ doc_name: '', doc_type: 'Purchase Invoice', file_url: '' });
       setShowAddDoc(false);
-    } catch { alert('Failed to add document.'); }
+      showToast(`Document "${docForm.doc_name}" attached!`, 'success');
+    } catch { showToast('Failed to add document.', 'error'); }
     finally { setSavingDoc(false); }
   };
 
@@ -215,7 +219,8 @@ export const CattleProfile: React.FC = () => {
     try {
       await apiClient.delete(`/cattle/${cattle.id}/purchase-documents/${docId}`);
       setDocs(prev => prev.filter(d => d.id !== docId));
-    } catch { alert('Failed to delete document.'); }
+      showToast('Document removed.', 'success');
+    } catch { showToast('Failed to delete document.', 'error'); }
   };
 
   const addOwnership = async () => {
@@ -226,7 +231,8 @@ export const CattleProfile: React.FC = () => {
       setOwnership(prev => [...prev, res.data]);
       setOwnerForm({ owner_name: '', owner_contact: '', transfer_date: '', transfer_price: '', transfer_location: '', transfer_notes: '' });
       setShowAddOwner(false);
-    } catch { alert('Failed to add ownership record.'); }
+      showToast('Ownership history record saved!', 'success');
+    } catch { showToast('Failed to add ownership record.', 'error'); }
     finally { setSavingDoc(false); }
   };
 

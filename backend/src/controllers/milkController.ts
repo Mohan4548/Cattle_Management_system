@@ -56,16 +56,26 @@ export const createMilkLog = async (req: Request, res: Response) => {
 
   store.milkLogs.unshift(newLog);
 
-  // Auto record income transaction
-  store.transactions.unshift({
-    id: `tx-milk-${Date.now()}`,
-    type: 'income',
-    category: 'Milk Sale',
+  // Auto record income transaction in central financials ledger
+  const milkTx = {
+    id: `fin-milk-${Date.now()}`,
+    type: 'income' as const,
+    category: 'Milk Sales',
     amount: totalIncome,
     transaction_date: newLog.log_date,
-    description: `Milk sale for ${newLog.cattle_name} (${newLog.yield_liters} L @ $${rate}/L)`,
+    date: newLog.log_date,
+    description: `Milk sale for ${newLog.cattle_name} (${newLog.yield_liters} L @ ₹${rate}/L)`,
     reference_id: `MILK-${Math.floor(1000 + Math.random() * 9000)}`,
-  });
+    invoice_number: `INV-MS-2026-${Math.floor(100 + Math.random() * 900)}`,
+    payment_method: 'bank_transfer',
+    status: 'completed',
+  };
+  store.transactions = store.transactions || [];
+  store.financials = store.financials || store.transactions;
+  store.transactions.unshift(milkTx);
+  if (store.financials !== store.transactions) {
+    store.financials.unshift(milkTx);
+  }
 
   return res.status(201).json(newLog);
 };
@@ -145,7 +155,8 @@ export const getMilkStats = async (req: Request, res: Response) => {
 
 // Feed Module Endpoints
 export const getFeedLogs = async (req: Request, res: Response) => {
-  return res.json(feedLogStore);
+  const list = store.feedRecords || feedLogStore || [];
+  return res.json(list);
 };
 
 export const createFeedLog = async (req: Request, res: Response) => {
@@ -155,16 +166,17 @@ export const createFeedLog = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Feed type and quantity in kg are required' });
   }
 
-  const cattle = store.cattle.find(c => c.id === cattle_id);
+  const cattle = store.cattle?.find((c: any) => c.id === cattle_id);
+  const logCost = Number(cost) || Number(quantity_kg) * 22; // ₹22 per kg
 
   const newLog: FeedLog = {
     id: `fl-${Date.now()}`,
-    cattle_id,
-    cattle_name: cattle?.name || 'Herd Batch Feed',
+    cattle_id: cattle_id || 'cattle-1',
+    cattle_name: cattle?.name || 'All Herd Feed Batch',
     feed_type,
     quantity_kg: Number(quantity_kg),
-    cost: Number(cost) || 7.50,
-    feeding_time: feeding_time || 'Morning (06:00 AM)',
+    cost: logCost,
+    feeding_time: feeding_time || 'Morning Shift',
     protein_pct: protein_pct ? Number(protein_pct) : 18,
     energy_tdn: energy_tdn ? Number(energy_tdn) : 72,
     fiber_pct: fiber_pct ? Number(fiber_pct) : 22,
@@ -174,17 +186,31 @@ export const createFeedLog = async (req: Request, res: Response) => {
   };
 
   feedLogStore.unshift(newLog);
+  if (store.feedRecords) {
+    store.feedRecords.unshift(newLog);
+  }
 
   // Auto record feed expense transaction
-  store.transactions.unshift({
-    id: `tx-feed-${Date.now()}`,
-    type: 'expense',
-    category: 'Feed Purchase',
-    amount: newLog.cost,
+  const feedTx = {
+    id: `fin-feed-${Date.now()}`,
+    type: 'expense' as const,
+    category: 'Feed & Nutrition',
+    amount: logCost,
     transaction_date: newLog.log_date,
+    date: newLog.log_date,
     description: `Daily feed: ${feed_type} (${quantity_kg} kg)`,
     reference_id: `FEED-${Math.floor(1000 + Math.random() * 9000)}`,
-  });
+    invoice_number: `EXP-FD-2026-${Math.floor(100 + Math.random() * 900)}`,
+    payment_method: 'bank_transfer',
+    status: 'completed',
+  };
+
+  store.transactions = store.transactions || [];
+  store.financials = store.financials || store.transactions;
+  store.transactions.unshift(feedTx);
+  if (store.financials !== store.transactions) {
+    store.financials.unshift(feedTx);
+  }
 
   return res.status(201).json(newLog);
 };

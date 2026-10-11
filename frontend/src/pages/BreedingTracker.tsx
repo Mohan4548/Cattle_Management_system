@@ -6,6 +6,7 @@ import { apiClient } from '../api/client';
 import { BreedingRecord, Cattle } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
+import { useToast } from '../context/ToastContext';
 import { FamilyTree } from '../components/breeding/FamilyTree';
 import { 
   Heart, 
@@ -129,6 +130,8 @@ export const BreedingTracker: React.FC = () => {
     fetchData();
   }, []);
 
+  const { showToast } = useToast();
+
   const handleCreateBreedingRecord = async (data: BreedingFormData) => {
     try {
       const res = await apiClient.post('/breeding', data);
@@ -136,8 +139,9 @@ export const BreedingTracker: React.FC = () => {
       setIsRecordModalOpen(false);
       resetRecord();
       fetchData();
+      showToast(`Breeding event for ${data.event_type} logged successfully!`, 'success');
     } catch {
-      alert('Failed to log breeding event.');
+      showToast('Failed to log breeding event.', 'error');
     }
   };
 
@@ -155,9 +159,9 @@ export const BreedingTracker: React.FC = () => {
       setIsCalfModalOpen(false);
       resetCalf();
       fetchData();
-      alert('✨ Calf successfully registered into Herd Directory & family tree linked!');
+      showToast('Calf successfully registered into Herd Directory & pedigree tree linked!', 'success');
     } catch {
-      alert('Failed to register calf.');
+      showToast('Failed to register calf.', 'error');
     }
   };
 

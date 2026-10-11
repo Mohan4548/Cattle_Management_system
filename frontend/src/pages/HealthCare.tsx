@@ -13,6 +13,7 @@ import {
 } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
+import { useToast } from '../context/ToastContext';
 import { 
   Stethoscope, 
   Syringe, 
@@ -187,14 +188,17 @@ export const HealthCare: React.FC = () => {
     fetchData();
   }, []);
 
+  const { showToast } = useToast();
+
   const handleCreateHealth = async (data: HealthFormData) => {
     try {
       const res = await apiClient.post('/health', data);
       setHealthRecords(prev => [res.data, ...prev]);
       setIsHealthModalOpen(false);
       resetHealth();
+      showToast(`Health record saved: ${data.diagnosis}!`, 'success');
     } catch {
-      alert('Failed to save health record.');
+      showToast('Failed to save health record.', 'error');
     }
   };
 
@@ -204,8 +208,9 @@ export const HealthCare: React.FC = () => {
       setVaccinations(prev => [res.data, ...prev]);
       setIsVacModalOpen(false);
       resetVac();
+      showToast(`Vaccination record for ${data.vaccine_name} saved!`, 'success');
     } catch {
-      alert('Failed to save vaccination record.');
+      showToast('Failed to save vaccination record.', 'error');
     }
   };
 
@@ -215,8 +220,9 @@ export const HealthCare: React.FC = () => {
       setDewormings(prev => [res.data, ...prev]);
       setIsDewormModalOpen(false);
       resetDeworm();
+      showToast(`Deworming schedule saved!`, 'success');
     } catch {
-      alert('Failed to save deworming entry.');
+      showToast('Failed to save deworming entry.', 'error');
     }
   };
 
@@ -226,8 +232,9 @@ export const HealthCare: React.FC = () => {
       setVitamins(prev => [res.data, ...prev]);
       setIsVitModalOpen(false);
       resetVit();
+      showToast(`Vitamin schedule for ${data.vitamin_name} saved!`, 'success');
     } catch {
-      alert('Failed to save vitamin schedule.');
+      showToast('Failed to save vitamin schedule.', 'error');
     }
   };
 
@@ -237,8 +244,9 @@ export const HealthCare: React.FC = () => {
       setDoctorVisits(prev => [res.data, ...prev]);
       setIsVisitModalOpen(false);
       resetVisit();
+      showToast(`Veterinary consultation record logged!`, 'success');
     } catch {
-      alert('Failed to log doctor visit.');
+      showToast('Failed to log doctor visit.', 'error');
     }
   };
 

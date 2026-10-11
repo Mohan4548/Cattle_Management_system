@@ -7,6 +7,7 @@ import { Cattle } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { BulkQRPanel } from '../modules/digitalIdentity/components/BulkQRPanel';
 import { QRViewModal } from '../modules/digitalIdentity/components/QRViewModal';
@@ -148,6 +149,7 @@ type CattleFormData = z.infer<typeof cattleSchema>;
 
 export const HerdDirectory: React.FC = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [cattleList, setCattleList] = useState<Cattle[]>([]);
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: 6 });
@@ -258,6 +260,8 @@ export const HerdDirectory: React.FC = () => {
         const res = await apiClient.put(`/cattle/${editingCattle.id}`, data);
         setCattleList(prev => prev.map(c => c.id === editingCattle.id ? res.data : c));
         setEditingCattle(null);
+        setIsAddModalOpen(false);
+        showToast(`Updated cattle profile for ${data.name}!`, 'success');
       } else {
         const res = await apiClient.post('/cattle', {
           ...data,
@@ -266,10 +270,11 @@ export const HerdDirectory: React.FC = () => {
         });
         setCattleList(prev => [res.data, ...prev]);
         setIsAddModalOpen(false);
+        showToast(`Registered ${data.name} (${res.data.tag_number || data.tag_number}) into Herd Directory!`, 'success');
       }
       reset();
     } catch (err) {
-      alert('Error saving cattle record.');
+      showToast('Error saving cattle record.', 'error');
     }
   };
 
@@ -312,8 +317,9 @@ export const HerdDirectory: React.FC = () => {
     try {
       await apiClient.delete(`/cattle/${id}`);
       setCattleList(prev => prev.filter(c => c.id !== id));
+      showToast('Cattle record deleted successfully.', 'success');
     } catch {
-      alert('Failed to delete cattle record.');
+      showToast('Failed to delete cattle record.', 'error');
     }
   };
 

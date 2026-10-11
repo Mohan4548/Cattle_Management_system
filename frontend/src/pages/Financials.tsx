@@ -3,6 +3,7 @@ import { apiClient } from '../api/client';
 import { FinancialTransaction, Cattle } from '../types';
 import { Badge } from '../components/common/Badge';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { useToast } from '../context/ToastContext';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -92,24 +93,30 @@ export const Financials: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleAddTransaction = (e: React.FormEvent) => {
+  const { showToast } = useToast();
+
+  const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAmount || !newDesc) return;
-    const tx: FinancialTransaction = {
-      id: `fin-${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-      type: newType,
-      category: newCategory,
-      amount: parseFloat(newAmount),
-      description: newDesc,
-      payment_method: newMethod as any,
-      status: 'completed',
-      invoice_number: `INV-2026-${Math.floor(100 + Math.random() * 900)}`
-    };
-    setTransactions([tx, ...transactions]);
-    setIsModalOpen(false);
-    setNewAmount('');
-    setNewDesc('');
+    try {
+      const parsedAmount = parseFloat(newAmount);
+      const res = await apiClient.post('/financials', {
+        type: newType,
+        category: newCategory,
+        amount: parsedAmount,
+        description: newDesc,
+        payment_method: newMethod,
+        transaction_date: new Date().toISOString().split('T')[0],
+      });
+      setTransactions(prev => [res.data, ...prev]);
+      setIsModalOpen(false);
+      setNewAmount('');
+      setNewDesc('');
+      showToast(`Logged ₹${parsedAmount.toLocaleString('en-IN')} ${newType} entry successfully!`, 'success');
+      fetchFinancials();
+    } catch {
+      showToast('Failed to record transaction.', 'error');
+    }
   };
 
   // Indian Economy Financial Computations in ₹ INR

@@ -7,6 +7,7 @@ import { MilkLog, FeedLog, Cattle, InventoryItem } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { useToast } from '../context/ToastContext';
 import { 
   Milk, 
   Plus, 
@@ -142,6 +143,8 @@ export const MilkYield: React.FC = () => {
     fetchData();
   }, []);
 
+  const { showToast } = useToast();
+
   const handleCreateMilkLog = async (data: MilkFormData) => {
     try {
       const res = await apiClient.post('/milk', data);
@@ -149,8 +152,9 @@ export const MilkYield: React.FC = () => {
       setIsMilkModalOpen(false);
       resetMilk();
       fetchData();
+      showToast(`Milk production of ${data.yield_liters} L logged successfully!`, 'success');
     } catch {
-      alert('Failed to log milk production.');
+      showToast('Failed to log milk production.', 'error');
     }
   };
 
@@ -161,8 +165,9 @@ export const MilkYield: React.FC = () => {
       setIsFeedModalOpen(false);
       resetFeed();
       fetchData();
+      showToast(`Feed distribution of ${data.quantity_kg} kg logged successfully!`, 'success');
     } catch {
-      alert('Failed to log feed session.');
+      showToast('Failed to log feed session.', 'error');
     }
   };
 

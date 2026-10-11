@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { apiClient } from '../api/client';
 import { UserProfile, UserRole } from '../types';
 import { Badge } from '../components/common/Badge';
+import { useToast } from '../context/ToastContext';
 import { Users, ShieldCheck, Mail, Phone, Calendar } from 'lucide-react';
 
 export const UsersAdmin: React.FC = () => {
+  const { showToast } = useToast();
   const [userList, setUserList] = useState<UserProfile[]>([]);
 
   const fetchUsers = async () => {
@@ -24,8 +26,9 @@ export const UsersAdmin: React.FC = () => {
     try {
       const res = await apiClient.patch(`/users/${id}`, { role: newRole });
       setUserList(prev => prev.map(u => u.id === id ? res.data : u));
+      showToast(`User permission role updated to "${newRole}"!`, 'success');
     } catch {
-      alert('Failed to update user role.');
+      showToast('Failed to update user role.', 'error');
     }
   };
 

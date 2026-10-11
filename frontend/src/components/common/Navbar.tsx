@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useToast } from '../../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -49,6 +50,7 @@ const PAGE_TITLES: Record<string, { title: string; crumb: string }> = {
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   const { user, switchRole, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -151,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
   // Voice search
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Voice Search requires Chrome or Edge browser.');
+      showToast('Voice Search requires Chrome or Edge browser.', 'info');
       return;
     }
     if (isListening) { setIsListening(false); return; }

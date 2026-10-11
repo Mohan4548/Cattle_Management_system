@@ -5,6 +5,7 @@ import { DashboardData } from '../types';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { useToast } from '../context/ToastContext';
 import { 
   Beef, 
   Milk, 
@@ -198,20 +199,47 @@ export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [timeRange, setTimeRange] = useState<'today' | 'week' | 'month'>('month');
 
+  const { showToast } = useToast();
+  const [cattleList, setCattleList] = useState<any[]>([]);
+
   // Quick Action Modals
   const [activeModal, setActiveModal] = useState<'cattle' | 'milk' | 'vaccine' | 'feed' | null>(null);
 
   // Form inputs for Quick Actions
   const [newTag, setNewTag] = useState('');
   const [newName, setNewName] = useState('');
+  const [newBreed, setNewBreed] = useState('Gir');
+  const [newGender, setNewGender] = useState<'female' | 'male'>('female');
+  const [newWeight, setNewWeight] = useState('480');
+
+  const [selectedCowId, setSelectedCowId] = useState('');
+  const [milkSession, setMilkSession] = useState<'morning' | 'evening'>('morning');
   const [milkAmount, setMilkAmount] = useState('14.5');
-  const [vacName, setVacName] = useState('Anthrax Booster');
+  const [fatPct, setFatPct] = useState('4.2');
+
+  const [vacCowId, setVacCowId] = useState('');
+  const [vacName, setVacName] = useState('Foot & Mouth (FMD) Booster');
+  const [vacDate, setVacDate] = useState(new Date().toISOString().split('T')[0]);
+  const [vacDueDate, setVacDueDate] = useState(new Date(Date.now() + 180 * 86400000).toISOString().split('T')[0]);
+
+  const [feedCowId, setFeedCowId] = useState('');
+  const [feedType, setFeedType] = useState('Alfalfa Hay Bales');
   const [feedQty, setFeedQty] = useState('50');
 
   const fetchDashboardData = async () => {
     try {
-      const res = await apiClient.get('/dashboard/stats');
+      const [res, cRes] = await Promise.all([
+        apiClient.get('/dashboard/stats'),
+        apiClient.get('/cattle'),
+      ]);
       setData(res.data);
+      const list = Array.isArray(cRes.data) ? cRes.data : (cRes.data?.data || []);
+      setCattleList(list);
+      if (list.length > 0) {
+        setSelectedCowId(prev => prev || list[0].id);
+        setVacCowId(prev => prev || list[0].id);
+        setFeedCowId(prev => prev || list[0].id);
+      }
     } catch {
       // API client fallback handled gracefully
     } finally {
@@ -226,38 +254,84 @@ export const Dashboard: React.FC = () => {
   const handleQuickAddCattle = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const tag = newTag.trim() || `FE-CAT-${Math.floor(100 + Math.random() * 900)}`;
+      const name = newName.trim() || 'Sundari';
       await apiClient.post('/cattle', {
-        tag_number: newTag || `FE-${Math.floor(106 + Math.random() * 50)}`,
-        name: newName || 'Bella',
-        breed: 'Holstein Friesian',
-        gender: 'female',
+        tag_number: tag,
+        name,
+        breed: newBreed,
+        gender: newGender,
         date_of_birth: '2023-01-01',
-        weight_kg: 520,
+        weight_kg: Number(newWeight) || 480,
         health_status: 'healthy',
-        lactation_stage: 'mid',
+        lactation_stage: newGender === 'female' ? 'mid' : 'dry',
       });
       setActiveModal(null);
+      setNewTag('');
+      setNewName('');
+      showToast(`Livestock ${name} (${tag}) registered into Herd Directory!`, 'success');
       fetchDashboardData();
     } catch {
-      alert('Failed to register cattle.');
+      showToast('Failed to register cattle.', 'error');
     }
   };
 
   const handleQuickAddMilk = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const cowId = selectedCowId || cattleList[0]?.id || 'cattle-1';
       await apiClient.post('/milk', {
-        cattle_id: 'cattle-1',
+        cattle_id: cowId,
         log_date: new Date().toISOString().split('T')[0],
-        session: 'morning',
-        yield_liters: Number(milkAmount),
-        fat_percentage: 4.1,
+        session: milkSession,
+        yield_liters: Number(milkAmount) || 12,
+        fat_percentage: Number(fatPct) || 4.2,
         snf_percentage: 8.7,
       });
       setActiveModal(null);
+      showToast(`Logged ${milkAmount} L milk production for ${milkSession} session!`, 'success');
       fetchDashboardData();
     } catch {
-      alert('Failed to log milk.');
+      showToast('Failed to log milk production.', 'error');
+    }
+  };
+
+  const handleQuickScheduleVaccine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const cowId = vacCowId || cattleList[0]?.id || 'cattle-1';
+      await apiClient.post('/vaccinations', {
+        cattle_id: cowId,
+        vaccine_name: vacName,
+        administered_date: vacDate,
+        next_due_date: vacDueDate,
+        administered_by: 'Dr. Marcus Vance',
+        status: 'scheduled',
+      });
+      setActiveModal(null);
+      showToast(`Vaccine ${vacName} scheduled successfully!`, 'success');
+      fetchDashboardData();
+    } catch {
+      showToast('Failed to schedule vaccine.', 'error');
+    }
+  };
+
+  const handleQuickAddFeed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const cowId = feedCowId || cattleList[0]?.id || 'cattle-1';
+      await apiClient.post('/feed', {
+        cattle_id: cowId,
+        feed_type: feedType,
+        quantity_kg: Number(feedQty) || 50,
+        cost: (Number(feedQty) || 50) * 22,
+        feeding_time: 'Morning Shift',
+      });
+      setActiveModal(null);
+      showToast(`Restocked ${feedQty} kg of ${feedType}!`, 'success');
+      fetchDashboardData();
+    } catch {
+      showToast('Failed to update feed stock.', 'error');
     }
   };
 
@@ -766,19 +840,77 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* ── Modals (all business logic preserved) ── */}
+      {/* ── Quick Action Modals ── */}
       <Modal isOpen={activeModal === 'cattle'} onClose={() => setActiveModal(null)} title="Quick Register Cattle">
         <form onSubmit={handleQuickAddCattle} className="space-y-4">
-          <div>
-            <label className="input-label">Tag Number</label>
-            <input type="text" value={newTag} onChange={(e) => setNewTag(e.target.value)} placeholder="FE-106" className="input-field" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="input-label">Tag Number / Ear Tag</label>
+              <input
+                type="text"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="e.g. FE-GIR-007"
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="input-label">Livestock Name</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="e.g. Sundari"
+                className="input-field"
+              />
+            </div>
           </div>
-          <div>
-            <label className="input-label">Name</label>
-            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Bella" className="input-field" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="input-label">Breed</label>
+              <select
+                value={newBreed}
+                onChange={(e) => setNewBreed(e.target.value)}
+                className="input-field"
+              >
+                <option value="Gir">Gir</option>
+                <option value="Holstein Friesian">Holstein Friesian</option>
+                <option value="Jersey">Jersey</option>
+                <option value="Sahiwal">Sahiwal</option>
+                <option value="Red Sindhi">Red Sindhi</option>
+                <option value="Tharparkar">Tharparkar</option>
+              </select>
+            </div>
+            <div>
+              <label className="input-label">Gender</label>
+              <select
+                value={newGender}
+                onChange={(e) => setNewGender(e.target.value as any)}
+                className="input-field"
+              >
+                <option value="female">Cow (Female)</option>
+                <option value="male">Bull (Male)</option>
+              </select>
+            </div>
+            <div>
+              <label className="input-label">Weight (kg)</label>
+              <input
+                type="number"
+                value={newWeight}
+                onChange={(e) => setNewWeight(e.target.value)}
+                placeholder="480"
+                className="input-field"
+              />
+            </div>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-card)]">
             <button type="button" onClick={() => setActiveModal(null)} className="btn-secondary text-sm">Cancel</button>
-            <button type="submit" className="btn-primary text-sm">Register</button>
+            <button type="submit" className="btn-primary text-sm flex items-center gap-1.5">
+              <Plus className="w-4 h-4" />
+              Register Livestock
+            </button>
           </div>
         </form>
       </Modal>
@@ -786,38 +918,184 @@ export const Dashboard: React.FC = () => {
       <Modal isOpen={activeModal === 'milk'} onClose={() => setActiveModal(null)} title="Quick Log Milk Yield">
         <form onSubmit={handleQuickAddMilk} className="space-y-4">
           <div>
-            <label className="input-label">Morning Yield (Liters)</label>
-            <input type="number" step="0.1" value={milkAmount} onChange={(e) => setMilkAmount(e.target.value)} className="input-field" />
+            <label className="input-label">Select Cow</label>
+            <select
+              value={selectedCowId}
+              onChange={(e) => setSelectedCowId(e.target.value)}
+              className="input-field"
+            >
+              {cattleList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.tag_number || c.tag_id}) — {c.breed}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="input-label">Milking Session</label>
+              <select
+                value={milkSession}
+                onChange={(e) => setMilkSession(e.target.value as any)}
+                className="input-field"
+              >
+                <option value="morning">Morning (06:00 AM)</option>
+                <option value="evening">Evening (05:00 PM)</option>
+              </select>
+            </div>
+            <div>
+              <label className="input-label">Yield (Liters)</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0.5"
+                max="50"
+                value={milkAmount}
+                onChange={(e) => setMilkAmount(e.target.value)}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="input-label">Fat %</label>
+              <input
+                type="number"
+                step="0.1"
+                min="2.0"
+                max="9.0"
+                value={fatPct}
+                onChange={(e) => setFatPct(e.target.value)}
+                className="input-field"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-card)]">
             <button type="button" onClick={() => setActiveModal(null)} className="btn-secondary text-sm">Cancel</button>
-            <button type="submit" className="btn-primary text-sm">Save Log</button>
+            <button type="submit" className="btn-primary text-sm flex items-center gap-1.5">
+              <Droplet className="w-4 h-4" />
+              Save Milk Log
+            </button>
           </div>
         </form>
       </Modal>
 
       <Modal isOpen={activeModal === 'vaccine'} onClose={() => setActiveModal(null)} title="Quick Schedule Vaccine">
-        <form onSubmit={(e) => { e.preventDefault(); setActiveModal(null); alert('Vaccine scheduled!'); }} className="space-y-4">
+        <form onSubmit={handleQuickScheduleVaccine} className="space-y-4">
           <div>
-            <label className="input-label">Vaccine Name</label>
-            <input type="text" value={vacName} onChange={(e) => setVacName(e.target.value)} className="input-field" />
+            <label className="input-label">Target Cattle</label>
+            <select
+              value={vacCowId}
+              onChange={(e) => setVacCowId(e.target.value)}
+              className="input-field"
+            >
+              {cattleList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.tag_number || c.tag_id})
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+
+          <div>
+            <label className="input-label">Vaccine / Biological</label>
+            <select
+              value={vacName}
+              onChange={(e) => setVacName(e.target.value)}
+              className="input-field"
+            >
+              <option value="Foot & Mouth (FMD) Booster">Foot & Mouth (FMD) Booster</option>
+              <option value="Anthrax Spore Vaccine">Anthrax Spore Vaccine</option>
+              <option value="Blackquarter (BQ) Vaccine">Blackquarter (BQ) Vaccine</option>
+              <option value="Brucellosis S19 Strain">Brucellosis S19 Strain</option>
+              <option value="Hemorrhagic Septicemia (HS)">Hemorrhagic Septicemia (HS)</option>
+              <option value="Rabies Inactivated Booster">Rabies Inactivated Booster</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="input-label">Administration Date</label>
+              <input
+                type="date"
+                value={vacDate}
+                onChange={(e) => setVacDate(e.target.value)}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="input-label">Next Booster Due</label>
+              <input
+                type="date"
+                value={vacDueDate}
+                onChange={(e) => setVacDueDate(e.target.value)}
+                className="input-field"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-card)]">
             <button type="button" onClick={() => setActiveModal(null)} className="btn-secondary text-sm">Cancel</button>
-            <button type="submit" className="btn-primary text-sm">Schedule</button>
+            <button type="submit" className="btn-primary text-sm flex items-center gap-1.5">
+              <Syringe className="w-4 h-4" />
+              Schedule Vaccine
+            </button>
           </div>
         </form>
       </Modal>
 
-      <Modal isOpen={activeModal === 'feed'} onClose={() => setActiveModal(null)} title="Quick Add Feed">
-        <form onSubmit={(e) => { e.preventDefault(); setActiveModal(null); alert('Feed inventory updated!'); }} className="space-y-4">
+      <Modal isOpen={activeModal === 'feed'} onClose={() => setActiveModal(null)} title="Quick Add Feed / Restock">
+        <form onSubmit={handleQuickAddFeed} className="space-y-4">
           <div>
-            <label className="input-label">Alfalfa Hay Bales Quantity</label>
-            <input type="number" value={feedQty} onChange={(e) => setFeedQty(e.target.value)} className="input-field" />
+            <label className="input-label">Feed Type / Fodder</label>
+            <select
+              value={feedType}
+              onChange={(e) => setFeedType(e.target.value)}
+              className="input-field"
+            >
+              <option value="Alfalfa Hay Bales">Alfalfa Hay Bales</option>
+              <option value="Dairy Concentrate 18% Protein">Dairy Concentrate 18% Protein</option>
+              <option value="Green Maize Fresh Fodder">Green Maize Fresh Fodder</option>
+              <option value="Corn Silage Premium Grade">Corn Silage Premium Grade</option>
+              <option value="Chelated Mineral & Salt Mixture">Chelated Mineral & Salt Mixture</option>
+            </select>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="input-label">Quantity (kg / Units)</label>
+              <input
+                type="number"
+                min="5"
+                max="1000"
+                value={feedQty}
+                onChange={(e) => setFeedQty(e.target.value)}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="input-label">Assigned Batch / Cow</label>
+              <select
+                value={feedCowId}
+                onChange={(e) => setFeedCowId(e.target.value)}
+                className="input-field"
+              >
+                <option value="">All Herd Barn Distribution</option>
+                {cattleList.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} ({c.tag_number || c.tag_id})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-card)]">
             <button type="button" onClick={() => setActiveModal(null)} className="btn-secondary text-sm">Cancel</button>
-            <button type="submit" className="btn-primary text-sm">Update Stock</button>
+            <button type="submit" className="btn-primary text-sm flex items-center gap-1.5">
+              <Boxes className="w-4 h-4" />
+              Update Stock & Log Feed
+            </button>
           </div>
         </form>
       </Modal>
