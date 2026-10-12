@@ -1171,55 +1171,59 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Final CTA Banner with Animated Ambient Glow ─── */}
+      {/* ─── Final CTA Banner ─── */}
       <section className="px-6 py-16 max-w-7xl mx-auto w-full relative">
         <motion.div
-          whileHover={{ scale: 1.01 }}
+          whileHover={{ scale: 1.008 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-br from-[#163E2B] via-[#123624] to-[#0A2216] text-white rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-xl relative overflow-hidden"
+          className="bg-white dark:bg-[#132219] rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-xl border-2 border-[#E5E2D7] dark:border-emerald-800/40 relative overflow-hidden"
         >
-          {/* Animated decorative pulses inside banner */}
-          <motion.div
-            animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.35, 0.15] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-emerald-400/20 blur-2xl pointer-events-none"
-          />
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.25, 0.1] }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-            className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-teal-400/20 blur-2xl pointer-events-none"
-          />
+          {/* Subtle Ambient Glow Blobs inside the card */}
+          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-teal-500/10 dark:bg-teal-500/15 blur-3xl pointer-events-none" />
 
+          {/* Leaf Icon with gentle glow */}
           <motion.div
-            whileHover={{ rotate: 180 }}
-            transition={{ duration: 0.6 }}
-            className="w-12 h-12 rounded-2xl bg-emerald-700/50 mx-auto flex items-center justify-center text-emerald-200 shadow-md"
+            whileHover={{ scale: 1.1, rotate: 12 }}
+            transition={{ duration: 0.3 }}
+            className="w-14 h-14 rounded-2xl bg-[#163E2B] text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-900/20"
           >
-            <Leaf className="w-6 h-6" />
+            <Leaf className="w-7 h-7 text-emerald-300" strokeWidth={2.2} />
           </motion.div>
 
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Take Control of Your Cattle Records
-          </h2>
-          <p className="text-sm text-emerald-100/90 max-w-xl mx-auto leading-relaxed">
-            Manage your farm with one simple, professional platform. Organize health histories, milk production, and digital identity tags effortlessly.
-          </p>
+          <div className="space-y-3 max-w-2xl mx-auto">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/15 inline-flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Modern Livestock Infrastructure
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#1C2420] dark:text-white leading-tight">
+              Take Complete Control of{' '}
+              <span className="bg-gradient-to-r from-[#163E2B] via-emerald-600 to-teal-600 dark:from-emerald-300 dark:to-teal-300 bg-clip-text text-transparent">
+                Your Cattle Records
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base text-[#526258] dark:text-slate-300 leading-relaxed">
+              Replace paper logbooks and scattered notes with one unified, professional platform. Organize health histories, daily milk logs, 283-day gestation alerts, and scannable QR ear tags in seconds.
+            </p>
+          </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 relative z-10">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-3 relative z-10">
+            <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.96 }}>
               <Link
                 to="/register"
-                className="px-8 py-3.5 rounded-xl bg-white text-[#163E2B] hover:bg-emerald-50 font-bold text-sm transition-colors shadow-md block"
+                className="px-8 py-3.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full sm:w-auto"
               >
-                Get Started Now
+                <span>Get Started Now</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+            <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.96 }}>
               <a
                 href="#interactive-demo"
-                className="px-8 py-3.5 rounded-xl bg-emerald-800/80 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors border border-emerald-700/60 block"
+                className="px-8 py-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1A2C21] hover:bg-[#EAE7DC]/60 dark:hover:bg-[#22392B] text-[#163E2B] dark:text-emerald-300 font-bold text-sm transition-all border border-[#E5E2D7] dark:border-emerald-700/40 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                Explore Interactive Demo
+                <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Explore Interactive Demo</span>
               </a>
             </motion.div>
           </div>
