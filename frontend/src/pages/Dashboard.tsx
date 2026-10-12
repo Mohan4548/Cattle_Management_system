@@ -385,36 +385,36 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6 pb-10">
       {/* ── Modern Human Header ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <div className="bg-gradient-to-r from-white via-emerald-50/40 to-teal-50/20 dark:from-slate-900 dark:via-emerald-950/20 dark:to-slate-900 rounded-2xl p-6 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2.5 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800/80">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Live Farm Operations
             </span>
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
             Good morning, {getGreetingName()} 👋
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Real-time cattle diagnostics, milk collection, and livestock financials.
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           {/* Time range switcher */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/70 dark:border-slate-700">
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700">
             {(['today', 'week', 'month'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setTimeRange(r)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   timeRange === r
-                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs font-bold'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {r === 'today' ? 'Today' : r === 'week' ? 'This Week' : 'This Month'}
@@ -424,16 +424,16 @@ export const Dashboard: React.FC = () => {
 
           <button
             onClick={() => setActiveModal('cattle')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold transition-all shadow-xs shadow-blue-500/20 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-98 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/25 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Cattle
           </button>
           <button
             onClick={() => navigate('/qr-scanner')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50/50 border border-emerald-300/80 dark:border-emerald-700/80 text-emerald-800 dark:text-emerald-300 text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            <ScanLine className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <ScanLine className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             Scan QR
           </button>
         </div>
@@ -448,50 +448,50 @@ export const Dashboard: React.FC = () => {
       {/* ── Core KPI Command Cards (High-Impact 4-Card Grid) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Active Herd */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Cattle</span>
-              <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                <Beef className="w-4.5 h-4.5" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Cattle</span>
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <Beef className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                 <AnimatedCounter value={kpi.totalCattle} />
               </span>
-              <span className="text-xs text-slate-400 font-medium">registered head</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">registered head</span>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300">
+              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60">
                 {kpi.healthyCattle} Healthy
               </span>
-              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300">
+              <span className="px-2 py-0.5 rounded-md font-semibold text-[11px] bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200/60">
                 {kpi.pregnantCattle} Pregnant
               </span>
             </div>
-            <Link to="/cattle" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+            <Link to="/cattle" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
               Herd →
             </Link>
           </div>
         </div>
 
         {/* Card 2: Milk Yield */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/40 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Daily Milk Yield</span>
-              <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-                <Droplet className="w-4.5 h-4.5" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Daily Milk Yield</span>
+              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/80 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                <Droplet className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
                 <AnimatedCounter value={kpi.milkToday} decimals={1} suffix=" L" />
               </span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded">
+              <span className="text-xs text-sky-700 dark:text-sky-300 font-bold bg-sky-50 dark:bg-sky-950/50 border border-sky-200/60 px-1.5 py-0.5 rounded">
                 Today
               </span>
             </div>
@@ -507,12 +507,12 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Card 3: Financial Net Profit */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Net Profit</span>
-              <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60 text-teal-600 dark:text-teal-400 flex items-center justify-center">
-                <TrendingUp className="w-4.5 h-4.5" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Net Profit</span>
+              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/80 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -532,12 +532,12 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Card 4: Action Items & Alerts */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-amber-500/40 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Actions</span>
-              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Bell className="w-4.5 h-4.5" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pending Actions</span>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/80 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <Bell className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -559,26 +559,26 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* ── Quick Operations Bar ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-sm">
         <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             Quick Farm Operations
           </span>
           <span className="text-[11px] text-slate-400 font-medium">Daily management shortcuts</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
-            { label: 'Register Cattle', icon: Beef, color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50', action: () => setActiveModal('cattle') },
-            { label: 'Record Milk', icon: Milk, color: 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50', action: () => setActiveModal('milk') },
-            { label: 'Scan Cattle QR', icon: ScanLine, color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50', action: () => navigate('/qr-scanner') },
-            { label: 'Schedule Vaccine', icon: Syringe, color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50', action: () => setActiveModal('vaccine') },
-            { label: 'Update Feed Stock', icon: Boxes, color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50', action: () => setActiveModal('feed') },
+            { label: 'Register Cattle', icon: Beef, color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border border-emerald-200/80', action: () => setActiveModal('cattle') },
+            { label: 'Record Milk', icon: Milk, color: 'text-sky-700 dark:text-sky-300 bg-sky-100/90 dark:bg-sky-950/60 border border-sky-200/80', action: () => setActiveModal('milk') },
+            { label: 'Scan Cattle QR', icon: ScanLine, color: 'text-indigo-700 dark:text-indigo-300 bg-indigo-100/90 dark:bg-indigo-950/60 border border-indigo-200/80', action: () => navigate('/qr-scanner') },
+            { label: 'Schedule Vaccine', icon: Syringe, color: 'text-purple-700 dark:text-purple-300 bg-purple-100/90 dark:bg-purple-950/60 border border-purple-200/80', action: () => setActiveModal('vaccine') },
+            { label: 'Update Feed Stock', icon: Boxes, color: 'text-amber-700 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-950/60 border border-amber-200/80', action: () => setActiveModal('feed') },
           ].map(({ label, icon: Icon, color, action }) => (
             <button
               key={label}
               onClick={action}
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200/70 dark:border-slate-800 hover:border-blue-500/40 dark:hover:border-blue-500/40 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150 text-left group cursor-pointer"
+              className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/50 bg-slate-50/80 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-150 text-left group cursor-pointer"
             >
               <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
                 <Icon className="w-4 h-4" />
