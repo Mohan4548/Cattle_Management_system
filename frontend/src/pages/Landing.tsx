@@ -67,13 +67,7 @@ const TICKER_ITEMS = [
   '📊 Automated Feed-to-Milk Margin Tracker',
 ];
 
-/* ── Real-Time Simulated Alerts ── */
-const LIVE_ALERTS = [
-  { icon: Scan, text: 'Ear Tag #CAT-2026-0891 verified', time: 'Just now', color: 'text-emerald-500' },
-  { icon: Milk, text: 'Morning Harvest: +18.5 L logged (FAT 4.8%)', time: '2m ago', color: 'text-sky-500' },
-  { icon: Heart, text: 'Gestation Milestone: Day 142 of 283', time: '6m ago', color: 'text-rose-500' },
-  { icon: Stethoscope, text: 'Dr. Sharma completed Batch Deworming', time: '14m ago', color: 'text-amber-500' },
-];
+
 
 /* ── Features List ── */
 const FEATURES = [
@@ -296,15 +290,7 @@ export const Landing: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [herdSize, setHerdSize] = useState<number>(20);
   const [simulatedScanActive, setSimulatedScanActive] = useState<boolean>(false);
-  const [currentAlertIndex, setCurrentAlertIndex] = useState<number>(0);
 
-  /* Cycle live notifications every 4 seconds */
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentAlertIndex((prev) => (prev + 1) % LIVE_ALERTS.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
 
   const triggerSimulatedScan = () => {
     setSimulatedScanActive(true);
@@ -692,36 +678,6 @@ export const Landing: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-
-            {/* Simulated Live Toast Alert Stream (Cycling in bottom-left corner) */}
-            <div className="absolute -bottom-8 -left-6 z-30 hidden sm:block">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentAlertIndex}
-                  initial={{ opacity: 0, y: 14, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -14, scale: 0.95 }}
-                  transition={{ duration: 0.35 }}
-                  className="bg-white/95 dark:bg-[#101A14]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 rounded-2xl p-3 shadow-xl flex items-center gap-3 text-xs"
-                >
-                  {(() => {
-                    const item = LIVE_ALERTS[currentAlertIndex];
-                    const AlertIcon = item.icon;
-                    return (
-                      <>
-                        <div className={`p-2 rounded-xl bg-emerald-500/10 ${item.color}`}>
-                          <AlertIcon className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[#1C2420] dark:text-white">{item.text}</div>
-                          <div className="text-[10px] text-[#526258] dark:text-slate-400">{item.time}</div>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </motion.div>
-              </AnimatePresence>
-            </div>
           </motion.div>
         </div>
       </section>
