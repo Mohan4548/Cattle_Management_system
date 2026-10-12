@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -23,6 +23,12 @@ import {
   BarChart3,
   Clock,
   Scan,
+  Radio,
+  Sliders,
+  Award,
+  Layers,
+  Check,
+  RefreshCw,
 } from 'lucide-react';
 
 /* ── Animation Variants ── */
@@ -48,6 +54,26 @@ const staggerContainer = {
     },
   },
 };
+
+/* ── Live Ticker Feed Items ── */
+const TICKER_ITEMS = [
+  '🐄 Gir Purebred Registry (Avg 18.5L/day)',
+  '🐃 Murrah High-FAT Buffalo Records (8.2% FAT)',
+  '🐂 Kangayam Pure Lineage Pedigrees',
+  '🌾 Sahiwal Dairy Benchmarks',
+  '🏷️ ISO-Compliant QR Ear Tags',
+  '🥛 Cooperative Dairy Rate Calculator (FAT & SNF)',
+  '🩺 283-Day Bovine Gestation Radar',
+  '📊 Automated Feed-to-Milk Margin Tracker',
+];
+
+/* ── Real-Time Simulated Alerts ── */
+const LIVE_ALERTS = [
+  { icon: Scan, text: 'Ear Tag #CAT-2026-0891 verified', time: 'Just now', color: 'text-emerald-500' },
+  { icon: Milk, text: 'Morning Harvest: +18.5 L logged (FAT 4.8%)', time: '2m ago', color: 'text-sky-500' },
+  { icon: Heart, text: 'Gestation Milestone: Day 142 of 283', time: '6m ago', color: 'text-rose-500' },
+  { icon: Stethoscope, text: 'Dr. Sharma completed Batch Deworming', time: '14m ago', color: 'text-amber-500' },
+];
 
 /* ── Features List ── */
 const FEATURES = [
@@ -165,6 +191,15 @@ const DEMO_TABS = [
       title: 'Automated Yield Recording & Fat Scoring',
       metric: '32.4 L',
       subtext: 'Today Total Yield (Gir + Kangayam batches)',
+      chartData: [
+        { label: 'Mon', val: 28 },
+        { label: 'Tue', val: 30 },
+        { label: 'Wed', val: 31 },
+        { label: 'Thu', val: 29 },
+        { label: 'Fri', val: 34 },
+        { label: 'Sat', val: 32 },
+        { label: 'Today', val: 35 },
+      ],
       stat1: { label: 'FAT Content', val: '4.8%' },
       stat2: { label: 'SNF Ratio', val: '8.9%' },
       stat3: { label: 'Market Rate', val: '₹48.00 / L' },
@@ -180,6 +215,12 @@ const DEMO_TABS = [
       title: 'Tamper-Proof Scannable Cattle Digital Passport',
       metric: 'CAT-2026-0891',
       subtext: 'Purebred Gir Cow • Age 3.8 Yrs • Tag Grade A',
+      chartData: [
+        { label: 'Immunity', val: 98 },
+        { label: 'Rumination', val: 92 },
+        { label: 'Activity', val: 88 },
+        { label: 'Hydration', val: 95 },
+      ],
       stat1: { label: 'Vaccination', val: 'Up to Date' },
       stat2: { label: 'Lactation', val: 'Stage 2 (Prime)' },
       stat3: { label: 'Last Scan', val: 'Today, 09:30 AM' },
@@ -195,6 +236,12 @@ const DEMO_TABS = [
       title: 'Proactive Health Alerts & Gestation Tracking',
       metric: '99.4%',
       subtext: 'Herd Wellness Index across 48 livestock',
+      chartData: [
+        { label: 'Vital A', val: 90 },
+        { label: 'Vital B', val: 85 },
+        { label: 'Vital C', val: 96 },
+        { label: 'Vital D', val: 92 },
+      ],
       stat1: { label: 'FMD Vaccine', val: 'Due in 6 Days' },
       stat2: { label: 'Deworming', val: 'Completed' },
       stat3: { label: 'Calving Alert', val: '14 Days to Due' },
@@ -210,6 +257,12 @@ const DEMO_TABS = [
       title: 'Feed-to-Milk Ratio & Net Profit Margins',
       metric: '+28.4%',
       subtext: 'Quarterly Operating Margin Improvement',
+      chartData: [
+        { label: 'Jan', val: 110 },
+        { label: 'Feb', val: 124 },
+        { label: 'Mar', val: 132 },
+        { label: 'Apr', val: 142 },
+      ],
       stat1: { label: 'Monthly Rev', val: '₹1,42,800' },
       stat2: { label: 'Feed Costs', val: '₹46,200' },
       stat3: { label: 'Net Profit', val: '₹96,600' },
@@ -241,8 +294,32 @@ const FAQS = [
 export const Landing: React.FC = () => {
   const [activeTab, setActiveTab] = useState('milk');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [herdSize, setHerdSize] = useState<number>(20);
+  const [simulatedScanActive, setSimulatedScanActive] = useState<boolean>(false);
+  const [currentAlertIndex, setCurrentAlertIndex] = useState<number>(0);
+
+  /* Cycle live notifications every 4 seconds */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentAlertIndex((prev) => (prev + 1) % LIVE_ALERTS.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const triggerSimulatedScan = () => {
+    setSimulatedScanActive(true);
+    setTimeout(() => {
+      setSimulatedScanActive(false);
+    }, 2500);
+  };
 
   const currentTab = DEMO_TABS.find((t) => t.id === activeTab) || DEMO_TABS[0];
+
+  /* ROI Calculations */
+  const estDailyYield = herdSize * 15; // 15L avg per cow
+  const estMonthlyRev = estDailyYield * 30 * 46; // ₹46/L
+  const estFeedCost = herdSize * 1800; // ₹1800/cow/mo
+  const estNetProfit = estMonthlyRev - estFeedCost;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#0E1712] text-[#1C2420] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-[#163E2B]/20 selection:text-[#163E2B] relative overflow-hidden">
@@ -250,12 +327,12 @@ export const Landing: React.FC = () => {
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
         <motion.div
           animate={{
-            x: [0, 40, 0],
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1],
+            x: [0, 50, 0],
+            y: [0, -35, 0],
+            scale: [1, 1.15, 1],
           }}
           transition={{
-            duration: 18,
+            duration: 16,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
@@ -263,24 +340,24 @@ export const Landing: React.FC = () => {
         />
         <motion.div
           animate={{
-            x: [0, -50, 0],
-            y: [0, 40, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 22,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="absolute top-1/3 -right-32 w-[32rem] h-[32rem] rounded-full bg-teal-500/10 dark:bg-teal-500/15 blur-3xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, 30, 0],
-            y: [0, -40, 0],
+            x: [0, -60, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.2, 1],
           }}
           transition={{
             duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-1/3 -right-32 w-[34rem] h-[34rem] rounded-full bg-teal-500/10 dark:bg-teal-500/15 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -40, 0],
+          }}
+          transition={{
+            duration: 18,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
@@ -291,12 +368,12 @@ export const Landing: React.FC = () => {
       {/* ─── Header / Navbar ─── */}
       <header className="h-20 border-b border-[#E5E2D7] dark:border-slate-800/80 sticky top-0 bg-[#FAF8F5]/85 dark:bg-[#0E1712]/85 backdrop-blur-md z-50 px-6">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          {/* Logo with gentle hover pulse */}
+          {/* Logo with interactive bounce */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
-              whileHover={{ scale: 1.08, rotate: 6 }}
+              whileHover={{ scale: 1.1, rotate: 6 }}
               whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-xl bg-[#163E2B] text-white flex items-center justify-center shadow-sm group-hover:bg-[#113222] transition-colors"
+              className="w-10 h-10 rounded-xl bg-[#163E2B] text-white flex items-center justify-center shadow-md group-hover:bg-[#113222] transition-colors"
             >
               <Leaf className="w-5 h-5 text-emerald-300" strokeWidth={2.2} />
             </motion.div>
@@ -317,6 +394,10 @@ export const Landing: React.FC = () => {
             </a>
             <a href="#interactive-demo" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
               Live Preview
+            </a>
+            <a href="#roi-calculator" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
+              <span>ROI Calculator</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </a>
             <a href="#how-it-works" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
               How It Works
@@ -347,7 +428,7 @@ export const Landing: React.FC = () => {
       </header>
 
       {/* ─── Hero Section ─── */}
-      <section className="px-6 pt-10 pb-20 lg:pt-14 lg:pb-24 max-w-7xl mx-auto w-full relative">
+      <section className="px-6 pt-10 pb-16 lg:pt-14 lg:pb-20 max-w-7xl mx-auto w-full relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Hero Content */}
           <motion.div
@@ -440,15 +521,15 @@ export const Landing: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right Hero Interactive Visual Card */}
+          {/* Right Hero Interactive Visual Card (HIGH-TECH BIOMETRICS HUD) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
             className="lg:col-span-5 relative"
           >
-            {/* Gentle ambient glow ring */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-70" />
+            {/* Ambient Glow ring */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-75" />
 
             {/* Continuous Floating Container */}
             <motion.div
@@ -458,66 +539,132 @@ export const Landing: React.FC = () => {
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
-              className="relative rounded-2xl overflow-hidden border border-[#E5E2D7] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-xl"
+              className="relative rounded-2xl overflow-hidden border border-[#E5E2D7] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-2xl"
             >
-              {/* Cattle Hero Image with Animated Laser Scan Overlay */}
+              {/* Cattle Hero Image with Animated HUD & Biometrics Reticle */}
               <div className="relative overflow-hidden group">
                 <img
                   src="/hero-farm.jpg"
                   alt="Healthy cattle grazing on modern farm"
-                  className="w-full h-80 sm:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-84 sm:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
                 />
 
-                {/* Animated Laser Scan Effect */}
+                {/* Laser Scanning Line */}
                 <motion.div
                   initial={{ top: '0%' }}
                   animate={{ top: ['0%', '100%', '0%'] }}
                   transition={{
-                    duration: 4,
+                    duration: 3.5,
                     repeat: Infinity,
                     ease: 'linear',
                   }}
-                  className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#10b981] opacity-80 pointer-events-none"
+                  className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#10b981] opacity-90 pointer-events-none z-10"
                 />
 
-                {/* Floating Top Badge: Live Ear Tag */}
+                {/* Simulated Radar Reticle Targeting Corner Brackets over ear tag */}
+                <div className="absolute top-12 left-10 w-24 h-24 pointer-events-none z-20">
+                  <div className="w-4 h-4 border-t-2 border-l-2 border-emerald-400 absolute top-0 left-0" />
+                  <div className="w-4 h-4 border-t-2 border-r-2 border-emerald-400 absolute top-0 right-0" />
+                  <div className="w-4 h-4 border-b-2 border-l-2 border-emerald-400 absolute bottom-0 left-0" />
+                  <div className="w-4 h-4 border-b-2 border-r-2 border-emerald-400 absolute bottom-0 right-0" />
+                  <motion.div
+                    animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-2 border border-dashed border-emerald-400/50 rounded-lg flex items-center justify-center text-[9px] font-mono text-emerald-300"
+                  >
+                    TAG-LOCK
+                  </motion.div>
+                </div>
+
+                {/* Interactive Scan Trigger Button */}
+                <button
+                  onClick={triggerSimulatedScan}
+                  className="absolute top-4 right-4 z-30 bg-black/70 hover:bg-emerald-900/80 backdrop-blur-md border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${simulatedScanActive ? 'animate-spin text-white' : ''}`} />
+                  <span>{simulatedScanActive ? 'Scanning...' : 'Test Scan Tag'}</span>
+                </button>
+
+                {/* Floating Top Left Badge: Live Ear Tag */}
                 <motion.div
-                  animate={{ y: [0, -4, 0] }}
+                  animate={{ y: [0, -3, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/20 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg"
+                  className="absolute top-4 left-4 z-20 bg-black/70 backdrop-blur-md border border-white/20 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg"
                 >
                   <Scan className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                  <span>Ear Tag: CAT-2026-0891</span>
+                  <span>CAT-2026-0891</span>
                 </motion.div>
+
+                {/* Interactive Flash Overlay when scan triggered */}
+                <AnimatePresence>
+                  {simulatedScanActive && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.7 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 bg-emerald-500/30 backdrop-blur-[2px] z-25 flex items-center justify-center pointer-events-none"
+                    >
+                      <div className="bg-black/80 px-4 py-2 rounded-xl text-white text-xs font-bold border border-emerald-400 flex items-center gap-2 shadow-2xl">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        Digital Tag Verified: Gir Cow Purebred
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Floating Biometric Pulse Line (ECG Animated Heartbeat) */}
+                <div className="absolute bottom-16 left-4 right-4 z-20 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs text-white">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-3.5 h-3.5 text-rose-400 animate-bounce" />
+                    <span className="font-mono text-[11px] text-slate-200">HR: 72 bpm</span>
+                  </div>
+                  {/* Animated ECG SVG wave */}
+                  <svg className="w-24 h-5 stroke-emerald-400 fill-none" viewBox="0 0 100 20">
+                    <motion.path
+                      d="M 0 10 L 20 10 L 25 2 L 30 18 L 35 10 L 45 10 L 50 4 L 55 16 L 60 10 L 100 10"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      animate={{
+                        pathOffset: [0, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
+                    />
+                  </svg>
+                  <span className="text-[11px] font-mono text-emerald-400 font-bold">Temp: 38.6°C</span>
+                </div>
 
                 {/* Floating Bottom Left Badge: Fresh Yield */}
                 <motion.div
-                  animate={{ y: [0, 5, 0] }}
+                  animate={{ y: [0, 4, 0] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                  className="absolute bottom-4 left-4 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3.5 py-2 rounded-xl text-xs shadow-lg flex items-center gap-2.5"
+                  className="absolute bottom-3 left-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-2"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                    <Milk className="w-4 h-4" />
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                    <Milk className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <div className="font-bold text-[#1C2420] dark:text-white">18.5 Liters</div>
-                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">+14% vs 7d avg</div>
+                    <span className="font-bold text-[#1C2420] dark:text-white">18.5 L</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold ml-1">+14%</span>
                   </div>
                 </motion.div>
 
-                {/* Floating Bottom Right Badge: Health status */}
+                {/* Floating Bottom Right Badge: Vitals */}
                 <motion.div
                   animate={{ scale: [1, 1.03, 1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute bottom-4 right-4 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-2 rounded-xl text-xs shadow-lg flex items-center gap-2"
+                  className="absolute bottom-3 right-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-1.5"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                   <span className="font-semibold text-[#1C2420] dark:text-white">Vitals Optimal</span>
                 </motion.div>
               </div>
 
               {/* Card Meta Details */}
-              <div className="p-5 bg-white dark:bg-[#142019] border-t border-[#E5E2D7] dark:border-slate-800 space-y-3">
+              <div className="p-4 bg-white dark:bg-[#142019] border-t border-[#E5E2D7] dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2.5 w-2.5">
@@ -525,10 +672,10 @@ export const Landing: React.FC = () => {
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                     </span>
                     <span className="text-xs font-bold text-[#1C2420] dark:text-white">
-                      Farm Sensor Hub Online
+                      Field Sensor Hub Active
                     </span>
                   </div>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400">
                     Gir Native Purebred
                   </span>
                 </div>
@@ -545,12 +692,64 @@ export const Landing: React.FC = () => {
                 </div>
               </div>
             </motion.div>
+
+            {/* Simulated Live Toast Alert Stream (Cycling in bottom-left corner) */}
+            <div className="absolute -bottom-8 -left-6 z-30 hidden sm:block">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentAlertIndex}
+                  initial={{ opacity: 0, y: 14, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -14, scale: 0.95 }}
+                  transition={{ duration: 0.35 }}
+                  className="bg-white/95 dark:bg-[#101A14]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 rounded-2xl p-3 shadow-xl flex items-center gap-3 text-xs"
+                >
+                  {(() => {
+                    const item = LIVE_ALERTS[currentAlertIndex];
+                    const AlertIcon = item.icon;
+                    return (
+                      <>
+                        <div className={`p-2 rounded-xl bg-emerald-500/10 ${item.color}`}>
+                          <AlertIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-[#1C2420] dark:text-white">{item.text}</div>
+                          <div className="text-[10px] text-[#526258] dark:text-slate-400">{item.time}</div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ─── Interactive Live Preview Module (NEW ANIMATED EXPERIENCE) ─── */}
-      <section id="interactive-demo" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+      {/* ─── Infinite Marquee Ticker (NEW CONTINUOUS ANIMATION) ─── */}
+      <section className="border-y border-[#E5E2D7] dark:border-slate-800/80 bg-white/70 dark:bg-[#111C15]/70 py-4 overflow-hidden relative backdrop-blur-sm">
+        <div className="flex w-max space-x-8 animate-marquee">
+          <motion.div
+            animate={{ x: [0, -1000] }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+            className="flex items-center gap-8 text-xs font-semibold text-[#526258] dark:text-slate-300 whitespace-nowrap"
+          >
+            {TICKER_ITEMS.concat(TICKER_ITEMS).map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Interactive Live Preview Module with Animated Bar Chart ─── */}
+      <section id="interactive-demo" className="px-6 py-20 bg-white dark:bg-[#111C15] border-b border-[#E5E2D7] dark:border-slate-800/80">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
@@ -627,6 +826,27 @@ export const Landing: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Animated Mini Graph Bar Simulation */}
+                <div className="py-5 border-b border-[#E5E2D7]/60 dark:border-slate-800/60">
+                  <div className="text-xs font-semibold text-[#526258] dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Real-Time Trajectory Trend</span>
+                  </div>
+                  <div className="flex items-end gap-3 h-24 bg-white dark:bg-[#16241C] p-3 rounded-xl border border-[#E5E2D7] dark:border-slate-800">
+                    {currentTab.content.chartData.map((bar, idx) => (
+                      <div key={idx} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${(bar.val / 150) * 100}%` }}
+                          transition={{ duration: 0.6, delay: idx * 0.08 }}
+                          className="w-full bg-gradient-to-t from-emerald-600 to-teal-400 rounded-md min-h-[6px]"
+                        />
+                        <span className="text-[10px] text-[#526258] dark:text-slate-400">{bar.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* 3 Detailed Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
                   <motion.div
@@ -684,9 +904,100 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
+      {/* ─── Interactive Farm Profit & Yield ROI Calculator (NEW HIGH-IMPACT SECTION) ─── */}
+      <section id="roi-calculator" className="px-6 py-20 max-w-7xl mx-auto w-full">
+        <div className="space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5" />
+              Dynamic Herd Profitability Calculator
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+              Calculate Your Farm Revenue Potential
+            </h2>
+            <p className="text-sm text-[#526258] dark:text-slate-300">
+              Drag the slider to adjust your herd count and see real-time projected milk output, gross revenue, and estimated profits.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto bg-white dark:bg-[#131F18] border border-[#E5E2D7] dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-xl">
+            {/* Slider Control */}
+            <div className="space-y-4 pb-8 border-b border-[#E5E2D7] dark:border-slate-800">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-[#1C2420] dark:text-white flex items-center gap-2">
+                  <Beef className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  Current Active Herd Size
+                </span>
+                <span className="text-2xl font-black text-[#163E2B] dark:text-emerald-400 bg-emerald-500/10 px-4 py-1 rounded-xl">
+                  {herdSize} Cattle
+                </span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                step="5"
+                value={herdSize}
+                onChange={(e) => setHerdSize(parseInt(e.target.value))}
+                className="w-full h-2.5 bg-[#FAF8F5] dark:bg-[#1B2920] rounded-lg appearance-none cursor-pointer accent-[#163E2B] dark:accent-emerald-400"
+              />
+              <div className="flex justify-between text-[11px] text-[#526258] dark:text-slate-400">
+                <span>Small Farm (5 Cattle)</span>
+                <span>Commercial Dairy (50 Cattle)</span>
+                <span>Mega Herd (100 Cattle)</span>
+              </div>
+            </div>
+
+            {/* Live Calculated Output Grid with motion number animations */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="p-5 rounded-2xl bg-[#FAF8F5] dark:bg-[#18261E] border border-[#E5E2D7] dark:border-slate-800 text-center"
+              >
+                <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">Daily Herd Milk Yield</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#1C2420] dark:text-white">
+                  {estDailyYield.toLocaleString()} L
+                </div>
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
+                  ~{(estDailyYield * 30).toLocaleString()} L / Month
+                </div>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="p-5 rounded-2xl bg-[#FAF8F5] dark:bg-[#18261E] border border-[#E5E2D7] dark:border-slate-800 text-center"
+              >
+                <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">Gross Monthly Revenue</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#1C2420] dark:text-white">
+                  ₹{estMonthlyRev.toLocaleString()}
+                </div>
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
+                  At benchmark ₹46 / Liter
+                </div>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="p-5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 text-center"
+              >
+                <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold mb-1">
+                  Est. Net Monthly Profit
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-[#163E2B] dark:text-emerald-300">
+                  ₹{estNetProfit.toLocaleString()}
+                </div>
+                <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 font-semibold">
+                  After feed & care expenses
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Features Section (ANIMATED CARDS) ─── */}
-      <section id="features" className="px-6 py-20 max-w-7xl mx-auto w-full">
-        <div className="space-y-14">
+      <section id="features" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+        <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Core Modules
@@ -715,7 +1026,7 @@ export const Landing: React.FC = () => {
                   variants={fadeInUp}
                   whileHover={{ y: -8, scale: 1.015 }}
                   transition={{ duration: 0.25 }}
-                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#163E2B]/40 hover:shadow-lg transition-all group relative overflow-hidden"
+                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#163E2B]/40 hover:shadow-lg transition-all group relative overflow-hidden"
                 >
                   {/* Subtle hover gradient glow */}
                   <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
@@ -727,7 +1038,7 @@ export const Landing: React.FC = () => {
                     >
                       <Icon className="w-6 h-6" strokeWidth={2} />
                     </motion.div>
-                    <span className="text-[11px] font-semibold text-[#526258] dark:text-slate-400 px-2.5 py-1 rounded-full bg-[#FAF8F5] dark:bg-[#1A2820] border border-[#E5E2D7] dark:border-slate-700/60">
+                    <span className="text-[11px] font-semibold text-[#526258] dark:text-slate-400 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A2820] border border-[#E5E2D7] dark:border-slate-700/60">
                       {item.badge}
                     </span>
                   </div>
@@ -747,9 +1058,9 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── How It Works (ANIMATED PIPELINE) ─── */}
-      <section id="how-it-works" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
-        <div className="max-w-7xl mx-auto space-y-14">
+      {/* ─── How It Works (ANIMATED PIPELINE WITH PULSE CONNECTORS) ─── */}
+      <section id="how-it-works" className="px-6 py-20 max-w-7xl mx-auto w-full">
+        <div className="space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Simple Process
@@ -774,7 +1085,7 @@ export const Landing: React.FC = () => {
                   viewport={{ once: true }}
                   variants={fadeInUp}
                   whileHover={{ y: -6 }}
-                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative hover:shadow-md transition-all group"
+                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative hover:shadow-md transition-all group"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-10 h-10 rounded-xl bg-[#163E2B] text-white font-bold text-sm flex items-center justify-center shadow-sm">
@@ -805,8 +1116,8 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Practical Benefits Section ─── */}
-      <section className="px-6 py-20 max-w-7xl mx-auto w-full">
-        <div className="space-y-12">
+      <section className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+        <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Enterprise Ready
@@ -831,7 +1142,7 @@ export const Landing: React.FC = () => {
                   viewport={{ once: true }}
                   variants={fadeInUp}
                   whileHover={{ y: -4 }}
-                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-emerald-500/40 transition-all shadow-sm"
+                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-emerald-500/40 transition-all shadow-sm"
                 >
                   <div className="w-10 h-10 rounded-lg bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center">
                     <Icon className="w-5 h-5" />
@@ -849,60 +1160,58 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Animated FAQ Accordion (NEW) ─── */}
-      <section id="faqs" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
-              Got Questions?
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
-              Clear answers to help you get the most out of FarmEase.
-            </p>
-          </div>
+      {/* ─── Animated FAQ Accordion ─── */}
+      <section id="faqs" className="px-6 py-20 max-w-4xl mx-auto w-full space-y-12">
+        <div className="text-center space-y-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+            Got Questions?
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-sm text-[#526258] dark:text-slate-300">
+            Clear answers to help you get the most out of FarmEase.
+          </p>
+        </div>
 
-          <div className="space-y-4">
-            {FAQS.map((faq, index) => {
-              const isExpanded = expandedFaq === index;
-              return (
-                <motion.div
-                  key={index}
-                  className="border border-[#E5E2D7] dark:border-slate-800 rounded-2xl bg-[#FAF8F5] dark:bg-[#15221B] overflow-hidden"
+        <div className="space-y-4">
+          {FAQS.map((faq, index) => {
+            const isExpanded = expandedFaq === index;
+            return (
+              <motion.div
+                key={index}
+                className="border border-[#E5E2D7] dark:border-slate-800 rounded-2xl bg-white dark:bg-[#142019] overflow-hidden shadow-sm"
+              >
+                <button
+                  onClick={() => setExpandedFaq(isExpanded ? null : index)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-sm sm:text-base text-[#1C2420] dark:text-white hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors"
                 >
-                  <button
-                    onClick={() => setExpandedFaq(isExpanded ? null : index)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-sm sm:text-base text-[#1C2420] dark:text-white hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors"
+                  <span>{faq.q}</span>
+                  <motion.div
+                    animate={{ rotate: isExpanded ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="shrink-0 ml-4"
                   >
-                    <span>{faq.q}</span>
-                    <motion.div
-                      animate={{ rotate: isExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="shrink-0 ml-4"
-                    >
-                      <ChevronDown className="w-4 h-4 text-[#526258] dark:text-slate-400" />
-                    </motion.div>
-                  </button>
+                    <ChevronDown className="w-4 h-4 text-[#526258] dark:text-slate-400" />
+                  </motion.div>
+                </button>
 
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="px-6 pb-5 text-xs sm:text-sm text-[#526258] dark:text-slate-300 leading-relaxed border-t border-[#E5E2D7]/50 dark:border-slate-800/60 pt-3"
-                      >
-                        {faq.a}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-          </div>
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="px-6 pb-5 text-xs sm:text-sm text-[#526258] dark:text-slate-300 leading-relaxed border-t border-[#E5E2D7]/50 dark:border-slate-800/60 pt-3"
+                    >
+                      {faq.a}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
