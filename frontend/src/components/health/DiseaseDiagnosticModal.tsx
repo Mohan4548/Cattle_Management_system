@@ -260,7 +260,7 @@ export const DiseaseDiagnosticModal: React.FC<DiseaseDiagnosticModalProps> = ({
                 className={`w-full py-3.5 rounded-2xl font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all ${
                   selectedSymptoms.length === 0 || isLoading
                     ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                    : 'bg-[#163E2B] hover:bg-[#113222] text-white hover:shadow-lg active:scale-[0.99]'
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white hover:shadow-emerald-500/25 hover:shadow-lg active:scale-[0.99]'
                 }`}
               >
                 {isLoading ? (

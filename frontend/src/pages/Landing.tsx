@@ -308,7 +308,7 @@ export const Landing: React.FC = () => {
   const estNetProfit = estMonthlyRev - estFeedCost;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#0E1712] text-[#1C2420] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-[#163E2B]/20 selection:text-[#163E2B] relative overflow-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F19] text-[#0F172A] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-[#059669]/20 selection:text-[#059669] relative overflow-hidden">
       {/* ─── Ambient Animated Background Blobs ─── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
         <motion.div
@@ -352,43 +352,43 @@ export const Landing: React.FC = () => {
       </div>
 
       {/* ─── Header / Navbar ─── */}
-      <header className="h-20 border-b border-[#E5E2D7] dark:border-slate-800/80 sticky top-0 bg-[#FAF8F5]/85 dark:bg-[#0E1712]/85 backdrop-blur-md z-50 px-6">
+      <header className="h-20 border-b border-[#E2E8F0] dark:border-slate-800/80 sticky top-0 bg-[#F8FAFC]/85 dark:bg-[#0B0F19]/85 backdrop-blur-md z-50 px-6">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
           {/* Logo with interactive bounce */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               whileHover={{ scale: 1.1, rotate: 6 }}
               whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-xl bg-[#163E2B] text-white flex items-center justify-center shadow-md group-hover:bg-[#113222] transition-colors"
+              className="w-10 h-10 rounded-xl bg-[#059669] text-white flex items-center justify-center shadow-md group-hover:bg-[#047857] transition-colors"
             >
               <Leaf className="w-5 h-5 text-emerald-300" strokeWidth={2.2} />
             </motion.div>
             <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight text-[#1C2420] dark:text-white leading-tight">
+              <span className="font-bold text-xl tracking-tight text-[#0F172A] dark:text-white leading-tight">
                 FarmEase
               </span>
-              <span className="text-[10px] font-semibold text-[#526258] dark:text-slate-400 tracking-wider uppercase">
+              <span className="text-[10px] font-semibold text-[#64748B] dark:text-slate-400 tracking-wider uppercase">
                 Cattle Management
               </span>
             </div>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#526258] dark:text-slate-400">
-            <a href="#features" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#64748B] dark:text-slate-400">
+            <a href="#features" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               Features
             </a>
-            <a href="#interactive-demo" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <a href="#interactive-demo" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               Live Preview
             </a>
-            <a href="#roi-calculator" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
+            <a href="#roi-calculator" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
               <span>ROI Calculator</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </a>
-            <a href="#how-it-works" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <a href="#how-it-works" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               How It Works
             </a>
-            <a href="#faqs" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <a href="#faqs" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               FAQs
             </a>
           </nav>
@@ -397,14 +397,14 @@ export const Landing: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link
               to="/login"
-              className="px-4 py-2 rounded-xl text-sm font-semibold text-[#1C2420] dark:text-slate-200 hover:text-[#163E2B] dark:hover:text-white hover:bg-[#EAE7DC]/60 dark:hover:bg-slate-800 transition-all"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-[#0F172A] dark:text-slate-200 hover:text-[#059669] dark:hover:text-white hover:bg-[#EAE7DC]/60 dark:hover:bg-slate-800 transition-all"
             >
               Sign In
             </Link>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/dashboard"
-                className="px-5 py-2.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5"
               >
                 Get Started <ChevronRight className="w-4 h-4" />
               </Link>
@@ -428,7 +428,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 border border-[#163E2B]/20 dark:border-emerald-500/30 text-[#163E2B] dark:text-emerald-400 text-xs font-semibold tracking-wide shadow-sm"
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10 border border-[#059669]/20 dark:border-emerald-500/30 text-[#059669] dark:text-emerald-400 text-xs font-semibold tracking-wide shadow-sm"
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -439,14 +439,14 @@ export const Landing: React.FC = () => {
             </motion.div>
 
             {/* Hero Main Heading with glowing gradient text */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#1C2420] dark:text-white leading-[1.12]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0F172A] dark:text-white leading-[1.12]">
               Smart Cattle Management,{' '}
-              <span className="bg-gradient-to-r from-[#163E2B] via-emerald-600 to-teal-500 dark:from-emerald-300 dark:via-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#059669] via-emerald-600 to-teal-500 dark:from-emerald-300 dark:via-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
                 Simplified & Automated.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-[#526258] dark:text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-base sm:text-lg text-[#64748B] dark:text-slate-300 max-w-2xl leading-relaxed">
               Digitize your entire dairy & livestock operations. Manage pedigree breeding, automated 283-day calving alerts, daily milk quality logs, and QR ear tags in one unified platform.
             </p>
 
@@ -455,7 +455,7 @@ export const Landing: React.FC = () => {
               <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   to="/register"
-                  className="px-8 py-3.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full"
+                  className="px-8 py-3.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full"
                 >
                   Get Started Free
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -464,7 +464,7 @@ export const Landing: React.FC = () => {
               <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.98 }}>
                 <Link
                   to="/dashboard"
-                  className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-700 hover:border-[#163E2B]/50 hover:bg-[#FAF8F5] dark:hover:bg-[#1C2B22] text-[#1C2420] dark:text-slate-200 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2 w-full"
+                  className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#15221B] border border-[#E2E8F0] dark:border-slate-700 hover:border-[#059669]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#1C2B22] text-[#0F172A] dark:text-slate-200 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2 w-full"
                 >
                   <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Launch Live Demo
@@ -473,36 +473,36 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* Quick Live Farm Metrics Cards with hover lift */}
-            <div className="pt-8 border-t border-[#E5E2D7] dark:border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="pt-8 border-t border-[#E2E8F0] dark:border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
               <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
-                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                <div className="text-2xl font-bold text-[#0F172A] dark:text-white flex items-center gap-1.5">
                   <span>99.4%</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 </div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Herd Health Rate</div>
+                <div className="text-xs text-[#64748B] dark:text-slate-400 font-medium">Herd Health Rate</div>
               </motion.div>
 
               <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
-                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                <div className="text-2xl font-bold text-[#0F172A] dark:text-white flex items-center gap-1.5">
                   <span>283-Day</span>
                 </div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Calving Predictor</div>
+                <div className="text-xs text-[#64748B] dark:text-slate-400 font-medium">Calving Predictor</div>
               </motion.div>
 
               <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
-                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                <div className="text-2xl font-bold text-[#0F172A] dark:text-white flex items-center gap-1.5">
                   <span>+18.5%</span>
                   <TrendingUp className="w-4 h-4 text-emerald-500" />
                 </div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Average Milk Gain</div>
+                <div className="text-xs text-[#64748B] dark:text-slate-400 font-medium">Average Milk Gain</div>
               </motion.div>
 
               <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
-                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                <div className="text-2xl font-bold text-[#0F172A] dark:text-white flex items-center gap-1.5">
                   <span>Instant</span>
                   <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">QR Tag Scan</div>
+                <div className="text-xs text-[#64748B] dark:text-slate-400 font-medium">QR Tag Scan</div>
               </motion.div>
             </div>
           </motion.div>
@@ -525,7 +525,7 @@ export const Landing: React.FC = () => {
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
-              className="relative rounded-2xl overflow-hidden border border-[#E5E2D7] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-2xl"
+              className="relative rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-2xl"
             >
               {/* Cattle Hero Image with Animated HUD & Biometrics Reticle */}
               <div className="relative overflow-hidden group">
@@ -627,13 +627,13 @@ export const Landing: React.FC = () => {
                 <motion.div
                   animate={{ y: [0, 4, 0] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                  className="absolute bottom-3 left-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-2"
+                  className="absolute bottom-3 left-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E2E8F0] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-2"
                 >
                   <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                     <Milk className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="font-bold text-[#1C2420] dark:text-white">18.5 L</span>
+                    <span className="font-bold text-[#0F172A] dark:text-white">18.5 L</span>
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold ml-1">+14%</span>
                   </div>
                 </motion.div>
@@ -642,38 +642,38 @@ export const Landing: React.FC = () => {
                 <motion.div
                   animate={{ scale: [1, 1.03, 1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute bottom-3 right-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-1.5"
+                  className="absolute bottom-3 right-4 z-20 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E2E8F0] dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs shadow-lg flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="font-semibold text-[#1C2420] dark:text-white">Vitals Optimal</span>
+                  <span className="font-semibold text-[#0F172A] dark:text-white">Vitals Optimal</span>
                 </motion.div>
               </div>
 
               {/* Card Meta Details */}
-              <div className="p-4 bg-white dark:bg-[#142019] border-t border-[#E5E2D7] dark:border-slate-800 space-y-2.5">
+              <div className="p-4 bg-white dark:bg-[#142019] border-t border-[#E2E8F0] dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                     </span>
-                    <span className="text-xs font-bold text-[#1C2420] dark:text-white">
+                    <span className="text-xs font-bold text-[#0F172A] dark:text-white">
                       Field Sensor Hub Active
                     </span>
                   </div>
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-[#059669]/10 dark:bg-emerald-500/10 text-[#059669] dark:text-emerald-400">
                     Gir Native Purebred
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs text-[#526258] dark:text-slate-300">
-                  <div className="bg-[#FAF8F5] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E5E2D7] dark:border-slate-700/60">
-                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Lactation Stage</span>
-                    <strong className="text-[#1C2420] dark:text-white font-semibold">2nd Calving (Peak)</strong>
+                <div className="grid grid-cols-2 gap-2 text-xs text-[#64748B] dark:text-slate-300">
+                  <div className="bg-[#F8FAFC] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700/60">
+                    <span className="block text-[11px] text-[#64748B] dark:text-slate-400">Lactation Stage</span>
+                    <strong className="text-[#0F172A] dark:text-white font-semibold">2nd Calving (Peak)</strong>
                   </div>
-                  <div className="bg-[#FAF8F5] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E5E2D7] dark:border-slate-700/60">
-                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Next Vaccination</span>
-                    <strong className="text-[#163E2B] dark:text-emerald-400 font-semibold">FMD Due in 12d</strong>
+                  <div className="bg-[#F8FAFC] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E2E8F0] dark:border-slate-700/60">
+                    <span className="block text-[11px] text-[#64748B] dark:text-slate-400">Next Vaccination</span>
+                    <strong className="text-[#059669] dark:text-emerald-400 font-semibold">FMD Due in 12d</strong>
                   </div>
                 </div>
               </div>
@@ -683,7 +683,7 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Infinite Marquee Ticker (NEW CONTINUOUS ANIMATION) ─── */}
-      <section className="border-y border-[#E5E2D7] dark:border-slate-800/80 bg-white/70 dark:bg-[#111C15]/70 py-4 overflow-hidden relative backdrop-blur-sm">
+      <section className="border-y border-[#E2E8F0] dark:border-slate-800/80 bg-white/70 dark:bg-[#111C15]/70 py-4 overflow-hidden relative backdrop-blur-sm">
         <div className="flex w-max space-x-8 animate-marquee">
           <motion.div
             animate={{ x: [0, -1000] }}
@@ -692,7 +692,7 @@ export const Landing: React.FC = () => {
               repeat: Infinity,
               ease: 'linear',
             }}
-            className="flex items-center gap-8 text-xs font-semibold text-[#526258] dark:text-slate-300 whitespace-nowrap"
+            className="flex items-center gap-8 text-xs font-semibold text-[#64748B] dark:text-slate-300 whitespace-nowrap"
           >
             {TICKER_ITEMS.concat(TICKER_ITEMS).map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
@@ -705,17 +705,17 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Interactive Live Preview Module with Animated Bar Chart ─── */}
-      <section id="interactive-demo" className="px-6 py-20 bg-white dark:bg-[#111C15] border-b border-[#E5E2D7] dark:border-slate-800/80">
+      <section id="interactive-demo" className="px-6 py-20 bg-white dark:bg-[#111C15] border-b border-[#E2E8F0] dark:border-slate-800/80">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5" />
               Interactive Simulation
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
               Experience the Farm Management Dashboard
             </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
+            <p className="text-sm text-[#64748B] dark:text-slate-300">
               Switch through live operational modules below to preview how FarmEase handles your daily farm chores.
             </p>
           </div>
@@ -731,8 +731,8 @@ export const Landing: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 relative ${
                     isActive
-                      ? 'bg-[#163E2B] text-white shadow-md'
-                      : 'bg-[#FAF8F5] dark:bg-[#15221B] text-[#526258] dark:text-slate-300 hover:text-[#163E2B] dark:hover:text-white border border-[#E5E2D7] dark:border-slate-800'
+                      ? 'bg-[#059669] text-white shadow-md'
+                      : 'bg-[#F8FAFC] dark:bg-[#15221B] text-[#64748B] dark:text-slate-300 hover:text-[#059669] dark:hover:text-white border border-[#E2E8F0] dark:border-slate-800'
                   }`}
                 >
                   <TabIcon className="w-4 h-4" />
@@ -758,37 +758,37 @@ export const Landing: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="bg-[#FAF8F5] dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-lg relative overflow-hidden"
+                className="bg-[#F8FAFC] dark:bg-[#142019] border border-[#E2E8F0] dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-lg relative overflow-hidden"
               >
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#E5E2D7] dark:border-slate-800/80">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#E2E8F0] dark:border-slate-800/80">
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                       {currentTab.content.tag}
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#0F172A] dark:text-white">
                       {currentTab.content.title}
                     </h3>
-                    <p className="text-xs text-[#526258] dark:text-slate-400">
+                    <p className="text-xs text-[#64748B] dark:text-slate-400">
                       {currentTab.content.detail}
                     </p>
                   </div>
-                  <div className="bg-white dark:bg-[#1A2A21] px-5 py-3 rounded-2xl border border-[#E5E2D7] dark:border-slate-700 shadow-sm text-right shrink-0">
-                    <div className="text-2xl sm:text-3xl font-extrabold text-[#163E2B] dark:text-emerald-400">
+                  <div className="bg-white dark:bg-[#1A2A21] px-5 py-3 rounded-2xl border border-[#E2E8F0] dark:border-slate-700 shadow-sm text-right shrink-0">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#059669] dark:text-emerald-400">
                       {currentTab.content.metric}
                     </div>
-                    <div className="text-[11px] text-[#526258] dark:text-slate-400 font-medium">
+                    <div className="text-[11px] text-[#64748B] dark:text-slate-400 font-medium">
                       {currentTab.content.subtext}
                     </div>
                   </div>
                 </div>
 
                 {/* Animated Mini Graph Bar Simulation */}
-                <div className="py-5 border-b border-[#E5E2D7]/60 dark:border-slate-800/60">
-                  <div className="text-xs font-semibold text-[#526258] dark:text-slate-400 mb-3 flex items-center gap-1.5">
+                <div className="py-5 border-b border-[#E2E8F0]/60 dark:border-slate-800/60">
+                  <div className="text-xs font-semibold text-[#64748B] dark:text-slate-400 mb-3 flex items-center gap-1.5">
                     <BarChart3 className="w-3.5 h-3.5 text-emerald-500" />
                     <span>Real-Time Trajectory Trend</span>
                   </div>
-                  <div className="flex items-end gap-3 h-24 bg-white dark:bg-[#16241C] p-3 rounded-xl border border-[#E5E2D7] dark:border-slate-800">
+                  <div className="flex items-end gap-3 h-24 bg-white dark:bg-[#16241C] p-3 rounded-xl border border-[#E2E8F0] dark:border-slate-800">
                     {currentTab.content.chartData.map((bar, idx) => (
                       <div key={idx} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <motion.div
@@ -797,7 +797,7 @@ export const Landing: React.FC = () => {
                           transition={{ duration: 0.6, delay: idx * 0.08 }}
                           className="w-full bg-gradient-to-t from-emerald-600 to-teal-400 rounded-md min-h-[6px]"
                         />
-                        <span className="text-[10px] text-[#526258] dark:text-slate-400">{bar.label}</span>
+                        <span className="text-[10px] text-[#64748B] dark:text-slate-400">{bar.label}</span>
                       </div>
                     ))}
                   </div>
@@ -807,49 +807,49 @@ export const Landing: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
                   <motion.div
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E2E8F0] dark:border-slate-800"
                   >
-                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                    <div className="text-xs text-[#64748B] dark:text-slate-400 mb-1">
                       {currentTab.content.stat1.label}
                     </div>
-                    <div className="text-lg font-bold text-[#1C2420] dark:text-white">
+                    <div className="text-lg font-bold text-[#0F172A] dark:text-white">
                       {currentTab.content.stat1.val}
                     </div>
                   </motion.div>
 
                   <motion.div
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E2E8F0] dark:border-slate-800"
                   >
-                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                    <div className="text-xs text-[#64748B] dark:text-slate-400 mb-1">
                       {currentTab.content.stat2.label}
                     </div>
-                    <div className="text-lg font-bold text-[#1C2420] dark:text-white">
+                    <div className="text-lg font-bold text-[#0F172A] dark:text-white">
                       {currentTab.content.stat2.val}
                     </div>
                   </motion.div>
 
                   <motion.div
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E2E8F0] dark:border-slate-800"
                   >
-                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                    <div className="text-xs text-[#64748B] dark:text-slate-400 mb-1">
                       {currentTab.content.stat3.label}
                     </div>
-                    <div className="text-lg font-bold text-[#163E2B] dark:text-emerald-400">
+                    <div className="text-lg font-bold text-[#059669] dark:text-emerald-400">
                       {currentTab.content.stat3.val}
                     </div>
                   </motion.div>
                 </div>
 
-                <div className="mt-6 flex items-center justify-between text-xs text-[#526258] dark:text-slate-400 pt-4 border-t border-[#E5E2D7]/60 dark:border-slate-800/60">
+                <div className="mt-6 flex items-center justify-between text-xs text-[#64748B] dark:text-slate-400 pt-4 border-t border-[#E2E8F0]/60 dark:border-slate-800/60">
                   <span className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                     Automated data validation active
                   </span>
                   <Link
                     to="/dashboard"
-                    className="font-semibold text-[#163E2B] dark:text-emerald-400 hover:underline flex items-center gap-1"
+                    className="font-semibold text-[#059669] dark:text-emerald-400 hover:underline flex items-center gap-1"
                   >
                     Open Live Module <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
@@ -864,27 +864,27 @@ export const Landing: React.FC = () => {
       <section id="roi-calculator" className="px-6 py-20 max-w-7xl mx-auto w-full">
         <div className="space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5" />
               Dynamic Herd Profitability Calculator
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
               Calculate Your Farm Revenue Potential
             </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
+            <p className="text-sm text-[#64748B] dark:text-slate-300">
               Drag the slider to adjust your herd count and see real-time projected milk output, gross revenue, and estimated profits.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto bg-white dark:bg-[#131F18] border border-[#E5E2D7] dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-xl">
+          <div className="max-w-4xl mx-auto bg-white dark:bg-[#131F18] border border-[#E2E8F0] dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-xl">
             {/* Slider Control */}
-            <div className="space-y-4 pb-8 border-b border-[#E5E2D7] dark:border-slate-800">
+            <div className="space-y-4 pb-8 border-b border-[#E2E8F0] dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#1C2420] dark:text-white flex items-center gap-2">
+                <span className="font-bold text-sm text-[#0F172A] dark:text-white flex items-center gap-2">
                   <Beef className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Current Active Herd Size
                 </span>
-                <span className="text-2xl font-black text-[#163E2B] dark:text-emerald-400 bg-emerald-500/10 px-4 py-1 rounded-xl">
+                <span className="text-2xl font-black text-[#059669] dark:text-emerald-400 bg-emerald-500/10 px-4 py-1 rounded-xl">
                   {herdSize} Cattle
                 </span>
               </div>
@@ -895,9 +895,9 @@ export const Landing: React.FC = () => {
                 step="5"
                 value={herdSize}
                 onChange={(e) => setHerdSize(parseInt(e.target.value))}
-                className="w-full h-2.5 bg-[#FAF8F5] dark:bg-[#1B2920] rounded-lg appearance-none cursor-pointer accent-[#163E2B] dark:accent-emerald-400"
+                className="w-full h-2.5 bg-[#F8FAFC] dark:bg-[#1B2920] rounded-lg appearance-none cursor-pointer accent-[#059669] dark:accent-emerald-400"
               />
-              <div className="flex justify-between text-[11px] text-[#526258] dark:text-slate-400">
+              <div className="flex justify-between text-[11px] text-[#64748B] dark:text-slate-400">
                 <span>Small Farm (5 Cattle)</span>
                 <span>Commercial Dairy (50 Cattle)</span>
                 <span>Mega Herd (100 Cattle)</span>
@@ -908,10 +908,10 @@ export const Landing: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
               <motion.div
                 whileHover={{ y: -4 }}
-                className="p-5 rounded-2xl bg-[#FAF8F5] dark:bg-[#18261E] border border-[#E5E2D7] dark:border-slate-800 text-center"
+                className="p-5 rounded-2xl bg-[#F8FAFC] dark:bg-[#18261E] border border-[#E2E8F0] dark:border-slate-800 text-center"
               >
-                <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">Daily Herd Milk Yield</div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#1C2420] dark:text-white">
+                <div className="text-xs text-[#64748B] dark:text-slate-400 mb-1">Daily Herd Milk Yield</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">
                   {estDailyYield.toLocaleString()} L
                 </div>
                 <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
@@ -921,10 +921,10 @@ export const Landing: React.FC = () => {
 
               <motion.div
                 whileHover={{ y: -4 }}
-                className="p-5 rounded-2xl bg-[#FAF8F5] dark:bg-[#18261E] border border-[#E5E2D7] dark:border-slate-800 text-center"
+                className="p-5 rounded-2xl bg-[#F8FAFC] dark:bg-[#18261E] border border-[#E2E8F0] dark:border-slate-800 text-center"
               >
-                <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">Gross Monthly Revenue</div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#1C2420] dark:text-white">
+                <div className="text-xs text-[#64748B] dark:text-slate-400 mb-1">Gross Monthly Revenue</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">
                   ₹{estMonthlyRev.toLocaleString()}
                 </div>
                 <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
@@ -939,7 +939,7 @@ export const Landing: React.FC = () => {
                 <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold mb-1">
                   Est. Net Monthly Profit
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-[#163E2B] dark:text-emerald-300">
+                <div className="text-2xl sm:text-3xl font-black text-[#059669] dark:text-emerald-300">
                   ₹{estNetProfit.toLocaleString()}
                 </div>
                 <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 font-semibold">
@@ -952,16 +952,16 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Features Section (ANIMATED CARDS) ─── */}
-      <section id="features" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+      <section id="features" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E2E8F0] dark:border-slate-800/80">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10">
               Core Modules
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
               Everything Needed to Run a Commercial Farm
             </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
+            <p className="text-sm text-[#64748B] dark:text-slate-300">
               Integrated agricultural tools designed for livestock managers, dairy operations, and veterinary care.
             </p>
           </div>
@@ -982,7 +982,7 @@ export const Landing: React.FC = () => {
                   variants={fadeInUp}
                   whileHover={{ y: -8, scale: 1.015 }}
                   transition={{ duration: 0.25 }}
-                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#163E2B]/40 hover:shadow-lg transition-all group relative overflow-hidden"
+                  className="bg-[#F8FAFC] dark:bg-[#15221B] border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#059669]/40 hover:shadow-lg transition-all group relative overflow-hidden"
                 >
                   {/* Subtle hover gradient glow */}
                   <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
@@ -990,20 +990,20 @@ export const Landing: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <motion.div
                       whileHover={{ rotate: 12, scale: 1.1 }}
-                      className="w-12 h-12 rounded-xl bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center group-hover:bg-[#163E2B] group-hover:text-white transition-colors shadow-sm"
+                      className="w-12 h-12 rounded-xl bg-[#059669]/10 dark:bg-emerald-500/10 text-[#059669] dark:text-emerald-400 flex items-center justify-center group-hover:bg-[#059669] group-hover:text-white transition-colors shadow-sm"
                     >
                       <Icon className="w-6 h-6" strokeWidth={2} />
                     </motion.div>
-                    <span className="text-[11px] font-semibold text-[#526258] dark:text-slate-400 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A2820] border border-[#E5E2D7] dark:border-slate-700/60">
+                    <span className="text-[11px] font-semibold text-[#64748B] dark:text-slate-400 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A2820] border border-[#E2E8F0] dark:border-slate-700/60">
                       {item.badge}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="font-bold text-base text-[#1C2420] dark:text-white mb-1.5 group-hover:text-[#163E2B] dark:group-hover:text-emerald-400 transition-colors">
+                    <h3 className="font-bold text-base text-[#0F172A] dark:text-white mb-1.5 group-hover:text-[#059669] dark:group-hover:text-emerald-400 transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -1018,13 +1018,13 @@ export const Landing: React.FC = () => {
       <section id="how-it-works" className="px-6 py-20 max-w-7xl mx-auto w-full">
         <div className="space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10">
               Simple Process
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
               How FarmEase Works
             </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
+            <p className="text-sm text-[#64748B] dark:text-slate-300">
               Three straightforward steps to organize and modernize your livestock management.
             </p>
           </div>
@@ -1041,10 +1041,10 @@ export const Landing: React.FC = () => {
                   viewport={{ once: true }}
                   variants={fadeInUp}
                   whileHover={{ y: -6 }}
-                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative hover:shadow-md transition-all group"
+                  className="bg-white dark:bg-[#142019] border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative hover:shadow-md transition-all group"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-10 h-10 rounded-xl bg-[#163E2B] text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#059669] text-white font-bold text-sm flex items-center justify-center shadow-sm">
                       {step.step}
                     </div>
                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
@@ -1052,10 +1052,10 @@ export const Landing: React.FC = () => {
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-lg text-[#1C2420] dark:text-white">
+                  <h3 className="font-bold text-lg text-[#0F172A] dark:text-white">
                     {step.title}
                   </h3>
-                  <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
                     {step.desc}
                   </p>
 
@@ -1072,16 +1072,16 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Practical Benefits Section ─── */}
-      <section className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+      <section className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E2E8F0] dark:border-slate-800/80">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10">
               Enterprise Ready
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
               Everything Your Farm Needs in One Place
             </h2>
-            <p className="text-sm text-[#526258] dark:text-slate-300">
+            <p className="text-sm text-[#64748B] dark:text-slate-300">
               Built to replace fragmented spreadsheets and paper binders with clean digital infrastructure.
             </p>
           </div>
@@ -1098,15 +1098,15 @@ export const Landing: React.FC = () => {
                   viewport={{ once: true }}
                   variants={fadeInUp}
                   whileHover={{ y: -4 }}
-                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-emerald-500/40 transition-all shadow-sm"
+                  className="bg-[#F8FAFC] dark:bg-[#15221B] border border-[#E2E8F0] dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-emerald-500/40 transition-all shadow-sm"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#059669]/10 dark:bg-emerald-500/10 text-[#059669] dark:text-emerald-400 flex items-center justify-center">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-sm text-[#1C2420] dark:text-white">
+                  <h3 className="font-bold text-sm text-[#0F172A] dark:text-white">
                     {benefit.title}
                   </h3>
-                  <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
                     {benefit.desc}
                   </p>
                 </motion.div>
@@ -1119,13 +1119,13 @@ export const Landing: React.FC = () => {
       {/* ─── Animated FAQ Accordion ─── */}
       <section id="faqs" className="px-6 py-20 max-w-4xl mx-auto w-full space-y-12">
         <div className="text-center space-y-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/10">
             Got Questions?
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0F172A] dark:text-white tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm text-[#526258] dark:text-slate-300">
+          <p className="text-sm text-[#64748B] dark:text-slate-300">
             Clear answers to help you get the most out of FarmEase.
           </p>
         </div>
@@ -1136,11 +1136,11 @@ export const Landing: React.FC = () => {
             return (
               <motion.div
                 key={index}
-                className="border border-[#E5E2D7] dark:border-slate-800 rounded-2xl bg-white dark:bg-[#142019] overflow-hidden shadow-sm"
+                className="border border-[#E2E8F0] dark:border-slate-800 rounded-2xl bg-white dark:bg-[#142019] overflow-hidden shadow-sm"
               >
                 <button
                   onClick={() => setExpandedFaq(isExpanded ? null : index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-sm sm:text-base text-[#1C2420] dark:text-white hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-sm sm:text-base text-[#0F172A] dark:text-white hover:text-[#059669] dark:hover:text-emerald-400 transition-colors"
                 >
                   <span>{faq.q}</span>
                   <motion.div
@@ -1148,7 +1148,7 @@ export const Landing: React.FC = () => {
                     transition={{ duration: 0.2 }}
                     className="shrink-0 ml-4"
                   >
-                    <ChevronDown className="w-4 h-4 text-[#526258] dark:text-slate-400" />
+                    <ChevronDown className="w-4 h-4 text-[#64748B] dark:text-slate-400" />
                   </motion.div>
                 </button>
 
@@ -1159,7 +1159,7 @@ export const Landing: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.25 }}
-                      className="px-6 pb-5 text-xs sm:text-sm text-[#526258] dark:text-slate-300 leading-relaxed border-t border-[#E5E2D7]/50 dark:border-slate-800/60 pt-3"
+                      className="px-6 pb-5 text-xs sm:text-sm text-[#64748B] dark:text-slate-300 leading-relaxed border-t border-[#E2E8F0]/50 dark:border-slate-800/60 pt-3"
                     >
                       {faq.a}
                     </motion.div>
@@ -1176,7 +1176,7 @@ export const Landing: React.FC = () => {
         <motion.div
           whileHover={{ scale: 1.008 }}
           transition={{ duration: 0.3 }}
-          className="bg-white dark:bg-[#132219] rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-xl border-2 border-[#E5E2D7] dark:border-emerald-800/40 relative overflow-hidden"
+          className="bg-white dark:bg-[#132219] rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-xl border-2 border-[#E2E8F0] dark:border-emerald-800/40 relative overflow-hidden"
         >
           {/* Subtle Ambient Glow Blobs inside the card */}
           <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 blur-3xl pointer-events-none" />
@@ -1186,23 +1186,23 @@ export const Landing: React.FC = () => {
           <motion.div
             whileHover={{ scale: 1.1, rotate: 12 }}
             transition={{ duration: 0.3 }}
-            className="w-14 h-14 rounded-2xl bg-[#163E2B] text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-900/20"
+            className="w-14 h-14 rounded-2xl bg-[#059669] text-white mx-auto flex items-center justify-center shadow-md shadow-emerald-900/20"
           >
             <Leaf className="w-7 h-7 text-emerald-300" strokeWidth={2.2} />
           </motion.div>
 
           <div className="space-y-3 max-w-2xl mx-auto">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/15 inline-flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#059669]/10 dark:bg-emerald-500/15 inline-flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               Modern Livestock Infrastructure
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#1C2420] dark:text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] dark:text-white leading-tight">
               Take Complete Control of{' '}
-              <span className="bg-gradient-to-r from-[#163E2B] via-emerald-600 to-teal-600 dark:from-emerald-300 dark:to-teal-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#059669] via-emerald-600 to-teal-600 dark:from-emerald-300 dark:to-teal-300 bg-clip-text text-transparent">
                 Your Cattle Records
               </span>
             </h2>
-            <p className="text-sm sm:text-base text-[#526258] dark:text-slate-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-[#64748B] dark:text-slate-300 leading-relaxed">
               Replace paper logbooks and scattered notes with one unified, professional platform. Organize health histories, daily milk logs, 283-day gestation alerts, and scannable QR ear tags in seconds.
             </p>
           </div>
@@ -1211,7 +1211,7 @@ export const Landing: React.FC = () => {
             <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.96 }}>
               <Link
                 to="/register"
-                className="px-8 py-3.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full sm:w-auto"
+                className="px-8 py-3.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full sm:w-auto"
               >
                 <span>Get Started Now</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -1220,7 +1220,7 @@ export const Landing: React.FC = () => {
             <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.96 }}>
               <a
                 href="#interactive-demo"
-                className="px-8 py-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1A2C21] hover:bg-[#EAE7DC]/60 dark:hover:bg-[#22392B] text-[#163E2B] dark:text-emerald-300 font-bold text-sm transition-all border border-[#E5E2D7] dark:border-emerald-700/40 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+                className="px-8 py-3.5 rounded-xl bg-[#F8FAFC] dark:bg-[#1A2C21] hover:bg-[#EAE7DC]/60 dark:hover:bg-[#22392B] text-[#059669] dark:text-emerald-300 font-bold text-sm transition-all border border-[#E2E8F0] dark:border-emerald-700/40 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
               >
                 <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Explore Interactive Demo</span>
@@ -1231,26 +1231,26 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="border-t border-[#E5E2D7] dark:border-slate-800/80 px-6 py-10 bg-white dark:bg-[#0B120E]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#526258] dark:text-slate-400">
+      <footer className="border-t border-[#E2E8F0] dark:border-slate-800/80 px-6 py-10 bg-white dark:bg-[#0B120E]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#64748B] dark:text-slate-400">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-[#163E2B] text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-[#059669] text-white flex items-center justify-center">
               <Leaf className="w-4 h-4 text-emerald-300" />
             </div>
             <span>© 2026 FarmEase Systems. All rights reserved.</span>
           </div>
 
           <div className="flex items-center gap-6 font-medium">
-            <Link to="/about" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <Link to="/about" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               About
             </Link>
-            <Link to="/contact" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <Link to="/contact" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               Contact
             </Link>
-            <Link to="/privacy" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <Link to="/privacy" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+            <Link to="/terms" className="hover:text-[#059669] dark:hover:text-emerald-400 transition-colors">
               Terms of Service
             </Link>
           </div>

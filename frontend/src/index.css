@@ -35,12 +35,12 @@
     --border-strong:  #cbd5e1;
     --border-card:    #e2e8f0;
 
-    /* ── Brand Colors (Premium SaaS Blue & Slate) ── */
-    --accent-green:        #2563eb;
-    --accent-green-light:  #3b82f6;
-    --accent-green-dark:   #1d4ed8;
-    --accent-green-subtle: #eff6ff;
-    --accent-green-glow:   rgba(37, 99, 235, 0.15);
+    /* ── Brand Colors (Vibrant Modern Emerald & Mint) ── */
+    --accent-green:        #059669;
+    --accent-green-light:  #10b981;
+    --accent-green-dark:   #047857;
+    --accent-green-subtle: #ecfdf5;
+    --accent-green-glow:   rgba(16, 185, 129, 0.20);
 
     /* ── Status Colors ── */
     --accent-sky:         #0284c7;
@@ -109,11 +109,11 @@
     --border-strong:  rgba(255, 255, 255, 0.16);
     --border-card:    rgba(255, 255, 255, 0.07);
 
-    --accent-green:        #3b82f6;
-    --accent-green-light:  #60a5fa;
-    --accent-green-dark:   #2563eb;
-    --accent-green-subtle: rgba(59, 130, 246, 0.12);
-    --accent-green-glow:   rgba(59, 130, 246, 0.25);
+    --accent-green:        #10b981;
+    --accent-green-light:  #34d399;
+    --accent-green-dark:   #059669;
+    --accent-green-subtle: rgba(16, 185, 129, 0.15);
+    --accent-green-glow:   rgba(16, 185, 129, 0.28);
 
     --accent-sky:         #38bdf8;
     --accent-sky-subtle:  rgba(56, 189, 248, 0.12);
@@ -490,12 +490,12 @@
     font-size: 0.8125rem;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
-    background: #163E2B;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: #ffffff;
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    box-shadow: 0 4px 14px rgba(22, 62, 43, 0.25);
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28);
     text-decoration: none;
     white-space: nowrap;
     letter-spacing: 0.01em;
@@ -507,7 +507,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%);
     transform: translateX(-100%);
     transition: transform 0.5s ease;
   }
@@ -517,9 +517,9 @@
   }
 
   .btn-primary:hover {
-    background: #113222;
+    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(22, 62, 43, 0.35);
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.38);
   }
 
   .btn-primary:active {
@@ -721,14 +721,14 @@
   }
 
   .badge-green  {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
   }
   .dark .badge-green  { 
-    color: #60a5fa; 
-    background: rgba(59, 130, 246, 0.16); 
-    border: 1px solid rgba(59, 130, 246, 0.25); 
+    color: #34d399; 
+    background: rgba(16, 185, 129, 0.16); 
+    border: 1px solid rgba(16, 185, 129, 0.25); 
   }
 
   .badge-sky    {
@@ -796,7 +796,7 @@
     transform: scale(1.06);
   }
 
-  .icon-box-green  { background: #eff6ff; color: #1d4ed8; }
+  .icon-box-green  { background: #ecfdf5; color: #059669; }
   .icon-box-sky    { background: var(--accent-sky-subtle);    color: var(--accent-sky); }
   .icon-box-amber  { background: var(--accent-amber-subtle);  color: var(--accent-amber); }
   .icon-box-rose   { background: var(--accent-rose-subtle);   color: var(--accent-rose); }
