@@ -9,32 +9,19 @@ import { useToast } from '../context/ToastContext';
 import { 
   Beef, 
   Milk, 
-  Heart, 
-  Stethoscope, 
-  DollarSign, 
   TrendingUp, 
   Boxes, 
   Syringe, 
-  CheckSquare, 
-  Truck, 
-  CloudSun, 
   Search, 
   Filter, 
   Plus, 
   Activity, 
   Bell, 
-  Sparkles, 
   Droplet, 
-  Calendar, 
   ArrowUpRight, 
-  ArrowDownRight, 
-  Clock, 
   PieChart as PieIcon, 
   BarChart3, 
-  Wind, 
-  Thermometer,
   ScanLine,
-  ShoppingCart,
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -52,144 +39,6 @@ import {
   CartesianGrid 
 } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
-
-// ─── Purchase Summary Strip (isolated, does not touch dashboard state) ─────────
-const PurchaseSummaryStrip: React.FC = () => {
-  const [purchaseStats, setPurchaseStats] = React.useState({ total: 0, count: 0, latest: '' });
-  React.useEffect(() => {
-    apiClient.get('/cattle', { params: { limit: 500, page: 1 } })
-      .then(res => {
-        const list: any[] = res.data?.data ?? (Array.isArray(res.data) ? res.data : []);
-        const withCost = list.filter((c: any) => c.purchase_cost && c.purchase_cost > 0);
-        const total = withCost.reduce((s: number, c: any) => s + (c.total_acquisition_cost ?? c.purchase_cost ?? 0), 0);
-        const sorted = withCost.sort((a: any, b: any) => (b.purchase_date || '').localeCompare(a.purchase_date || ''));
-        const latest = sorted[0] ? `${sorted[0].name} – ₹${(sorted[0].purchase_cost || 0).toLocaleString('en-IN')}` : '';
-        setPurchaseStats({ total, count: withCost.length, latest });
-      })
-      .catch(() => {});
-  }, []);
-  if (!purchaseStats.total) return null;
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
-          <ShoppingCart className="w-4 h-4" />
-        </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Capital Acquisition Registry</p>
-          <p className="text-base font-bold text-slate-900 dark:text-white tabular-nums leading-tight mt-0.5">
-            ₹{purchaseStats.total.toLocaleString('en-IN')}
-          </p>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{purchaseStats.count} total cattle head acquired</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4 flex-wrap">
-        {purchaseStats.latest && (
-          <div className="text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Recent Acquisition</p>
-            <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 max-w-[180px] truncate">{purchaseStats.latest}</p>
-          </div>
-        )}
-        <Link to="/purchases" className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition-all flex items-center gap-1.5 shrink-0">
-          <ShoppingCart className="w-3.5 h-3.5" />
-          <span>View Registry</span>
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-// ─── AI Health Summary Widget ──────────────────────────────────────────────────
-const AIHealthSummaryWidget: React.FC = () => {
-  const navigate = useNavigate();
-  const [summary, setSummary] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    apiClient.get('/health/ai-insights')
-      .then(res => setSummary(res.data))
-      .catch(() => {});
-  }, []);
-
-  // Only show if there are actual cattle requiring attention or high/medium risk alerts
-  if (!summary || ((summary.cattleRequiringAttention?.length ?? 0) === 0 && (summary.highRiskCount ?? 0) === 0 && (summary.mediumRiskCount ?? 0) === 0)) {
-    return null;
-  }
-
-  return (
-    <div className="p-4 rounded-xl border border-amber-200/90 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/80">
-          <Sparkles className="w-4 h-4" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-900 dark:text-white">
-              Clinical Health Alerts
-            </span>
-            <span className="px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 rounded border border-amber-200/80">
-              {summary.highRiskCount} High Risk Flagged
-            </span>
-          </div>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-            {summary.cattleRequiringAttention?.length || 0} animals require veterinary diagnostic review ({summary.highRiskCount || 0} High, {summary.mediumRiskCount || 0} Medium risk).
-          </p>
-        </div>
-      </div>
-
-      <button
-        onClick={() => navigate('/ai-insights')}
-        className="px-3 py-1.5 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium transition-all shrink-0 cursor-pointer flex items-center gap-1 shadow-2xs"
-      >
-        <span>Review Clinical Alerts</span>
-        <ArrowUpRight className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-};
-// ─── AI Breeding Summary Widget ────────────────────────────────────────────────
-const AIBreedingSummaryWidget: React.FC = () => {
-  const navigate = useNavigate();
-  const [summary, setSummary] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    apiClient.get('/farm/breeding-insights')
-      .then(res => setSummary(res.data))
-      .catch(() => {});
-  }, []);
-
-  if (!summary || !summary.summary?.hasData) return null;
-
-  return (
-    <div className="p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200/60 dark:border-emerald-800/60">
-          <Heart className="w-4 h-4" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-900 dark:text-white">
-              Reproduction & Gestation Intelligence
-            </span>
-            <span className="px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 rounded border border-emerald-200/60 dark:border-emerald-800/60">
-              {summary.summary.confirmedPregnancies} Confirmed Gestations
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {summary.summary.upcomingDeliveries} upcoming calving windows scheduled • {summary.attentionRequired?.length || 0} active monitor items
-          </p>
-        </div>
-      </div>
-
-      <button
-        onClick={() => navigate('/ai-insights?tab=breeding')}
-        className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition-all shrink-0 cursor-pointer flex items-center gap-1.5"
-      >
-        <span>Breeding Insights</span>
-        <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-      </button>
-    </div>
-  );
-};
 
 
 export const Dashboard: React.FC = () => {
@@ -442,12 +291,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Health Summary Widget */}
-      <AIHealthSummaryWidget />
-
-      {/* AI Breeding Overview Widget */}
-      <AIBreedingSummaryWidget />
-
       {/* ── Enterprise KPI Command Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Active Herd */}
@@ -596,68 +439,30 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Purchase Investment Summary (links to /purchases) ── */}
-      <PurchaseSummaryStrip />
-
-      {/* ── Charts Row ── */}
-
+      {/* ── Primary Operational Charts (Milk Harvest & Genetics Mix) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Weather Widget — light/dark adaptive */}
-        <div className="card-premium p-5 border border-[var(--accent-sky)]/20 flex flex-col justify-between" style={{ background: 'linear-gradient(135deg, var(--accent-sky-subtle) 0%, var(--bg-card) 100%)' }}>
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="badge-pill badge-sky">Live Weather</span>
-              <CloudSun className="w-5 h-5 text-[var(--accent-amber)]" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-xs font-semibold text-[var(--text-secondary)]">{data?.weather?.location || 'Green Valley Cattle Ranch'}</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[var(--text-primary)]">{data?.weather?.temp || 24}°C</span>
-                <span className="text-xs text-[var(--accent-sky)] font-semibold">{data?.weather?.condition || 'Partly Cloudy'}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-[var(--border-card)] text-xs">
-              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <Thermometer className="w-3.5 h-3.5 text-[var(--accent-sky)]" />
-                <span>Humidity: <strong className="text-[var(--text-primary)]">{data?.weather?.humidity || '62%'}</strong></span>
-              </div>
-              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <Wind className="w-3.5 h-3.5 text-[var(--accent-sky)]" />
-                <span>Wind: <strong className="text-[var(--text-primary)]">{data?.weather?.wind || '14 km/h'}</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 p-3 rounded-xl bg-[var(--accent-sky-subtle)] border border-[var(--accent-sky)]/20 text-[11px] text-[var(--text-secondary)]">
-            <span className="font-bold text-[var(--accent-sky)] block mb-0.5">Pasture Forecast:</span>
-            {data?.weather?.forecast || 'Ideal pasture condition for morning grazing.'}
-          </div>
-        </div>
-
-        {/* Milk Production Chart */}
-        <div className="lg:col-span-2 card-premium p-5 border border-[var(--border-card)]">
+        {/* Milk Production Chart (Spans 2 columns) */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="section-title flex items-center gap-2">
-                <Milk className="w-4 h-4 text-[var(--accent-teal)]" />
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <Milk className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                 Milk Production Trend
               </h3>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">Morning · Evening · Total (liters/day)</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Morning · Evening · Total Daily Harvest (Liters)</p>
             </div>
-            <Link to="/milk" className="text-xs font-semibold flex items-center gap-1 transition-colors" style={{ color: 'var(--accent-teal)' }}>
-              View All <ArrowUpRight className="w-3.5 h-3.5" />
+            <Link to="/milk" className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors">
+              Milk Records <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="h-56 w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data?.charts?.milkTrend || []} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="totalYieldGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0d9488" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#047857" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#047857" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
@@ -667,68 +472,26 @@ export const Dashboard: React.FC = () => {
                   contentStyle={{
                     backgroundColor: 'var(--bg-card)',
                     border: '1px solid var(--border-card)',
-                    borderRadius: '10px',
+                    borderRadius: '8px',
                     color: 'var(--text-primary)',
                     fontSize: '12px',
-                    boxShadow: 'var(--shadow-md)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 />
-                <Area type="monotone" dataKey="total" name="Total (L)" stroke="#0d9488" strokeWidth={2.5} fill="url(#totalYieldGrad)" />
+                <Area type="monotone" dataKey="total" name="Total (L)" stroke="#047857" strokeWidth={2.2} fill="url(#totalYieldGrad)" />
                 <Area type="monotone" dataKey="morning" name="Morning" stroke="#d97706" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
                 <Area type="monotone" dataKey="evening" name="Evening" stroke="#7c3aed" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
 
-      {/* ── Financial + Breed Charts ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Income vs Expense */}
-        <div className="lg:col-span-2 card-premium p-5 border border-[var(--border-card)]">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="section-title flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-[var(--accent-green)]" />
-                Income vs Expenses
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">Monthly P&L comparison</p>
-            </div>
-            <Link to="/financials" className="text-xs font-semibold flex items-center gap-1 transition-colors" style={{ color: 'var(--accent-green)' }}>
-              Finance <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.charts?.financialTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    border: '1px solid var(--border-card)',
-                    borderRadius: '10px',
-                    color: 'var(--text-primary)',
-                    fontSize: '12px',
-                    boxShadow: 'var(--shadow-md)',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', color: 'var(--text-secondary)' }} />
-                <Bar dataKey="income" name="Income" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Breed Distribution */}
-        <div className="card-premium p-5 border border-[var(--border-card)] flex flex-col justify-between">
+        {/* Breed Distribution (1 column) */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
           <div>
-            <h3 className="section-title flex items-center gap-2 mb-4">
-              <PieIcon className="w-4 h-4 text-[var(--accent-violet)]" />
-              Breed Mix
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
+              <PieIcon className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+              Herd Breed Mix
             </h3>
 
             <div className="h-44 w-full">
@@ -739,7 +502,7 @@ export const Dashboard: React.FC = () => {
                     cx="50%"
                     cy="50%"
                     innerRadius={46}
-                    outerRadius={70}
+                    outerRadius={68}
                     paddingAngle={4}
                     dataKey="value"
                   >
@@ -751,10 +514,9 @@ export const Dashboard: React.FC = () => {
                     contentStyle={{
                       backgroundColor: 'var(--bg-card)',
                       border: '1px solid var(--border-card)',
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       color: 'var(--text-primary)',
                       fontSize: '12px',
-                      boxShadow: 'var(--shadow-md)',
                     }}
                   />
                 </PieChart>
@@ -762,84 +524,93 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-1.5 pt-3 border-t border-[var(--border-card)]">
+          <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
             {breedData.map((item) => (
               <div key={item.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                  <span className="text-[var(--text-secondary)] font-medium truncate">{item.name}</span>
+                  <span className="text-slate-600 dark:text-slate-400 font-medium truncate">{item.name}</span>
                 </div>
-                <span className="font-bold text-[var(--text-primary)] shrink-0 ml-2">{item.value}</span>
+                <span className="font-semibold text-slate-900 dark:text-white shrink-0 ml-2">{item.value}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Activity Feed + Deliveries ── */}
+      {/* ── Financial Ledger & Operational Activity Log ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Recent Activities */}
-        <div className="card-premium p-5 border border-[var(--border-card)]">
+        {/* Income vs Expenses Bar Chart */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="section-title flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[var(--accent-green)]" />
-              Recent Activity
-            </h3>
-            <span className="section-label">{filteredActivities.length} logs</span>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+                Monthly Income vs Expenses
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Operating revenue vs cost breakdown</p>
+            </div>
+            <Link to="/financials" className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors">
+              Finance Ledger <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-            {filteredActivities.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon"><Activity className="w-5 h-5" /></div>
-                <p className="text-xs text-[var(--text-muted)]">No recent activity</p>
-              </div>
-            ) : filteredActivities.map((act) => (
-              <div
-                key={act.id}
-                className="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-card)] flex items-start justify-between gap-3 text-xs"
-              >
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[var(--text-primary)]">{act.title}</span>
-                    <span className="text-[10px] text-[var(--text-muted)]">by {act.user_name}</span>
-                  </div>
-                  <p className="text-[11px] text-[var(--text-secondary)]">{act.description}</p>
-                </div>
-                <span className="text-[10px] text-[var(--text-muted)] font-mono shrink-0">{act.timestamp}</span>
-              </div>
-            ))}
+          <div className="h-60 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data?.charts?.financialTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
+                <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-card)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)',
+                    fontSize: '12px',
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', color: 'var(--text-secondary)' }} />
+                <Bar dataKey="income" name="Income" fill="#047857" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Upcoming Deliveries */}
-        <div className="card-premium p-5 border border-[var(--border-card)]">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="section-title flex items-center gap-2">
-              <Truck className="w-4 h-4 text-[var(--accent-amber)]" />
-              Upcoming Deliveries
-            </h3>
-            <span className="badge-pill badge-amber">In Transit</span>
-          </div>
+        {/* Recent Operational Audit Log */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+                Recent Operational Activity
+              </h3>
+              <span className="text-[11px] font-semibold text-slate-400">{filteredActivities.length} logs recorded</span>
+            </div>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-            {(data?.deliveries || []).map((del) => (
-              <div
-                key={del.id}
-                className="p-3 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-card)] flex items-center justify-between gap-3 text-xs"
-              >
-                <div>
-                  <h4 className="font-semibold text-[var(--text-primary)]">{del.title}</h4>
-                  <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{del.supplier_or_client} • {del.quantity}</p>
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              {filteredActivities.length === 0 ? (
+                <div className="p-8 text-center">
+                  <Activity className="w-6 h-6 mx-auto text-slate-300 mb-1" />
+                  <p className="text-xs text-slate-400">No operational activity recorded yet</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="text-[11px] font-bold text-[var(--accent-amber)] block">{del.expected_date}</span>
-                  <Badge variant={del.status === 'in_transit' ? 'in_progress' : 'healthy'}>
-                    {del.status.replace('_', ' ')}
-                  </Badge>
+              ) : filteredActivities.map((act) => (
+                <div
+                  key={act.id}
+                  className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 flex items-start justify-between gap-3 text-xs"
+                >
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-900 dark:text-white truncate">{act.title}</span>
+                      <span className="text-[10px] text-slate-400 shrink-0">by {act.user_name}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{act.description}</p>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono shrink-0">{act.timestamp}</span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
