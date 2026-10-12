@@ -34,8 +34,11 @@ import {
   TrendingUp, 
   Paperclip,
   Upload,
-  Sparkles
+  Sparkles,
+  Share2
 } from 'lucide-react';
+import { DiseaseDiagnosticModal } from '../components/health/DiseaseDiagnosticModal';
+import { WhatsAppAlertModal } from '../components/notifications/WhatsAppAlertModal';
 import { 
   ResponsiveContainer, 
   LineChart, 
@@ -133,6 +136,8 @@ export const HealthCare: React.FC = () => {
   const [isDewormModalOpen, setIsDewormModalOpen] = useState(false);
   const [isVitModalOpen, setIsVitModalOpen] = useState(false);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
+  const [isDiagnosticOpen, setIsDiagnosticOpen] = useState(false);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [viewPrescriptionUrl, setViewPrescriptionUrl] = useState<string | null>(null);
 
   // Forms
@@ -271,6 +276,24 @@ export const HealthCare: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Feature 1: AI Disease Diagnostic Wizard */}
+          <button
+            onClick={() => setIsDiagnosticOpen(true)}
+            className="btn-secondary text-rose-600 dark:text-rose-400 font-bold border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+          >
+            <Stethoscope className="w-3.5 h-3.5 text-rose-500" />
+            AI Symptom Checker
+          </button>
+
+          {/* Feature 3: WhatsApp Alert Broadcast */}
+          <button
+            onClick={() => setIsWhatsAppOpen(true)}
+            className="btn-secondary text-[#25D366] font-bold border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+          >
+            <Share2 className="w-3.5 h-3.5 text-[#25D366]" />
+            WhatsApp Alerts
+          </button>
+
           <button
             onClick={handlePrintPDF}
             className="btn-secondary"
@@ -821,6 +844,18 @@ export const HealthCare: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Feature 1: AI Disease Diagnostic Triage Modal */}
+      <DiseaseDiagnosticModal
+        isOpen={isDiagnosticOpen}
+        onClose={() => setIsDiagnosticOpen(false)}
+      />
+
+      {/* Feature 3: WhatsApp Alert Broadcast Modal */}
+      <WhatsAppAlertModal
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+      />
     </div>
   );
 };

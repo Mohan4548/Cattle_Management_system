@@ -9,10 +9,15 @@ import { useToast } from '../context/ToastContext';
 import { DigitalIdentityCard } from '../modules/digitalIdentity/components/DigitalIdentityCard';
 import { CattleHealthRiskCard } from '../modules/healthRisk/components/CattleHealthRiskCard';
 import { CattleBreedingInsightCard } from '../modules/breeding/components/CattleBreedingInsightCard';
+import { CattlePassportModal } from '../components/cattle/CattlePassportModal';
+import { DiseaseDiagnosticModal } from '../components/health/DiseaseDiagnosticModal';
+import { WhatsAppAlertModal } from '../components/notifications/WhatsAppAlertModal';
 import {
   Beef,
   ArrowLeft,
   Printer,
+  Award,
+  Share2,
   Edit,
   Trash2,
   Calendar,
@@ -70,6 +75,9 @@ export const CattleProfile: React.FC = () => {
   const [docForm, setDocForm]         = useState({ doc_name: '', doc_type: 'Purchase Invoice', file_url: '' });
   const [ownerForm, setOwnerForm]     = useState({ owner_name: '', owner_contact: '', transfer_date: '', transfer_price: '', transfer_location: '', transfer_notes: '' });
   const [savingDoc, setSavingDoc]     = useState(false);
+  const [showPassportModal, setShowPassportModal] = useState(false);
+  const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
 
   // ─── Per-cattle health data (lazy loaded when health tab opens) ───────────
   const [cattleHealthRecords, setCattleHealthRecords] = useState<any[]>([]);
@@ -262,13 +270,32 @@ export const CattleProfile: React.FC = () => {
           Back to Directory
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Feature 2: Official Cattle Digital Passport */}
           <button
-            onClick={handlePrint}
-            className="px-3.5 py-2 rounded-xl glass-panel hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5"
+            onClick={() => setShowPassportModal(true)}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-600/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
           >
-            <Printer className="w-4 h-4 text-emerald-500" />
-            Print Passport
+            <Award className="w-4 h-4 text-emerald-600" />
+            Official Passport
+          </button>
+
+          {/* Feature 1: AI Disease Triage */}
+          <button
+            onClick={() => setShowDiagnosticModal(true)}
+            className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <Stethoscope className="w-4 h-4 text-rose-500" />
+            AI Disease Triage
+          </button>
+
+          {/* Feature 3: WhatsApp Alert */}
+          <button
+            onClick={() => setShowWhatsAppModal(true)}
+            className="px-3.5 py-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 text-emerald-800 dark:text-[#25D366] text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <Share2 className="w-4 h-4 text-emerald-600 dark:text-[#25D366]" />
+            WhatsApp Alert
           </button>
 
           {/* Phase 3: Scan Another QR */}
@@ -277,7 +304,7 @@ export const CattleProfile: React.FC = () => {
             className="px-3.5 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition-all flex items-center gap-1.5"
           >
             <ScanLine className="w-4 h-4" />
-            Scan Another QR
+            Scan QR
           </button>
 
           {user?.role === 'admin' && (
@@ -1169,6 +1196,40 @@ export const CattleProfile: React.FC = () => {
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Feature 2: Official Cattle Digital Passport Modal */}
+      {cattle && (
+        <CattlePassportModal
+          isOpen={showPassportModal}
+          onClose={() => setShowPassportModal(false)}
+          cattle={cattle}
+          vaccinations={cattleVaccinations}
+        />
+      )}
+
+      {/* Feature 1: AI Disease Diagnostic Triage Modal */}
+      {cattle && (
+        <DiseaseDiagnosticModal
+          isOpen={showDiagnosticModal}
+          onClose={() => setShowDiagnosticModal(false)}
+          cattleId={cattle.id}
+          cattleName={cattle.name}
+          tagNumber={cattle.tag_number}
+          breed={cattle.breed}
+        />
+      )}
+
+      {/* Feature 3: WhatsApp Alert Dispatcher Modal */}
+      {cattle && (
+        <WhatsAppAlertModal
+          isOpen={showWhatsAppModal}
+          onClose={() => setShowWhatsAppModal(false)}
+          cattleId={cattle.id}
+          cattleName={cattle.name}
+          tagNumber={cattle.tag_number}
+          defaultAlertType="VACCINATION_REMINDER"
+        />
       )}
     </div>
   );

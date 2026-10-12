@@ -11,6 +11,8 @@ import * as usersController from '../controllers/usersController.js';
 import * as dashboardController from '../controllers/dashboardController.js';
 import * as digitalIdentityController from '../controllers/digitalIdentityController.js';
 import * as cattleHealthRiskController from '../controllers/cattleHealthRiskController.js';
+import * as cattleDiseaseDiagnosticController from '../controllers/cattleDiseaseDiagnosticController.js';
+import * as whatsappAlertController from '../controllers/whatsappAlertController.js';
 import * as notificationController from '../controllers/notificationController.js';
 import * as cattleBreedingAnalysisController from '../controllers/cattleBreedingAnalysisController.js';
 import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
@@ -49,6 +51,8 @@ router.post('/feed', authenticateToken, requireRole(['admin', 'farmer', 'worker'
 
 // Health Routes
 router.get('/health/ai-insights', authenticateToken, cattleHealthRiskController.getAIHealthInsights);
+router.get('/health/symptoms-list', authenticateToken, cattleDiseaseDiagnosticController.getSymptomsList);
+router.post('/health/diagnose', authenticateToken, cattleDiseaseDiagnosticController.diagnoseSymptoms);
 router.get('/health', authenticateToken, healthController.getHealthRecords);
 router.post('/health', authenticateToken, requireRole(['admin', 'farmer', 'veterinarian']), healthController.createHealthRecord);
 router.get('/vaccinations', authenticateToken, healthController.getVaccinations);
@@ -90,6 +94,7 @@ router.post('/notifications/generate', authenticateToken, notificationController
 router.post('/notifications/mark-all-read', authenticateToken, notificationController.markAllAsRead);
 router.patch('/notifications/:id/read', authenticateToken, notificationController.markAsRead);
 router.get('/cattle/:id/alerts', authenticateToken, notificationController.getCattleAlerts);
+router.post('/alerts/whatsapp', authenticateToken, whatsappAlertController.generateWhatsAppAlert);
 
 // Purchase Document Routes
 router.get('/cattle/:id/purchase-documents', authenticateToken, cattleController.getPurchaseDocuments);
