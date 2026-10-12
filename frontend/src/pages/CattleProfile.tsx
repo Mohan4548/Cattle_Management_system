@@ -482,7 +482,7 @@ export const CattleProfile: React.FC = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 px-1 text-xs font-bold transition-all relative flex items-center gap-1.5 shrink-0 ${
                 activeTab === tab.id
-                  ? 'text-emerald-500 border-b-2 border-emerald-500'
+                  ? 'text-primary-600 border-b-2 border-primary-600'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
@@ -495,10 +495,10 @@ export const CattleProfile: React.FC = () => {
         {activeTab === 'timeline' && (
           <div className="space-y-4 pt-2">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-500" />
+              <Clock className="w-4 h-4 text-primary-500" />
               Cattle Lifetime Event History
             </h3>
-            <div className="relative border-l-2 border-emerald-500/30 ml-3 space-y-6 pl-6">
+            <div className="relative border-l-2 border-primary-500/30 ml-3 space-y-6 pl-6">
               {(cattle.timeline || [
                 { id: '1', title: 'Birth Record', date: cattle.date_of_birth, category: 'birth', description: `Calf born on farm.` },
                 { id: '2', title: 'Registration & Tagging', date: cattle.created_at?.split('T')[0], category: 'purchase', description: `Assigned Cattle ID ${cattle.tag_number}.` },
@@ -508,10 +508,10 @@ export const CattleProfile: React.FC = () => {
                 ...cattleVaccinations.slice(0, 2).map((v: any, i: number) => ({ id: `v${i}`, title: `Vaccination – ${v.vaccine_name}`, date: v.administered_date, category: 'vaccination' as const, description: `${v.vaccine_name}${v.administered_by ? ` administered by ${v.administered_by}` : ''}. Next due: ${v.next_due_date || '—'}.` })),
               ]).map((evt: any) => (
                 <div key={evt.id} className="relative group">
-                  <span className="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-slate-900" />
+                  <span className="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-primary-500 ring-4 ring-white dark:ring-slate-900" />
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">{evt.title}</h4>
-                    <span className="text-[10px] font-mono text-emerald-500 font-bold">{evt.date}</span>
+                    <span className="text-[10px] font-mono text-primary-500 font-bold">{evt.date}</span>
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">{evt.description}</p>
                 </div>
@@ -524,7 +524,7 @@ export const CattleProfile: React.FC = () => {
         {activeTab === 'gallery' && (
           <div className="space-y-4 pt-2">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-emerald-500" />
+              <ImageIcon className="w-4 h-4 text-primary-500" />
               Cattle Photo Gallery
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -533,7 +533,7 @@ export const CattleProfile: React.FC = () => {
                   key={idx}
                   onClick={() => setSelectedPhoto(img)}
                   className={`relative h-32 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${
-                    selectedPhoto === img ? 'border-emerald-500 ring-2 ring-emerald-500/40' : 'border-transparent hover:border-slate-400'
+                    selectedPhoto === img ? 'border-primary-500 ring-2 ring-primary-500/40' : 'border-transparent hover:border-slate-400'
                   }`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />

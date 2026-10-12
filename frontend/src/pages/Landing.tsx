@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Beef,
   Milk,
@@ -16,7 +16,38 @@ import {
   FileText,
   Activity,
   ChevronRight,
+  ChevronDown,
+  CheckCircle2,
+  Sparkles,
+  Zap,
+  BarChart3,
+  Clock,
+  Scan,
 } from 'lucide-react';
+
+/* ── Animation Variants ── */
+const fadeInUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.55,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  }),
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
 
 /* ── Features List ── */
 const FEATURES = [
@@ -24,31 +55,43 @@ const FEATURES = [
     icon: Beef,
     title: 'Herd Directory & Breeds',
     desc: 'Auto Tag IDs, QR ear tags, and profiles for Gir, Kangayam, Sahiwal, Ongole and native breeds.',
+    badge: 'Breed Intelligence',
+    color: 'from-emerald-500/10 to-teal-500/10',
   },
   {
     icon: Milk,
     title: 'Milk Yield & Quality Metrics',
     desc: 'Track morning & evening yields, FAT% / SNF% quality scores, milk rate pricing, and performance logs.',
+    badge: 'Daily Production',
+    color: 'from-sky-500/10 to-blue-500/10',
   },
   {
     icon: Stethoscope,
     title: 'Veterinary Health & Vitals',
     desc: 'Vaccination schedules, deworming cycles, doctor visit logs, and vitals trend monitoring.',
+    badge: 'Clinical Tracking',
+    color: 'from-amber-500/10 to-orange-500/10',
   },
   {
     icon: Heart,
     title: '283-Day Calving Predictor',
     desc: 'Insemination tracking, 283-day gestation countdown, calf registration, and pedigree history.',
+    badge: 'Breeding Science',
+    color: 'from-rose-500/10 to-pink-500/10',
   },
   {
     icon: DollarSign,
     title: 'Purchase & P&L Financials',
     desc: 'Track purchases, feed costs, medicine expenses, sales ledger, and printable P&L statements.',
+    badge: 'Farm Economics',
+    color: 'from-emerald-500/10 to-green-500/10',
   },
   {
     icon: QrCode,
     title: 'QR Digital Ear Tag System',
     desc: 'Unique permanent Digital IDs (CAT-2026-XXXXXX) with scannable QR ear tags for quick field checks.',
+    badge: 'Field Ready',
+    color: 'from-purple-500/10 to-indigo-500/10',
   },
 ];
 
@@ -58,16 +101,22 @@ const STEPS = [
     step: '01',
     title: 'Register Your Cattle',
     desc: 'Create digital cattle profiles with ear tag IDs, breed classifications, age, and initial medical history.',
+    icon: Beef,
+    highlight: 'One-click ear tag assignment',
   },
   {
     step: '02',
     title: 'Track Daily Operations',
     desc: 'Log milk yield, vaccination dates, health checks, feed expenses, and breeding cycles in real time.',
+    icon: Activity,
+    highlight: 'Instant offline & mobile logging',
   },
   {
     step: '03',
     title: 'Monitor & Manage',
     desc: 'View clear herd analytics, financial ROI, automated health reminders, and digital audit documents.',
+    icon: TrendingUp,
+    highlight: 'Real-time profit & health insights',
   },
 ];
 
@@ -105,26 +154,152 @@ const BENEFITS = [
   },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
+/* ── Interactive Demo Tabs Data ── */
+const DEMO_TABS = [
+  {
+    id: 'milk',
+    label: 'Milk Yield Intelligence',
+    icon: Milk,
+    content: {
+      tag: 'DAILY HARVEST',
+      title: 'Automated Yield Recording & Fat Scoring',
+      metric: '32.4 L',
+      subtext: 'Today Total Yield (Gir + Kangayam batches)',
+      stat1: { label: 'FAT Content', val: '4.8%' },
+      stat2: { label: 'SNF Ratio', val: '8.9%' },
+      stat3: { label: 'Market Rate', val: '₹48.00 / L' },
+      detail: 'Morning and evening sessions synced with automated dairy cooperative payout projections.',
+    },
+  },
+  {
+    id: 'qr',
+    label: 'QR Ear Tag Identity',
+    icon: QrCode,
+    content: {
+      tag: 'INSTANT FIELD VERIFICATION',
+      title: 'Tamper-Proof Scannable Cattle Digital Passport',
+      metric: 'CAT-2026-0891',
+      subtext: 'Purebred Gir Cow • Age 3.8 Yrs • Tag Grade A',
+      stat1: { label: 'Vaccination', val: 'Up to Date' },
+      stat2: { label: 'Lactation', val: 'Stage 2 (Prime)' },
+      stat3: { label: 'Last Scan', val: 'Today, 09:30 AM' },
+      detail: 'Instant QR scanning directly from mobile camera without special scanner hardware.',
+    },
+  },
+  {
+    id: 'health',
+    label: 'Veterinary Radar',
+    icon: Stethoscope,
+    content: {
+      tag: 'CLINICAL MONITORING',
+      title: 'Proactive Health Alerts & Gestation Tracking',
+      metric: '99.4%',
+      subtext: 'Herd Wellness Index across 48 livestock',
+      stat1: { label: 'FMD Vaccine', val: 'Due in 6 Days' },
+      stat2: { label: 'Deworming', val: 'Completed' },
+      stat3: { label: 'Calving Alert', val: '14 Days to Due' },
+      detail: 'Auto-schedules Dr. visits and alerts farm staff before health issues affect yield.',
+    },
+  },
+  {
+    id: 'financials',
+    label: 'Farm ROI & P&L',
+    icon: DollarSign,
+    content: {
+      tag: 'LIVE ECONOMICS',
+      title: 'Feed-to-Milk Ratio & Net Profit Margins',
+      metric: '+28.4%',
+      subtext: 'Quarterly Operating Margin Improvement',
+      stat1: { label: 'Monthly Rev', val: '₹1,42,800' },
+      stat2: { label: 'Feed Costs', val: '₹46,200' },
+      stat3: { label: 'Net Profit', val: '₹96,600' },
+      detail: 'Track feed expenses per cow against milk revenue for data-backed culling & investment.',
+    },
+  },
+];
+
+/* ── FAQ Data ── */
+const FAQS = [
+  {
+    q: 'How does the QR Ear Tag system work in the field?',
+    a: 'Each cattle profile generates a unique permanent Digital ID and high-resolution printable QR code. Farm workers can scan the tag with any standard smartphone camera or our built-in QR scanner to instantly bring up the animal’s medical history, pedigree, and milk yield.',
+  },
+  {
+    q: 'Can I track native Indian breeds like Gir, Kangayam, and Sahiwal?',
+    a: 'Yes! FarmEase has native breed templates specifically calibrated for Indian zebu breeds including Gir, Kangayam, Sahiwal, Red Sindhi, and Murrah buffaloes with localized yield benchmarks and gestation profiles.',
+  },
+  {
+    q: 'Does it support multiple workers and veterinarians?',
+    a: 'Absolutely. FarmEase includes role-based access control for Farm Owners, Managers, Milkers, and Visiting Veterinarians so everyone sees the exact tools they need.',
+  },
+  {
+    q: 'Can I use FarmEase offline or in low connectivity barns?',
+    a: 'Yes, FarmEase is built with local caching and offline-tolerant workflows so milk yield and vitals can be entered in the barn and synced automatically once connected.',
+  },
+];
 
 export const Landing: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('milk');
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  const currentTab = DEMO_TABS.find((t) => t.id === activeTab) || DEMO_TABS[0];
+
   return (
-    <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#0E1712] text-[#1C2420] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-[#163E2B]/20 selection:text-[#163E2B]">
+    <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#0E1712] text-[#1C2420] dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-[#163E2B]/20 selection:text-[#163E2B] relative overflow-hidden">
+      {/* ─── Ambient Animated Background Blobs ─── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -30, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, -50, 0],
+            y: [0, 40, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-1/3 -right-32 w-[32rem] h-[32rem] rounded-full bg-teal-500/10 dark:bg-teal-500/15 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -40, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute bottom-10 left-1/4 w-80 h-80 rounded-full bg-emerald-600/5 dark:bg-emerald-400/10 blur-3xl"
+        />
+      </div>
+
       {/* ─── Header / Navbar ─── */}
-      <header className="h-20 border-b border-[#E5E2D7] dark:border-slate-800/80 sticky top-0 bg-[#FAF8F5]/90 dark:bg-[#0E1712]/90 backdrop-blur-md z-50 px-6">
+      <header className="h-20 border-b border-[#E5E2D7] dark:border-slate-800/80 sticky top-0 bg-[#FAF8F5]/85 dark:bg-[#0E1712]/85 backdrop-blur-md z-50 px-6">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo with gentle hover pulse */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-[#163E2B] text-white flex items-center justify-center shadow-sm group-hover:bg-[#113222] transition-colors">
+            <motion.div
+              whileHover={{ scale: 1.08, rotate: 6 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-10 h-10 rounded-xl bg-[#163E2B] text-white flex items-center justify-center shadow-sm group-hover:bg-[#113222] transition-colors"
+            >
               <Leaf className="w-5 h-5 text-emerald-300" strokeWidth={2.2} />
-            </div>
+            </motion.div>
             <div className="flex flex-col">
               <span className="font-bold text-xl tracking-tight text-[#1C2420] dark:text-white leading-tight">
                 FarmEase
@@ -140,15 +315,15 @@ export const Landing: React.FC = () => {
             <a href="#features" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
               Features
             </a>
+            <a href="#interactive-demo" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+              Live Preview
+            </a>
             <a href="#how-it-works" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
               How It Works
             </a>
-            <Link to="/about" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
-              About
-            </Link>
-            <Link to="/contact" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
-              Contact
-            </Link>
+            <a href="#faqs" className="hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors">
+              FAQs
+            </a>
           </nav>
 
           {/* Header Action Buttons */}
@@ -159,122 +334,359 @@ export const Landing: React.FC = () => {
             >
               Sign In
             </Link>
-            <Link
-              to="/dashboard"
-              className="px-5 py-2.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5"
-            >
-              Get Started <ChevronRight className="w-4 h-4" />
-            </Link>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                to="/dashboard"
+                className="px-5 py-2.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5"
+              >
+                Get Started <ChevronRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
           </div>
         </div>
       </header>
 
       {/* ─── Hero Section ─── */}
-      <section className="px-6 pt-12 pb-20 lg:pt-16 lg:pb-24 max-w-7xl mx-auto w-full">
+      <section className="px-6 pt-10 pb-20 lg:pt-14 lg:pb-24 max-w-7xl mx-auto w-full relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Hero Content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-7 space-y-6 text-left"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 border border-[#163E2B]/20 dark:border-emerald-500/30 text-[#163E2B] dark:text-emerald-400 text-xs font-semibold tracking-wide">
-              <Shield className="w-3.5 h-3.5 text-[#163E2B] dark:text-emerald-400" />
-              Professional Livestock Management Platform
-            </div>
+            {/* Animated live pill badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 border border-[#163E2B]/20 dark:border-emerald-500/30 text-[#163E2B] dark:text-emerald-400 text-xs font-semibold tracking-wide shadow-sm"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span>Smart Cattle OS & Field Intelligence 2026</span>
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1C2420] dark:text-white leading-[1.12]">
+            {/* Hero Main Heading with glowing gradient text */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#1C2420] dark:text-white leading-[1.12]">
               Smart Cattle Management,{' '}
-              <span className="text-[#163E2B] dark:text-emerald-400">Simplified.</span>
+              <span className="bg-gradient-to-r from-[#163E2B] via-emerald-600 to-teal-500 dark:from-emerald-300 dark:via-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
+                Simplified & Automated.
+              </span>
             </h1>
 
             <p className="text-base sm:text-lg text-[#526258] dark:text-slate-300 max-w-2xl leading-relaxed">
-              Manage cattle health, purchases, vaccinations, breeding, milk records and farm operations from one connected platform.
+              Digitize your entire dairy & livestock operations. Manage pedigree breeding, automated 283-day calving alerts, daily milk quality logs, and QR ear tags in one unified platform.
             </p>
 
-            {/* CTAs */}
+            {/* Interactive CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-              <Link
-                to="/register"
-                className="px-8 py-3.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2 group"
-              >
-                Get Started Free
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/dashboard"
-                className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-700 hover:border-[#163E2B]/40 text-[#1C2420] dark:text-slate-200 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2"
-              >
-                Launch Live Demo
-              </Link>
+              <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  to="/register"
+                  className="px-8 py-3.5 rounded-xl bg-[#163E2B] hover:bg-[#113222] text-white font-semibold text-sm transition-all shadow-md flex items-center justify-center gap-2 group w-full"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  to="/dashboard"
+                  className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-700 hover:border-[#163E2B]/50 hover:bg-[#FAF8F5] dark:hover:bg-[#1C2B22] text-[#1C2420] dark:text-slate-200 font-semibold text-sm transition-all shadow-sm flex items-center justify-center gap-2 w-full"
+                >
+                  <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  Launch Live Demo
+                </Link>
+              </motion.div>
             </div>
 
-            {/* Quick Farm Metrics */}
+            {/* Quick Live Farm Metrics Cards with hover lift */}
             <div className="pt-8 border-t border-[#E5E2D7] dark:border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">Healthy Cattle</div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Digital Herd Profiles</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">Vaccinations</div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Scheduled Alerts</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">Milk Records</div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Daily Production Log</div>
-              </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">QR Ear Tags</div>
-                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Instant Field Verification</div>
-              </div>
+              <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
+                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                  <span>99.4%</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                </div>
+                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Herd Health Rate</div>
+              </motion.div>
+
+              <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
+                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                  <span>283-Day</span>
+                </div>
+                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Calving Predictor</div>
+              </motion.div>
+
+              <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
+                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                  <span>+18.5%</span>
+                  <TrendingUp className="w-4 h-4 text-emerald-500" />
+                </div>
+                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">Average Milk Gain</div>
+              </motion.div>
+
+              <motion.div whileHover={{ y: -4 }} className="space-y-0.5 p-2 rounded-xl transition-colors">
+                <div className="text-2xl font-bold text-[#1C2420] dark:text-white flex items-center gap-1.5">
+                  <span>Instant</span>
+                  <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-xs text-[#526258] dark:text-slate-400 font-medium">QR Tag Scan</div>
+              </motion.div>
             </div>
           </motion.div>
 
-          {/* Right Hero Image Card */}
+          {/* Right Hero Interactive Visual Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
             className="lg:col-span-5 relative"
           >
-            <div className="relative rounded-2xl overflow-hidden border border-[#E5E2D7] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-md">
-              <img
-                src="/hero-farm.jpg"
-                alt="Healthy cattle grazing on modern farm"
-                className="w-full h-80 sm:h-96 object-cover"
-              />
+            {/* Gentle ambient glow ring */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-70" />
+
+            {/* Continuous Floating Container */}
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+              className="relative rounded-2xl overflow-hidden border border-[#E5E2D7] dark:border-slate-800 bg-white dark:bg-[#142019] shadow-xl"
+            >
+              {/* Cattle Hero Image with Animated Laser Scan Overlay */}
+              <div className="relative overflow-hidden group">
+                <img
+                  src="/hero-farm.jpg"
+                  alt="Healthy cattle grazing on modern farm"
+                  className="w-full h-80 sm:h-96 object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+
+                {/* Animated Laser Scan Effect */}
+                <motion.div
+                  initial={{ top: '0%' }}
+                  animate={{ top: ['0%', '100%', '0%'] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                  className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#10b981] opacity-80 pointer-events-none"
+                />
+
+                {/* Floating Top Badge: Live Ear Tag */}
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/20 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg"
+                >
+                  <Scan className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  <span>Ear Tag: CAT-2026-0891</span>
+                </motion.div>
+
+                {/* Floating Bottom Left Badge: Fresh Yield */}
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                  className="absolute bottom-4 left-4 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3.5 py-2 rounded-xl text-xs shadow-lg flex items-center gap-2.5"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                    <Milk className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-[#1C2420] dark:text-white">18.5 Liters</div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">+14% vs 7d avg</div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Bottom Right Badge: Health status */}
+                <motion.div
+                  animate={{ scale: [1, 1.03, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute bottom-4 right-4 bg-white/95 dark:bg-[#121E17]/95 backdrop-blur-md border border-[#E5E2D7] dark:border-slate-700/80 px-3 py-2 rounded-xl text-xs shadow-lg flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-semibold text-[#1C2420] dark:text-white">Vitals Optimal</span>
+                </motion.div>
+              </div>
+
+              {/* Card Meta Details */}
               <div className="p-5 bg-white dark:bg-[#142019] border-t border-[#E5E2D7] dark:border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                    </span>
                     <span className="text-xs font-bold text-[#1C2420] dark:text-white">
-                      Farm System Online
+                      Farm Sensor Hub Online
                     </span>
                   </div>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400">
-                    ID: CAT-2026-0891
+                    Gir Native Purebred
                   </span>
                 </div>
+
                 <div className="grid grid-cols-2 gap-2 text-xs text-[#526258] dark:text-slate-300">
                   <div className="bg-[#FAF8F5] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E5E2D7] dark:border-slate-700/60">
-                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Breed</span>
-                    <strong className="text-[#1C2420] dark:text-white font-semibold">Gir / Indian Native</strong>
+                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Lactation Stage</span>
+                    <strong className="text-[#1C2420] dark:text-white font-semibold">2nd Calving (Peak)</strong>
                   </div>
                   <div className="bg-[#FAF8F5] dark:bg-[#1C2B22] p-2.5 rounded-lg border border-[#E5E2D7] dark:border-slate-700/60">
-                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Daily Milk Yield</span>
-                    <strong className="text-[#163E2B] dark:text-emerald-400 font-semibold">18.5 Liters / Day</strong>
+                    <span className="block text-[11px] text-[#526258] dark:text-slate-400">Next Vaccination</span>
+                    <strong className="text-[#163E2B] dark:text-emerald-400 font-semibold">FMD Due in 12d</strong>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* ─── Features Section ─── */}
-      <section id="features" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
-        <div className="max-w-7xl mx-auto space-y-14">
+      {/* ─── Interactive Live Preview Module (NEW ANIMATED EXPERIENCE) ─── */}
+      <section id="interactive-demo" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3.5 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10 inline-flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" />
+              Interactive Simulation
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+              Experience the Farm Management Dashboard
+            </h2>
+            <p className="text-sm text-[#526258] dark:text-slate-300">
+              Switch through live operational modules below to preview how FarmEase handles your daily farm chores.
+            </p>
+          </div>
+
+          {/* Interactive Navigation Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 max-w-3xl mx-auto">
+            {DEMO_TABS.map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 relative ${
+                    isActive
+                      ? 'bg-[#163E2B] text-white shadow-md'
+                      : 'bg-[#FAF8F5] dark:bg-[#15221B] text-[#526258] dark:text-slate-300 hover:text-[#163E2B] dark:hover:text-white border border-[#E5E2D7] dark:border-slate-800'
+                  }`}
+                >
+                  <TabIcon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute inset-0 border-2 border-emerald-400/30 rounded-xl pointer-events-none"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Animated Tab Content Box */}
+          <div className="max-w-4xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="bg-[#FAF8F5] dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-lg relative overflow-hidden"
+              >
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#E5E2D7] dark:border-slate-800/80">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                      {currentTab.content.tag}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#1C2420] dark:text-white">
+                      {currentTab.content.title}
+                    </h3>
+                    <p className="text-xs text-[#526258] dark:text-slate-400">
+                      {currentTab.content.detail}
+                    </p>
+                  </div>
+                  <div className="bg-white dark:bg-[#1A2A21] px-5 py-3 rounded-2xl border border-[#E5E2D7] dark:border-slate-700 shadow-sm text-right shrink-0">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#163E2B] dark:text-emerald-400">
+                      {currentTab.content.metric}
+                    </div>
+                    <div className="text-[11px] text-[#526258] dark:text-slate-400 font-medium">
+                      {currentTab.content.subtext}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3 Detailed Stat Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                  >
+                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                      {currentTab.content.stat1.label}
+                    </div>
+                    <div className="text-lg font-bold text-[#1C2420] dark:text-white">
+                      {currentTab.content.stat1.val}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                  >
+                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                      {currentTab.content.stat2.label}
+                    </div>
+                    <div className="text-lg font-bold text-[#1C2420] dark:text-white">
+                      {currentTab.content.stat2.val}
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-white dark:bg-[#18261E] p-4 rounded-2xl border border-[#E5E2D7] dark:border-slate-800"
+                  >
+                    <div className="text-xs text-[#526258] dark:text-slate-400 mb-1">
+                      {currentTab.content.stat3.label}
+                    </div>
+                    <div className="text-lg font-bold text-[#163E2B] dark:text-emerald-400">
+                      {currentTab.content.stat3.val}
+                    </div>
+                  </motion.div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between text-xs text-[#526258] dark:text-slate-400 pt-4 border-t border-[#E5E2D7]/60 dark:border-slate-800/60">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    Automated data validation active
+                  </span>
+                  <Link
+                    to="/dashboard"
+                    className="font-semibold text-[#163E2B] dark:text-emerald-400 hover:underline flex items-center gap-1"
+                  >
+                    Open Live Module <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Features Section (ANIMATED CARDS) ─── */}
+      <section id="features" className="px-6 py-20 max-w-7xl mx-auto w-full">
+        <div className="space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Core Modules
@@ -287,24 +699,41 @@ export const Landing: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {FEATURES.map((item, i) => {
               const Icon = item.icon;
               return (
                 <motion.div
                   key={i}
                   custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeUp}
-                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#163E2B]/40 transition-colors group"
+                  variants={fadeInUp}
+                  whileHover={{ y: -8, scale: 1.015 }}
+                  transition={{ duration: 0.25 }}
+                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-4 hover:border-[#163E2B]/40 hover:shadow-lg transition-all group relative overflow-hidden"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center group-hover:bg-[#163E2B] group-hover:text-white transition-colors">
-                    <Icon className="w-6 h-6" strokeWidth={2} />
+                  {/* Subtle hover gradient glow */}
+                  <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+
+                  <div className="flex items-center justify-between">
+                    <motion.div
+                      whileHover={{ rotate: 12, scale: 1.1 }}
+                      className="w-12 h-12 rounded-xl bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center group-hover:bg-[#163E2B] group-hover:text-white transition-colors shadow-sm"
+                    >
+                      <Icon className="w-6 h-6" strokeWidth={2} />
+                    </motion.div>
+                    <span className="text-[11px] font-semibold text-[#526258] dark:text-slate-400 px-2.5 py-1 rounded-full bg-[#FAF8F5] dark:bg-[#1A2820] border border-[#E5E2D7] dark:border-slate-700/60">
+                      {item.badge}
+                    </span>
                   </div>
+
                   <div>
-                    <h3 className="font-bold text-base text-[#1C2420] dark:text-white mb-1.5">
+                    <h3 className="font-bold text-base text-[#1C2420] dark:text-white mb-1.5 group-hover:text-[#163E2B] dark:group-hover:text-emerald-400 transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
@@ -314,13 +743,13 @@ export const Landing: React.FC = () => {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="px-6 py-20 max-w-7xl mx-auto w-full">
-        <div className="space-y-14">
+      {/* ─── How It Works (ANIMATED PIPELINE) ─── */}
+      <section id="how-it-works" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+        <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Simple Process
@@ -333,35 +762,51 @@ export const Landing: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {STEPS.map((step, i) => (
-              <motion.div
-                key={i}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#163E2B] text-white font-bold text-sm flex items-center justify-center">
-                  {step.step}
-                </div>
-                <h3 className="font-bold text-lg text-[#1C2420] dark:text-white">
-                  {step.title}
-                </h3>
-                <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
-                  {step.desc}
-                </p>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {STEPS.map((step, i) => {
+              const StepIcon = step.icon;
+              return (
+                <motion.div
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  whileHover={{ y: -6 }}
+                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-7 space-y-4 relative hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-[#163E2B] text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                      {step.step}
+                    </div>
+                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <StepIcon className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-lg text-[#1C2420] dark:text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
+                    {step.desc}
+                  </p>
+
+                  <div className="pt-2">
+                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">
+                      ✓ {step.highlight}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ─── Trust & Practical Benefits Section ─── */}
-      <section className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
-        <div className="max-w-7xl mx-auto space-y-12">
+      {/* ─── Practical Benefits Section ─── */}
+      <section className="px-6 py-20 max-w-7xl mx-auto w-full">
+        <div className="space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
               Enterprise Ready
@@ -378,9 +823,15 @@ export const Landing: React.FC = () => {
             {BENEFITS.map((benefit, i) => {
               const Icon = benefit.icon;
               return (
-                <div
+                <motion.div
                   key={i}
-                  className="bg-[#FAF8F5] dark:bg-[#15221B] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-3"
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  whileHover={{ y: -4 }}
+                  className="bg-white dark:bg-[#142019] border border-[#E5E2D7] dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-emerald-500/40 transition-all shadow-sm"
                 >
                   <div className="w-10 h-10 rounded-lg bg-[#163E2B]/10 dark:bg-emerald-500/10 text-[#163E2B] dark:text-emerald-400 flex items-center justify-center">
                     <Icon className="w-5 h-5" />
@@ -391,40 +842,123 @@ export const Landing: React.FC = () => {
                   <p className="text-xs text-[#526258] dark:text-slate-300 leading-relaxed">
                     {benefit.desc}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* ─── Final CTA Banner ─── */}
-      <section className="px-6 py-16 max-w-7xl mx-auto w-full">
-        <div className="bg-[#163E2B] text-white rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-md">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-700/50 mx-auto flex items-center justify-center text-emerald-200">
-            <Leaf className="w-6 h-6" />
+      {/* ─── Animated FAQ Accordion (NEW) ─── */}
+      <section id="faqs" className="px-6 py-20 bg-white dark:bg-[#111C15] border-y border-[#E5E2D7] dark:border-slate-800/80">
+        <div className="max-w-4xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#163E2B] dark:text-emerald-400 px-3 py-1 rounded-full bg-[#163E2B]/10 dark:bg-emerald-500/10">
+              Got Questions?
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1C2420] dark:text-white tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-sm text-[#526258] dark:text-slate-300">
+              Clear answers to help you get the most out of FarmEase.
+            </p>
           </div>
+
+          <div className="space-y-4">
+            {FAQS.map((faq, index) => {
+              const isExpanded = expandedFaq === index;
+              return (
+                <motion.div
+                  key={index}
+                  className="border border-[#E5E2D7] dark:border-slate-800 rounded-2xl bg-[#FAF8F5] dark:bg-[#15221B] overflow-hidden"
+                >
+                  <button
+                    onClick={() => setExpandedFaq(isExpanded ? null : index)}
+                    className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-sm sm:text-base text-[#1C2420] dark:text-white hover:text-[#163E2B] dark:hover:text-emerald-400 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    <motion.div
+                      animate={{ rotate: isExpanded ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="shrink-0 ml-4"
+                    >
+                      <ChevronDown className="w-4 h-4 text-[#526258] dark:text-slate-400" />
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="px-6 pb-5 text-xs sm:text-sm text-[#526258] dark:text-slate-300 leading-relaxed border-t border-[#E5E2D7]/50 dark:border-slate-800/60 pt-3"
+                      >
+                        {faq.a}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Final CTA Banner with Animated Ambient Glow ─── */}
+      <section className="px-6 py-16 max-w-7xl mx-auto w-full relative">
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          transition={{ duration: 0.3 }}
+          className="bg-gradient-to-br from-[#163E2B] via-[#123624] to-[#0A2216] text-white rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-xl relative overflow-hidden"
+        >
+          {/* Animated decorative pulses inside banner */}
+          <motion.div
+            animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.35, 0.15] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-emerald-400/20 blur-2xl pointer-events-none"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.25, 0.1] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+            className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-teal-400/20 blur-2xl pointer-events-none"
+          />
+
+          <motion.div
+            whileHover={{ rotate: 180 }}
+            transition={{ duration: 0.6 }}
+            className="w-12 h-12 rounded-2xl bg-emerald-700/50 mx-auto flex items-center justify-center text-emerald-200 shadow-md"
+          >
+            <Leaf className="w-6 h-6" />
+          </motion.div>
+
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
             Take Control of Your Cattle Records
           </h2>
           <p className="text-sm text-emerald-100/90 max-w-xl mx-auto leading-relaxed">
             Manage your farm with one simple, professional platform. Organize health histories, milk production, and digital identity tags effortlessly.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              to="/register"
-              className="px-8 py-3.5 rounded-xl bg-white text-[#163E2B] hover:bg-emerald-50 font-bold text-sm transition-colors shadow-sm"
-            >
-              Get Started Now
-            </Link>
-            <a
-              href="#features"
-              className="px-8 py-3.5 rounded-xl bg-emerald-800/80 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors border border-emerald-700/60"
-            >
-              Explore Features
-            </a>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 relative z-10">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+              <Link
+                to="/register"
+                className="px-8 py-3.5 rounded-xl bg-white text-[#163E2B] hover:bg-emerald-50 font-bold text-sm transition-colors shadow-md block"
+              >
+                Get Started Now
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+              <a
+                href="#interactive-demo"
+                className="px-8 py-3.5 rounded-xl bg-emerald-800/80 hover:bg-emerald-800 text-white font-semibold text-sm transition-colors border border-emerald-700/60 block"
+              >
+                Explore Interactive Demo
+              </a>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ─── Footer ─── */}
@@ -456,3 +990,5 @@ export const Landing: React.FC = () => {
     </div>
   );
 };
+
+export default Landing;
