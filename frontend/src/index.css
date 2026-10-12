@@ -14,14 +14,14 @@
    ────────────────────────────────────────────────────────────── */
 @layer base {
   :root {
-    /* ── Backgrounds (Rich, high-contrast human SaaS canvas) ── */
-    --bg-primary:     #eef2f6;
+    /* ── Backgrounds (Clean, refined enterprise SaaS canvas) ── */
+    --bg-primary:     #f8fafc;
     --bg-secondary:   #ffffff;
-    --bg-tertiary:    #e2e8f0;
+    --bg-tertiary:    #f1f5f9;
     --bg-card:        #ffffff;
     --bg-card-hover:  #f8fafc;
     --bg-glass:       rgba(255, 255, 255, 0.95);
-    --bg-sidebar:     #0f172a;
+    --bg-sidebar:     #ffffff;
     --bg-input:       #ffffff;
 
     /* ── Text (High contrast, crisp typography) ── */
@@ -30,17 +30,17 @@
     --text-muted:     #64748b;
     --text-inverse:   #ffffff;
 
-    /* ── Borders (Refined, visible structure) ── */
-    --border-base:    #cbd5e1;
-    --border-strong:  #94a3b8;
+    /* ── Borders (Subtle, refined slate) ── */
+    --border-base:    #e2e8f0;
+    --border-strong:  #cbd5e1;
     --border-card:    #e2e8f0;
 
-    /* ── Brand Colors (Vibrant Modern Emerald & Mint) ── */
-    --accent-green:        #059669;
-    --accent-green-light:  #10b981;
-    --accent-green-dark:   #047857;
+    /* ── Brand Colors (Authoritative Forest Emerald) ── */
+    --accent-green:        #047857;
+    --accent-green-light:  #059669;
+    --accent-green-dark:   #065f46;
     --accent-green-subtle: #ecfdf5;
-    --accent-green-glow:   rgba(16, 185, 129, 0.25);
+    --accent-green-glow:   rgba(4, 120, 87, 0.15);
 
     /* ── Status Colors ── */
     --accent-sky:         #0284c7;
