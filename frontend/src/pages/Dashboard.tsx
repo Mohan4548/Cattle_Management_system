@@ -22,6 +22,10 @@ import {
   PieChart as PieIcon, 
   BarChart3, 
   ScanLine,
+  Sparkles,
+  CheckCircle2,
+  Calendar,
+  ChevronRight,
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -236,29 +240,30 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-10">
-      {/* ── Enterprise Command Header ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-              Operational Telemetry Active
+      {/* ── Human-Centered Welcoming Header ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Farm Operations Online
             </span>
-            <span className="text-xs text-slate-400 dark:text-slate-500">
-              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Farm Operations Command Center
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}, {user?.full_name ? user.full_name.split(' ').slice(0, 2).join(' ') : 'Farmer'} 👋
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Real-time cattle diagnostics, milk collection, and livestock financial records.
+          <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
+            {kpi.totalCattle === 0 
+              ? "Your digital farm is ready. Register your first cow or record today's milk harvest to bring your barn to life."
+              : `Managing ${kpi.totalCattle} cattle head. All daily chores and lactation telemetry are up to date.`}
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Time range switcher */}
-          <div className="flex items-center p-0.5 bg-slate-100 dark:bg-slate-800/80 rounded-lg border border-slate-200/80 dark:border-slate-700/80 text-xs font-medium">
+          <div className="flex items-center p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-700/80 text-xs">
             {(['today', 'week', 'month'] as const).map((r) => (
               <button
                 key={r}
@@ -273,34 +278,88 @@ export const Dashboard: React.FC = () => {
               </button>
             ))}
           </div>
-
           <button
             onClick={() => setActiveModal('cattle')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            Register Cattle
+            Add Cattle
           </button>
           <button
             onClick={() => navigate('/qr-scanner')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/60 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-xs cursor-pointer"
           >
-            <ScanLine className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
-            Scan QR Tag
+            <ScanLine className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            Scan QR
           </button>
         </div>
       </div>
 
-      {/* ── Enterprise KPI Command Cards ── */}
+      {/* ── Human-Centered Getting Started Guide (Active when herd is empty) ── */}
+      {kpi.totalCattle === 0 && (
+        <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-slate-50 dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-slate-900 border border-emerald-200/80 dark:border-emerald-800/40 rounded-2xl p-5 shadow-2xs">
+          <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Let's Get Your Farm Started</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Complete these 3 simple steps to start tracking your herd and milk collection</p>
+              </div>
+            </div>
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-100/80 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 shrink-0">
+              Quick Setup
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button
+              onClick={() => setActiveModal('cattle')}
+              className="text-left p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200/60 dark:border-slate-700 hover:border-emerald-600 hover:shadow-xs transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold flex items-center justify-center">1</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all" />
+              </div>
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">Register Your First Cow</h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Add ear tag number, breed (Gir, Jersey, HF), and age.</p>
+            </button>
+            <button
+              onClick={() => setActiveModal('milk')}
+              className="text-left p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200/60 dark:border-slate-700 hover:border-emerald-600 hover:shadow-xs transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-[11px] font-bold flex items-center justify-center">2</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-700 group-hover:translate-x-0.5 transition-all" />
+              </div>
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">Log Milk Collection</h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Record morning and evening liters to track daily farm yield.</p>
+            </button>
+            <button
+              onClick={() => navigate('/qr-scanner')}
+              className="text-left p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200/60 dark:border-slate-700 hover:border-emerald-600 hover:shadow-xs transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300 text-[11px] font-bold flex items-center justify-center">3</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-700 group-hover:translate-x-0.5 transition-all" />
+              </div>
+              <h4 className="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">Scan or Print Ear Tags</h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Generate official digital identity QR cards and passports.</p>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Human-Friendly Farm KPI Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Active Herd */}
+        {/* Card 1: Your Herd */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Registered Herd
+                Your Cattle Herd
               </span>
-              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                 <Beef className="w-4 h-4" />
               </div>
             </div>
@@ -313,22 +372,24 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-              <strong className="text-slate-700 dark:text-slate-300 font-semibold">{kpi.healthyCattle}</strong> Healthy · <strong className="text-slate-700 dark:text-slate-300 font-semibold">{kpi.pregnantCattle}</strong> Gestating
+              {kpi.totalCattle === 0 
+                ? 'Ready to register cattle' 
+                : `${kpi.healthyCattle} Healthy · ${kpi.pregnantCattle} Gestating`}
             </span>
             <Link to="/cattle" className="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline text-[11px]">
-              Roster →
+              {kpi.totalCattle === 0 ? '+ Register' : 'View Roster →'}
             </Link>
           </div>
         </div>
 
-        {/* Card 2: Milk Yield */}
+        {/* Card 2: Milk Harvest */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Daily Harvest Volume
+                Today's Milk Harvest
               </span>
-              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 flex items-center justify-center">
                 <Droplet className="w-4 h-4" />
               </div>
             </div>
@@ -343,22 +404,24 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-              Month to Date: <strong className="text-slate-700 dark:text-slate-300 font-semibold">{kpi.milkThisMonth.toLocaleString()} L</strong>
+              {kpi.milkToday === 0 
+                ? 'No harvest logged today' 
+                : `Month Total: ${kpi.milkThisMonth.toLocaleString()} L`}
             </span>
             <Link to="/milk" className="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline text-[11px]">
-              Logs →
+              {kpi.milkToday === 0 ? '+ Log Milk' : 'Milk Logs →'}
             </Link>
           </div>
         </div>
 
-        {/* Card 3: Financial Net Profit */}
+        {/* Card 3: Farm Net Profit */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Operating Net Margin
+                Farm Net Profit
               </span>
-              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4" />
               </div>
             </div>
@@ -370,7 +433,7 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-              Expenses: ₹{kpi.expenses.toLocaleString('en-IN')}
+              {kpi.expenses === 0 ? 'Revenue minus expenses' : `Expenses: ₹${kpi.expenses.toLocaleString('en-IN')}`}
             </span>
             <Link to="/financials" className="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline text-[11px]">
               Ledger →
@@ -378,14 +441,14 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 4: Action Items & Alerts */}
+        {/* Card 4: Action Items */}
         <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Operational Tasks Due
+                Today's Farm Tasks
               </span>
-              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 flex items-center justify-center">
                 <Bell className="w-4 h-4" />
               </div>
             </div>
@@ -398,7 +461,9 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-              {kpi.vaccinationsDue} Vax Due · {kpi.todaysTasks} Routine Tasks
+              {kpi.vaccinationsDue + kpi.todaysTasks === 0 
+                ? "You're all caught up! 🎉" 
+                : `${kpi.vaccinationsDue} Vax Due · ${kpi.todaysTasks} Chores`}
             </span>
             <Link to="/tasks" className="text-emerald-700 dark:text-emerald-400 font-semibold hover:underline text-[11px]">
               Board →
@@ -407,13 +472,13 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Professional Operations Shortcut Bar ── */}
+      {/* ── Daily Farm Operations Bar ── */}
       <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between mb-3 px-1">
           <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-            Quick Operations
+            Daily Farm Operations
           </span>
-          <span className="text-[11px] text-slate-400">Standard operational logging</span>
+          <span className="text-[11px] text-slate-400">Common actions for your daily routine</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           {[
@@ -457,32 +522,50 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="h-60 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data?.charts?.milkTrend || []} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="totalYieldGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#047857" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#047857" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    border: '1px solid var(--border-card)',
-                    borderRadius: '8px',
-                    color: 'var(--text-primary)',
-                    fontSize: '12px',
-                    boxShadow: 'var(--shadow-sm)',
-                  }}
-                />
-                <Area type="monotone" dataKey="total" name="Total (L)" stroke="#047857" strokeWidth={2.2} fill="url(#totalYieldGrad)" />
-                <Area type="monotone" dataKey="morning" name="Morning" stroke="#d97706" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
-                <Area type="monotone" dataKey="evening" name="Evening" stroke="#7c3aed" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {(!data?.charts?.milkTrend || data.charts.milkTrend.every(m => m.total === 0)) ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-2">
+                  <Milk className="w-5 h-5" />
+                </div>
+                <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">No Milk Production Records Yet</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xs mt-1">
+                  Start logging your morning and evening collections to visualize daily production curves.
+                </p>
+                <button
+                  onClick={() => setActiveModal('milk')}
+                  className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold cursor-pointer transition-all shadow-2xs"
+                >
+                  + Record First Milk Batch
+                </button>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data?.charts?.milkTrend || []} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="totalYieldGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#047857" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#047857" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-card)',
+                      borderRadius: '8px',
+                      color: 'var(--text-primary)',
+                      fontSize: '12px',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                  />
+                  <Area type="monotone" dataKey="total" name="Total (L)" stroke="#047857" strokeWidth={2.2} fill="url(#totalYieldGrad)" />
+                  <Area type="monotone" dataKey="morning" name="Morning" stroke="#d97706" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
+                  <Area type="monotone" dataKey="evening" name="Evening" stroke="#7c3aed" strokeWidth={1.5} fill="transparent" strokeDasharray="4 2" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -495,37 +578,51 @@ export const Dashboard: React.FC = () => {
             </h3>
 
             <div className="h-44 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={breedData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={46}
-                    outerRadius={68}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {breedData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-card)',
-                      border: '1px solid var(--border-card)',
-                      borderRadius: '8px',
-                      color: 'var(--text-primary)',
-                      fontSize: '12px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {breedData.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-4 bg-slate-50/50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                  <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-1.5">
+                    <Beef className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">No Cattle Registered</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Add cows to view your herd's genetic breed distribution.
+                  </p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={breedData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={46}
+                      outerRadius={68}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {breedData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'var(--bg-card)',
+                        border: '1px solid var(--border-card)',
+                        borderRadius: '8px',
+                        color: 'var(--text-primary)',
+                        fontSize: '12px',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
           <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
-            {breedData.map((item) => (
+            {breedData.length === 0 ? (
+              <p className="text-[11px] text-slate-400 text-center py-1">0 breeds recorded</p>
+            ) : breedData.map((item) => (
               <div key={item.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -556,25 +653,37 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="h-60 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.charts?.financialTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    border: '1px solid var(--border-card)',
-                    borderRadius: '8px',
-                    color: 'var(--text-primary)',
-                    fontSize: '12px',
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', color: 'var(--text-secondary)' }} />
-                <Bar dataKey="income" name="Income" fill="#047857" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {(!data?.charts?.financialTrend || data.charts.financialTrend.every(f => f.income === 0 && f.expense === 0)) ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-2">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">Financial Ledger is Fresh</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xs mt-1">
+                  Log milk sales and feed expenses to see your revenue and operating profit comparison.
+                </p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data?.charts?.financialTrend || []} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-card)" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-card)',
+                      borderRadius: '8px',
+                      color: 'var(--text-primary)',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', color: 'var(--text-secondary)' }} />
+                  <Bar dataKey="income" name="Income" fill="#047857" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="expense" name="Expense" fill="#e11d48" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -591,9 +700,12 @@ export const Dashboard: React.FC = () => {
 
             <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
               {filteredActivities.length === 0 ? (
-                <div className="p-8 text-center">
-                  <Activity className="w-6 h-6 mx-auto text-slate-300 mb-1" />
-                  <p className="text-xs text-slate-400">No operational activity recorded yet</p>
+                <div className="p-8 text-center bg-slate-50/50 dark:bg-slate-800/20 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                  <Activity className="w-6 h-6 mx-auto text-slate-300 dark:text-slate-600 mb-1" />
+                  <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300">Ready for Farm Activity</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Any milk logged, animals registered, or chores completed will appear here in real time.
+                  </p>
                 </div>
               ) : filteredActivities.map((act) => (
                 <div
