@@ -54,7 +54,7 @@ export const App: React.FC = () => {
         <ThemeProvider>
           <AuthProvider>
             <ToastProvider>
-              <BrowserRouter>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Routes>
                   {/* Public Marketing & Informational Routes */}
                   <Route path="/" element={<Landing />} />

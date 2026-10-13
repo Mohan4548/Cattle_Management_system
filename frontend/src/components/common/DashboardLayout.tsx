@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { MobileBottomNav } from './MobileBottomNav';
+import { AICopilotWidget } from '../ai/AICopilotWidget';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -90,6 +91,9 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
 
       {/* ── Mobile Bottom Navigation ── */}
       <MobileBottomNav />
+
+      {/* ── Floating FarmEase AI Copilot ── */}
+      <AICopilotWidget />
     </div>
   );
 };

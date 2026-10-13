@@ -124,12 +124,14 @@ export async function resolveQRPayload(rawPayload: string): Promise<QRResolveRes
     };
   }
 
-  // 3. Try resolving via digital identity slug endpoint
+  // 3. Resolve via safe unified resolver (returns 200 with { found: boolean }, zero console errors)
   try {
-    const res = await apiClient.get(`/identity/slug/${encodeURIComponent(slug)}`);
-    const data = res.data;
+    const res = await apiClient.get('/identity/resolve', {
+      params: { code: slug }
+    });
 
-    if (data?.cattle_id) {
+    if (res.data?.found && res.data?.data) {
+      const data = res.data.data;
       const info: ScannedCattleInfo = {
         cattle_id: data.cattle_id,
         cattle_name: data.cattle_name ?? 'Unknown',
@@ -146,7 +148,6 @@ export async function resolveQRPayload(rawPayload: string): Promise<QRResolveRes
       return { success: true, cattle: info };
     }
   } catch (err: any) {
-    // If not a 404, or if 404 let's try direct cattle API lookup below
     const status = err?.response?.status;
     if (status === 401 || status === 403) {
       return {
@@ -158,63 +159,6 @@ export async function resolveQRPayload(rawPayload: string): Promise<QRResolveRes
         },
       };
     }
-  }
-
-  // 4. Fallback: try direct cattle endpoint (/cattle/:id)
-  try {
-    const cattleRes = await apiClient.get(`/cattle/${encodeURIComponent(slug)}`);
-    const c = cattleRes.data;
-    if (c?.id) {
-      const info: ScannedCattleInfo = {
-        cattle_id: c.id,
-        cattle_name: c.name ?? 'Unknown',
-        cattle_tag: c.tag_id ?? c.tag_number ?? 'N/A',
-        breed: c.breed ?? 'Unknown',
-        age: c.age,
-        health_status: c.health_status ?? c.status ?? 'healthy',
-        lactation_stage: c.lactation_stage ?? 'mid',
-        image_url: c.image_url ?? c.photo_url ?? '',
-        digital_identity_id: c.digital_identity_id ?? `CAT-2026-${c.id}`,
-        public_profile_slug: c.public_profile_slug ?? slug,
-        qr_status: c.qr_status ?? 'active',
-      };
-      return { success: true, cattle: info };
-    }
-  } catch {
-    // Continue to tag search fallback
-  }
-
-  // 5. Fallback: search all cattle list for matching tag_id or tag_number
-  try {
-    const listRes = await apiClient.get('/cattle');
-    const allCattle = Array.isArray(listRes.data) ? listRes.data : listRes.data?.data;
-    if (Array.isArray(allCattle)) {
-      const match = allCattle.find((c: any) =>
-        c.id?.toLowerCase() === slug ||
-        c.tag_id?.toLowerCase() === slug ||
-        c.tag_number?.toLowerCase() === slug ||
-        c.digital_identity_id?.toLowerCase() === slug ||
-        c.public_profile_slug?.toLowerCase() === slug
-      );
-      if (match) {
-        const info: ScannedCattleInfo = {
-          cattle_id: match.id,
-          cattle_name: match.name ?? 'Unknown',
-          cattle_tag: match.tag_id ?? match.tag_number ?? 'N/A',
-          breed: match.breed ?? 'Unknown',
-          age: match.age,
-          health_status: match.health_status ?? match.status ?? 'healthy',
-          lactation_stage: match.lactation_stage ?? 'mid',
-          image_url: match.image_url ?? match.photo_url ?? '',
-          digital_identity_id: match.digital_identity_id ?? `CAT-2026-${match.id}`,
-          public_profile_slug: match.public_profile_slug ?? slug,
-          qr_status: match.qr_status ?? 'active',
-        };
-        return { success: true, cattle: info };
-      }
-    }
-  } catch {
-    // If all fail, return unknown cattle error
   }
 
   return {

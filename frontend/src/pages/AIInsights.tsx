@@ -4,6 +4,8 @@ import { apiClient } from '../api/client';
 import { AIHealthInsightsSummary, CattleAttentionItem, SmartNotification } from '../types';
 import { Badge } from '../components/common/Badge';
 import { FarmBreedingIntelligence } from '../modules/breeding/components/FarmBreedingIntelligence';
+import { AIMilkForecastSection } from '../modules/milk/components/AIMilkForecastSection';
+import { AIImageDiagnosticModal } from '../components/ai/AIImageDiagnosticModal';
 import {
   Sparkles,
   RefreshCw,
@@ -26,7 +28,10 @@ import {
   Check,
   Bell,
   CheckCheck,
-  Heart
+  Heart,
+  Milk,
+  Camera,
+  Bot
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -45,8 +50,9 @@ import {
 export const AIInsights: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') === 'breeding' ? 'breeding' : 'health';
-  const [activeTab, setActiveTab] = useState<'health' | 'breeding'>(initialTab);
+  const rawTab = searchParams.get('tab');
+  const initialTab = (rawTab === 'breeding' || rawTab === 'milk' || rawTab === 'diagnostic') ? rawTab : 'health';
+  const [activeTab, setActiveTab] = useState<'health' | 'breeding' | 'milk' | 'diagnostic'>(initialTab as any);
 
   const [data, setData] = useState<AIHealthInsightsSummary | null>(null);
   const [notifications, setNotifications] = useState<SmartNotification[]>([]);
@@ -54,7 +60,7 @@ export const AIInsights: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTabChange = (tab: 'health' | 'breeding') => {
+  const handleTabChange = (tab: 'health' | 'breeding' | 'milk' | 'diagnostic') => {
     setActiveTab(tab);
     setSearchParams({ tab });
   };
@@ -162,10 +168,10 @@ export const AIInsights: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-fit">
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full sm:w-fit overflow-x-auto scrollbar-none">
         <button
           onClick={() => handleTabChange('health')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
             activeTab === 'health'
               ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -177,19 +183,47 @@ export const AIInsights: React.FC = () => {
 
         <button
           onClick={() => handleTabChange('breeding')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
             activeTab === 'breeding'
               ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <Heart className="w-4 h-4" />
-          Breeding & Pregnancy Intelligence
+          Breeding Intelligence
+        </button>
+
+        <button
+          onClick={() => handleTabChange('milk')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+            activeTab === 'milk'
+              ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Milk className="w-4 h-4" />
+          30-Day Milk Forecast & Feed AI
+        </button>
+
+        <button
+          onClick={() => handleTabChange('diagnostic')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+            activeTab === 'diagnostic'
+              ? 'bg-white dark:bg-slate-800 text-violet-600 dark:text-violet-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Camera className="w-4 h-4" />
+          AI Image Diagnostic
         </button>
       </div>
 
       {activeTab === 'breeding' ? (
         <FarmBreedingIntelligence />
+      ) : activeTab === 'milk' ? (
+        <AIMilkForecastSection />
+      ) : activeTab === 'diagnostic' ? (
+        <AIImageDiagnosticModal />
       ) : (
         <>
           {/* Auto-generated AI Summary Banner */}
@@ -552,12 +586,30 @@ export const AIInsights: React.FC = () => {
                     Last Analyzed: {new Date(item.lastAnalysis).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </span>
 
-                  <button
-                    onClick={() => navigate(`/cattle/${item.id}`)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> View Profile
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('open-ai-copilot', {
+                            detail: {
+                              query: `Analyze clinical health risk for cattle ${item.name} (${item.tag_number}). Main risk factor: ${item.mainFactor} - ${item.factorDescription}`,
+                            },
+                          })
+                        );
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all cursor-pointer border border-emerald-500/20"
+                      title="Consult AI Copilot regarding this animal"
+                    >
+                      <Bot className="w-3.5 h-3.5" /> Ask AI Vet
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/cattle/${item.id}`)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View Profile
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

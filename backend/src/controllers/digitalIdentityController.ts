@@ -143,6 +143,69 @@ export const getIdentityBySlug = async (req: Request, res: Response) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// GET /identity/resolve?code=... — Safe resolver that never returns 404
+// ─────────────────────────────────────────────────────────────────────────────
+export const resolveQR = async (req: Request, res: Response) => {
+  const code = (req.query.code || req.query.query || req.query.slug || '').toString().trim();
+  if (!code) {
+    return res.json({ found: false, message: 'No search code provided' });
+  }
+
+  try {
+    const clean = code.toLowerCase();
+    let identity = digitalIdentityService.getIdentityBySlug(clean);
+
+    if (!identity) {
+      identity = digitalIdentityService.getIdentityByDigitalId(code.toUpperCase());
+    }
+
+    let cattle = identity ? store.cattle.find((c: any) => c.id === identity?.cattle_id) : null;
+    if (!cattle) {
+      cattle = store.cattle.find((c: any) =>
+        c.id?.toLowerCase() === clean ||
+        c.tag_id?.toLowerCase() === clean ||
+        c.tag_number?.toLowerCase() === clean ||
+        c.name?.toLowerCase() === clean ||
+        (c.tag_number && c.tag_number.toLowerCase().includes(clean)) ||
+        (c.tag_id && c.tag_id.toLowerCase().includes(clean))
+      ) ?? null;
+
+      if (cattle && !identity) {
+        identity = digitalIdentityService.getIdentityByCattleId(cattle.id)
+          ?? digitalIdentityService.ensureIdentityForCattle(cattle);
+      }
+    }
+
+    if (!cattle) {
+      return res.json({
+        found: false,
+        message: `No active cattle record found matching identifier "${code}".`
+      });
+    }
+
+    return res.json({
+      found: true,
+      data: {
+        cattle_id: cattle.id,
+        cattle_name: cattle.name ?? 'Unknown',
+        cattle_tag: cattle.tag_id ?? cattle.tag_number ?? 'N/A',
+        breed: cattle.breed ?? 'Unknown',
+        age: cattle.age,
+        health_status: cattle.health_status ?? cattle.status ?? 'healthy',
+        lactation_stage: cattle.lactation_stage ?? 'mid',
+        image_url: cattle.image_url ?? cattle.photo_url ?? '',
+        digital_identity_id: identity?.digital_identity_id ?? `CAT-2026-${cattle.id}`,
+        public_profile_slug: identity?.public_profile_slug ?? clean,
+        qr_status: identity?.qr_status ?? 'active',
+        public_profile_url: `/farm/cattle/${identity?.public_profile_slug || clean}`,
+      }
+    });
+  } catch (err: any) {
+    return res.json({ found: false, message: err.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // GET /identity/:cattleId — Get the Digital Identity for a specific cattle
 // ─────────────────────────────────────────────────────────────────────────────
 export const getIdentityByCattleId = async (req: Request, res: Response) => {

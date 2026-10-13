@@ -6,5 +6,6 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'farmease-super-secret-production-jwt-key-2026',
   supabaseUrl: process.env.SUPABASE_URL || '',
   supabaseKey: process.env.SUPABASE_ANON_KEY || '',
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
   nodeEnv: process.env.NODE_ENV || 'development',
 };

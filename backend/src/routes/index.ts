@@ -15,6 +15,7 @@ import * as cattleDiseaseDiagnosticController from '../controllers/cattleDisease
 import * as whatsappAlertController from '../controllers/whatsappAlertController.js';
 import * as notificationController from '../controllers/notificationController.js';
 import * as cattleBreedingAnalysisController from '../controllers/cattleBreedingAnalysisController.js';
+import * as aiController from '../controllers/aiController.js';
 import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -72,6 +73,12 @@ router.post('/breeding/register-calf', authenticateToken, requireRole(['admin', 
 router.get('/cattle/:id/breeding-insights', authenticateToken, cattleBreedingAnalysisController.getBreedingInsight);
 router.get('/farm/breeding-insights', authenticateToken, cattleBreedingAnalysisController.getFarmBreedingInsights);
 
+// ─── Advanced AI Suite Routes ───────────────────────────────────────────
+router.post('/ai/copilot/chat', authenticateToken, aiController.chatWithAICopilot);
+router.get('/ai/copilot/suggestions', authenticateToken, aiController.getCopilotSuggestions);
+router.get('/ai/forecast/milk', authenticateToken, aiController.getMilkForecast);
+router.post('/ai/diagnostic/image', authenticateToken, aiController.analyzeDiagnosticImage);
+
 // Feed & Inventory Routes
 router.get('/inventory', authenticateToken, inventoryController.getInventory);
 router.post('/inventory', authenticateToken, requireRole(['admin', 'farmer']), inventoryController.createInventoryItem);
@@ -122,6 +129,9 @@ router.get('/identity/all', authenticateToken, requireRole(['admin', 'farmer']),
 
 // Validate a Digital Identity ID string
 router.get('/identity/validate/:digitalIdentityId', authenticateToken, digitalIdentityController.validateIdentity);
+
+// Safe QR / Identifier resolver (always returns 200 with { found: boolean }, never generates 404 in console)
+router.get('/identity/resolve', authenticateToken, digitalIdentityController.resolveQR);
 
 // [Phase 3] Resolve a public_profile_slug to identity (used by QR Scanner)
 router.get('/identity/slug/:slug', authenticateToken, digitalIdentityController.getIdentityBySlug);
